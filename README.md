@@ -107,3 +107,10 @@ docker build . -t nextjs-starter-shadcn -f Dockerfile.bun
 docker run -p 3000:3000 nextjs-starter-shadcn
 ```
 <p style="text-align: center;"> With ❤️ from 🇮🇳 </p>
+
+Landing page Inspiration
+
+https://www.youtube.com/watch?v=ctAl4eCCtJ4
+
+https://github.com/PiusLucky/lms-landing-page
+

@@ -4,8 +4,11 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 
 import { ThemeProvider } from 'next-themes';
+import { SidebarProvider } from "../registry/new-york-v4/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 import '@/app/globals.css';
 import { Toaster } from '@/registry/new-york-v4/ui/sonner';
+import { NavbarWrapper } from '@/components/navbar/navbar';
 
 const geistSans = localFont({
     src: './fonts/GeistVF.woff',
@@ -25,15 +28,18 @@ export const metadata: Metadata = {
 
 const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
     return (
-        // ? https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
-        // ? https://react.dev/reference/react-dom/client/hydrateRoot#suppressing-unavoidable-hydration-mismatch-errors
         <html suppressHydrationWarning lang='en'>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground overscroll-none antialiased`}>
                 <ThemeProvider attribute='class'>
-                    
-                    {children}
-                    <Toaster />
+                    <SidebarProvider>
+                        <AppSidebar />
+                        <main className='w-full'>
+                            <NavbarWrapper/>
+                            {children}
+                        </main>
+                        <Toaster />
+                    </SidebarProvider>
                 </ThemeProvider>
             </body>
         </html>

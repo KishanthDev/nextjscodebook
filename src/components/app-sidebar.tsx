@@ -2,6 +2,10 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+
+import { NavUser } from '@/registry/new-york-v4/blocks/sidebar-07/components/nav-user';
+import { TeamSwitcher } from '@/registry/new-york-v4/blocks/sidebar-07/components/team-switcher';
+
 import {
   Sidebar,
   SidebarContent,
@@ -9,17 +13,53 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail
 } from '@/registry/new-york-v4/ui/sidebar';
 
-import { LayoutDashboard, MessageCircle } from 'lucide-react';
+import {
+  LayoutDashboard,
+  MessageCircle,
+  Bot,
+  Settings2,
+  GalleryVerticalEnd,
+  AudioWaveform,
+  Command
+} from 'lucide-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = {
+    name: 'shadcn',
+    email: 'm@example.com',
+    avatar: '/avatars/shadcn.jpg'
+  };
+
+  const teams = [
+    {
+      name: 'Acme Inc',
+      logo: GalleryVerticalEnd,
+      plan: 'Enterprise'
+    },
+    {
+      name: 'Acme Corp.',
+      logo: AudioWaveform,
+      plan: 'Startup'
+    },
+    {
+      name: 'Evil Corp.',
+      logo: Command,
+      plan: 'Free'
+    }
+  ];
+
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader />
+      <SidebarHeader>
+        <TeamSwitcher teams={teams} />
+        <SidebarGroup className="py-0 group-data-[collapsible=icon]:hidden" />
+      </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
@@ -31,18 +71,41 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="/chat">
+                <Link href="/chats">
                   <MessageCircle className="mr-2" />
-                  <span>Chat</span>
+                  <span>Chats</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/ai-agent">
+                  <Bot className="mr-2" />
+                  <span>AI Agent</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/chat-customization">
+                  <Settings2 className="mr-2" />
+                  <span>Chat Customization</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+
+      <SidebarFooter>
+        <NavUser user={user} />
+      </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

@@ -25,7 +25,9 @@ import {
   Settings2,
   GalleryVerticalEnd,
   AudioWaveform,
-  Command
+  Command,
+  Circle,
+  MessagesSquare
 } from 'lucide-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -95,6 +97,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <Link href="/html/chatview.html">
                   <Settings2 className="mr-2" />
                   <span>Chat Customization</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/bubble">
+                  <Circle className="mr-2" />
+                  <span>Bubble</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/chat-widget-open">
+                  <MessagesSquare className="mr-2" />
+                  <span>Chat Widget Open</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

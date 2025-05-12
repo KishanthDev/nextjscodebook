@@ -10,7 +10,7 @@ export default function Home() {
         const isLoggedIn = localStorage.getItem("login") === "true";
         if (isLoggedIn) {
             console.log("Home: Redirecting to /dashboard (isLoggedIn=true)");
-            router.push("/home");
+            router.push("/dashboard");
         }
     }, [router]);
 

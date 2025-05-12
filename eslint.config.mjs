@@ -44,6 +44,7 @@ export default [
             '@typescript-eslint/no-unused-expressions': 'off',
             'import/no-unresolved': 'off',
             'import/no-named-as-default': 'off',
+            'newline-before-return': 'off',
             // ! TO COMPILE SHADCN EXAMPLES, PLEASE REMOVE AS NEEDED
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-empty-object-type': 'off',

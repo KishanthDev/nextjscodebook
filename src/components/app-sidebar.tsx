@@ -118,6 +118,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/eye-catcher">
+                  <MessagesSquare className="mr-2" />
+                  <span>Eye Catcher</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/chat-bar">
+                  <MessagesSquare className="mr-2" />
+                  <span>Chat Bar</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

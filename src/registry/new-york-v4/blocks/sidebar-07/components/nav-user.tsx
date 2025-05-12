@@ -13,6 +13,7 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/registry/new-york-v4/ui/sidebar';
 
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 export function NavUser({
     user
@@ -86,7 +87,7 @@ export function NavUser({
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
                             <LogOut />
-                            Log out
+                            <Link href="/auth">Log out</Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

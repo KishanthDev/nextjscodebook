@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Chat Button</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      /* Bubble */
+      --bubble-bg-color: #1f2b37;
+      --bubble-hover-bg-color: #2e3d4e;
+      --bubble-dot-color: #63524b;
+      --bubble-icon-outer-color: #ffffff;
+      --bubble-icon-inner-color: #655858;
+      /* Chat Widget Landing */
+      --modal-gradient-start: #d3d3d3;
+      --modal-gradient-end: #e8e8e8;
+      --modal-title-color: #000000;
+      --chat-preview-bg-color: #4f6aa1;
+      --chat-preview-text-color: #497cd0;
+      --chat-now-btn-bg-color: #000000;
+      --chat-now-btn-text-color: #ffffff;
+      --chat-now-btn-hover-bg-color: #333333;
+      --link-item-bg-color: #f3f4f6;
+      --link-item-text-color: #374151;
+      --landing-icon-bg-color: #ff5101;
+      --landing-icon-fill-color: #ffffff;
+      /* Chat Widget Open */
+      --bubble-bg-color-open: #ffffff;
+      --bubble-border-color: #ff5101;
+      --bubble-title-color: #000000;
+      --bubble-text-color: #374151;
+      --bot-msg-bg-color: #ffffff;
+      --user-msg-bg-color: #8f8f8f;
+      --msg-text-color: #402626;
+      --input-bg-color: #674242;
+      --send-btn-bg-color: #ff0000;
+      --send-btn-icon-color: #ffffff;
+      --bubble-icon-outer-color-open: #ff5101;
+      --bubble-icon-inner-color-open: #ffffff;
+      /* Chat Footer */
+      --chat-footer-bg-color: #f9fafb;
+      --chat-footer-text-color: #6b7280;
+      /* Footer Box and Buttons */
+      --footer-box-bg: #ffffff;
+      --home-btn-bg: #f3f4f6;
+      --livechat-btn-bg: #f3f4f6;
+      --home-btn-icon-color: #374151;
+      --livechat-btn-icon-color: #374151;
+      --hover-bg: #e5e7eb;
+      --hover-icon-color: #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    @keyframes slideUp {
+      0% { transform: translate(80%, 80%) scale(0.2); opacity: 0; }
+      100% { transform: translate(0, 0) scale(1); opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(100%); opacity: 0; }
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+    }
+
+    .animate-slideUp { animation: slideUp 0.5s ease-out forwards; }
+    .animate-slideDown { animation: slideDown 0.2s ease-in forwards; }
+
+    .dot-loader span {
+      animation: bounce 0.6s infinite ease-in-out;
+      background-color: var(--bubble-dot-color);
+    }
+
+    .dot-loader span:nth-child(2) { animation-delay: 0.1s; }
+    .dot-loader span:nth-child(3) { animation-delay: 0.2s; }
+
+    .content-item { transition: background-color 0.3s ease-in-out; }
+
+    .footer-box {
+      background-color: var(--footer-box-bg);
+      transition: background-color 0.3s ease;
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+    }
+
+    .footer-box a {
+      border-radius: 8px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5px;
+      padding: 8px;
+      width: 70px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .footer-box a#homeButton {
+      background-color: var(--home-btn-bg);
+      color: var(--home-btn-icon-color);
+    }
+
+    .footer-box a#liveChatButton {
+      background-color: var(--livechat-btn-bg);
+      color: var(--livechat-btn-icon-color);
+    }
+
+    .footer-box a:hover {
+      background-color: var(--hover-bg);
+      color: var(--hover-icon-color);
+    }
+
+    .footer-box a svg {
+      stroke: currentColor;
+      fill: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      width: 25px;
+      height: 25px;
+    }
+
+    .footer-box a.selected {
+      color: black;
+    }
+
+    .footer-box a.selected svg {
+      fill: black;
+      stroke: none;
+    }
+
+    .footer-box a:hover svg {
+      stroke: var(--hover-icon-color);
+      fill: var(--hover-icon-color);
+    }
+
+    .send-button {
+      display: flex;
+      color: #a9a9a9;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background-color: transparent;
+      border-radius: 8px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      z-index: 10;
+    }
+
+    .send-button.active {
+      background-color: var(--send-btn-bg-color);
+      color: var(--send-btn-icon-color);
+    }
+
+    .send-button.active:hover {
+      background-color: var(--send-btn-bg-color);
+    }
+
+    .send-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .send-button svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    #modalContent {
+      width: 392px;
+      height: 714px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      max-width: 100vw;
+      max-height: 95vh;
+      border: none;
+      margin: 0;
+      background: linear-gradient(to bottom, var(--modal-gradient-start), var(--modal-gradient-end));
+    }
+
+    @media (max-width: 480px) {
+      #modalContent {
+        width: 95vw;
+        height: 95vh;
+        padding: 12px;
+        max-width: 95vw;
+        max-height: 95vh;
+      }
+      .footer-box {
+        padding: 0.5rem;
+        width: calc(100% + 24px);
+        margin-left: -12px;
+        margin-right: -12px;
+      }
+      .footer-box a { font-size: 0.8rem; width: 60px; }
+    }
+
+    @media (min-width: 481px) and (max-width: 768px) {
+      #modalContent { width: 360px; height: 650px; max-width: 95vw; max-height: 90vh; }
+    }
+
+    @media (min-width: 1024px) {
+      #modalContent { width: 392px; height: 714px; }
+    }
+
+    #homeContent, #liveChatContent {
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      flex: 1;
+      width: 100%;
+    }
+
+    #homeContent.active, #liveChatContent.active { display: flex; }
+    #homeContent { padding-bottom: 8px; }
+    #liveChatContent.active ~ .footer-box { display: none; }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 16px;
+      font-size: small;
+      margin-bottom: 8px;
+      color: var(--msg-text-color);
+    }
+
+    .chat-message {
+      position: relative;
+      margin-bottom: 16px;
+      padding: 10px 10px;
+      max-width: 80%;
+      word-wrap: break-word;
+      color: var(--msg-text-color);
+    }
+
+    .chat-message.user {
+      margin-left: auto;
+      background-color: var(--user-msg-bg-color);
+      border-radius: 20px 20px 0 20px;
+    }
+
+    .chat-message:not(.user) {
+      background-color: var(--bot-msg-bg-color);
+      border-radius: 20px 20px 20px 0;
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      gap: 8px;
+      width: 100%;
+      border-top: 1px solid #d1d5db;
+      background-color: #fff;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .input-container input[type="text"] {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      background-color: var(--input-bg-color);
+      color: var(--msg-text-color);
+    }
+
+    .input-container .button-group {
+      display: flex;
+      gap: 6px;
+    }
+
+    .input-container button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #374151;
+    }
+
+    .input-container button:hover { color: #000; }
+
+    .emoji-picker {
+      position: absolute;
+      bottom: 50px;
+      right: 10px;
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px;
+      display: none;
+      flex-wrap: wrap;
+      gap: 4px;
+      width: 140px;
+    }
+
+    .emoji-picker span {
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .emoji-picker span:hover {
+      background: #f3f4f6;
+      border-radius: 4px;
+    }
+
+    .content-item {
+      max-width: 100%;
+      padding: 10px;
+    }
+
+    .content-item a {
+      overflow-wrap: break-word;
+      word-break: break-word;
+      max-width: 100%;
+    }
+
+    .arrow-container {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .content-item:hover .arrow-container {
+      transform: translateX(5px);
+      background-color: #000;
+    }
+
+    .relative.w-full.max-w-md {
+      margin-top: -8px;
+      padding-bottom: 10px;
+      max-width: 95%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #liveChatContent .relative.w-full.max-w-md input[type="text"] {
+      padding: 10px 70px 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+      min-height: 40px;
+      transition: border-color 0.2s ease-in-out;
+    }
+
+    #liveChatContent .relative.w-full.max-w-md input[type="text"]:focus {
+      border-color: #000;
+    }
+
+    #liveChatContent .relative.w-full.max-w-md .absolute.right-2 {
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    #liveChatContent .relative.w-full.max-w-md .absolute.right-2 button {
+      font-size: 18px;
+    }
+
+    .chat-button {
+      background-color: var(--bubble-bg-color);
+    }
+
+    .chat-button:hover {
+      background-color: var(--bubble-hover-bg-color);
+    }
+
+    .chat-button .chat-icon { opacity: 1; transition: none; }
+    .chat-button:hover .chat-icon { opacity: 0; }
+    .chat-button:hover .dot-loader { opacity: 1; }
+
+    .more-options-button {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .more-options-button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30px;
+      height: 30px;
+      background-color: #e5e7eb;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.2s ease-in-out;
+      z-index: -1;
+    }
+
+    .more-options-button:hover::before {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      display: none;
+      flex-direction: column;
+      width: 200px;
+      z-index: 100;
+      margin-top: 8px;
+    }
+
+    .dropdown-menu.active { display: flex; }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      gap: 8px;
+      font-size: 14px;
+      color: #374151;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .dropdown-item:hover { background: #000; color: #fff; }
+    .dropdown-item:hover svg { fill: #fff; }
+
+    .dropdown-item svg {
+      width: 20px;
+      height: 20px;
+      fill: #374151;
+      transition: fill 0.2s ease;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 34px;
+      height: 20px;
+      margin-left: auto;
+    }
+
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider { background-color: #ff5101; }
+    input:checked + .slider:before { transform: translateX(14px); }
+
+    .chat-footer {
+      text-align: center;
+      padding: 4px 0;
+      margin: 0;
+      border-radius: 0 0px 16px 16px;
+      font-size: 12px;
+      color: var(--chat-footer-text-color);
+      background-color: var(--chat-footer-bg-color);
+      border-top: 1px solid #e5e7eb;
+      line-height: 1;
+      margin-top: 16px;
+      margin-left: -16px;
+      margin-right: -16px;
+      margin-bottom: -16px;
+    }
+
+    .company-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .company-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    .company-logo span {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--bubble-title-color);
+    }
+
+    .header-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-buttons button {
+      font-size: 24px;
+      line-height: 1;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #374151;
+      transition: color 0.2s ease;
+    }
+
+    .header-buttons button:hover { color: #000; }
+
+    #homeContent .close-button, #liveChatContent .close-button {
+      position: absolute;
+      top: 0;
+      right: 1rem;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #4b5563;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      .chat-messages { padding: 8px 12px; }
+      .company-logo img { width: 28px; height: 28px; }
+      .company-logo span { font-size: 14px; }
+      .header-buttons button { font-size: 20px; padding: 6px; }
+      #homeContent .close-button, #liveChatContent .close-button {
+        font-size: 2.5rem;
+        right: 0.75rem;
+      }
+      #homeContent h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+    <h1>Welcome to Our Website</h1>
+    <button onclick="alert('Button clicked!')">Click Me</button>
+  </div>
+  <!-- Bubble -->
+  <button type="button" aria-label="Open LiveChat chat widget"
+    class="fixed bottom-5 right-5 border-none rounded-full w-16 h-16 flex items-center justify-center cursor-pointer shadow-lg z-50 transition-colors duration-300 overflow-hidden chat-button">
+    <div class="absolute chat-icon">
+      <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
+        <path fill="var(--bubble-icon-outer-color)"
+          d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z" />
+        <path fill="var(--bubble-icon-inner-color)"
+          d="M19.57,21.68h3.67a2.08,2.08,0,0,0,2.11-1.81,89.86,89.86,0,0,0,0-10.38,1.9,1.9,0,0,0-1.84-1.74,113.15,113.15,0,0,0-15,0A1.9,1.9,0,0,0,6.71,9.49a74.92,74.92,0,0,0-.06,10.38,2,2,0,0,0,2.1,1.81h3.81V26.5Z" />
+      </svg>
+    </div>
+    <div class="flex gap-1 opacity-0 absolute items-end h-3.5 dot-loader transition-opacity duration-300">
+      <span class="block w-1.5 h-1.5 rounded-full"></span>
+      <span class="block w-1.5 h-1.5 rounded-full"></span>
+      <span class="block w-1.5 h-1.5 rounded-full"></span>
+    </div>
+  </button>
+  <!-- Chat Widget Landing -->
+  <div class="fixed bottom-5 right-5 z-50 hidden" id="chatModal" role="dialog" aria-labelledby="modalTitle"
+    aria-hidden="true">
+    <div id="modalContent" class="rounded-2xl shadow-xl animate-slideUp flex flex-col">
+      <div id="homeContent" class="active">
+        <button
+          class="minimize-button close-button"
+          aria-label="Close modal">_</button>
+        <h2 id="modalTitle" class="text-4xl pl-2 pt-9 mb-5 font-bold sm:text-5xl"
+          style="color: var(--modal-title-color);">Chat with us!</h2>
+        <div class="border border-gray-300 rounded-2xl p-3 mb-3"
+          style="background-color: var(--chat-preview-bg-color);">
+          <div class="flex items-start pl-5 pt-5 gap-4">
+            <div class="relative mt-3 rounded-full p-2" style="background-color: orange;">
+              <svg viewBox="0 0 32 32" aria-hidden="true" class="w-6 h-6" style="fill:white;">
+                <path
+                  d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z" />
+              </svg>
+              <span class="absolute top-0 left-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-light text-xs text-black mb-1">LiveChat Bot · 07:41 PM</div>
+              <p class="font-normal sm:text-sm" style="color: var(--chat-preview-text-color);">
+                Engage your customers effortlessly with our powerful LiveChat tools. Interested in...
+              </p>
+            </div>
+          </div>
+          <button type="button"
+            class="chat-now-btn w-full mt-4 p-2 rounded-lg text-lg font-bold flex items-center justify-center gap-1 transition-colors duration-300 sm:text-sm sm:p-3.5"
+            style="background-color: var(--chat-now-btn-bg-color); color: var(--chat-now-btn-text-color);">
+            Chat now
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 fill-current">
+              <path
+                d="M4.3880707,3.17638951 L20.4789623,11.1029371 C20.9743965,11.3469933 21.1781786,11.9464687 20.9341223,12.4419029 C20.8367142,12.6396414 20.6767008,12.7996548 20.4789623,12.8970629 L4.3743554,20.8303668 C3.87892124,21.074423 3.27944584,20.870641 3.03538961,20.3752068 C2.90852242,20.1176664 2.89846393,19.8180217 3.00777474,19.5525533 L6.12545221,11.9794521 L6.12845221,11.9204521 L3.02294371,4.4577144 C2.81072167,3.94783182 3.05202321,3.36245036 3.56190579,3.15022831 C3.82783088,3.03939996 4.12934099,3.04893645 4.3880707,3.17638951 Z M5.892,6.146 L7.91045221,10.9964521 L11.0011069,11.0000006 C11.5533913,11.0006119 12.0006107,11.4488225 12,12.0011069 C11.9993881,12.5533913 11.5511775,13.0006107 10.9988931,13 L7.86945221,12.9964521 L5.865,17.866 L17.773,12 L5.892,6.146 Z" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <div
+            class="border border-gray-300 rounded-xl p-2 mb-2 flex items-center justify-between hover:bg-[#e8e8e8] transition-colors duration-300 group content-item"
+            style="background-color: var(--link-item-bg-color);">
+            <a href="#pricing" class="no-underline text-sm flex items-center gap-2 flex-1 sm:text-sm"
+              style="color: var(--link-item-text-color);">
+              <span>💰</span>
+              Pricing
+            </a>
+            <span
+              class="w-6 h-6 bg-gray-500 border border-gray-300 rounded-full flex items-center justify-center arrow-container">
+              <i class="fas fa-arrow-right text-white text-sm arrow"></i>
+            </span>
+          </div>
+          <div
+            class="border border-gray-300 rounded-xl p-2 mb-2 flex items-center justify-between hover:bg-[#e8e8e8] transition-colors duration-300 group content-item"
+            style="background-color: var(--link-item-bg-color);">
+            <a href="#tour" class="no-underline text-sm flex items-center gap-2 flex-1 sm:text-sm"
+              style="color: var(--link-item-text-color);">
+              <span>👓</span>
+              Take a tour
+            </a>
+            <span
+              class="w-6 h-6 bg-gray-500 border border-gray-300 rounded-full flex items-center justify-center arrow-container">
+              <i class="fas fa-arrow-right text-white text-sm arrow"></i>
+            </span>
+          </div>
+          <div
+            class="border border-gray-300 rounded-xl p-2 mb-2 flex items-center justify-between hover:bg-[#e8e8e8] transition-colors duration-300 group content-item"
+            style="background-color: var(--link-item-bg-color);">
+            <a href="#hire" class="no-underline text-sm flex items-center gap lavender-2 flex-1 sm:text-sm"
+              style="color: var(--link-item-text-color);">
+              <span>🤖</span>
+              Hire AI-powered Chatbot
+            </a>
+            <span
+              class="w-6 h-6 bg-gray-500 border border-gray-300 rounded-full flex items-center justify-center arrow-container">
+              <i class="fas fa-arrow-right text-white text-sm arrow"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- Chat Widget Open -->
+      <div id="liveChatContent">
+        <div class="chat-header border-b pb-2.5 border-gray-900 flex items-center justify-between">
+          <div class="company-logo">
+            <img src="https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png" alt="LiveChat Logo" />
+            <span>LiveChat</span>
+          </div>
+          <div class="header-buttons">
+            <button class="back-button" aria-label="Back to home section">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <button class="more-options-button" aria-label="More options">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <button aria-label="More options">
+              <i class="fas fa-minus minimize-button"></i>
+            </button>
+          </div>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <div class="dropdown-item" onclick="alert('Send transcript clicked')">
+              <svg color="inherit" viewBox="0 0 24 24" aria-hidden="true" class="lc-uz8pkq">
+                <path
+                  d="M5.5,6l6.5,5.7L18.5,6H5.5z M20,7.3l-7.3,6.4c-0.4,0.3-0.9,0.3-1.3,0L4,7.3V17c0,0.6,0.4,1,1,1h14 c0.6,0,1-0.4,1-1V7.3z M5,4h14c1.7,0,3,1.3,3,3v10c0,1.7-1.3,3-3,3H5c-1.7,0-3-1.3-3-3V7C2,5.3,3.3,4,5,4z">
+                </path>
+              </svg>
+              Send transcript
+            </div>
+            <div class="dropdown-item" onclick="alert('Move chat to mobile clicked')">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="lc-uz8pkq">
+                <path
+                  d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H7V4h10v16zm-5-3c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1z" />
+              </svg>
+              Move chat to mobile
+            </div>
+            <div class="dropdown-item">
+              <svg color="inherit" viewBox="0 0 24 24" aria-hidden="true" class="lc-uz8pkq">
+                <path
+                  d="M15,19v-2c2.8,0,5-2.2,5-5s-2.2-5-5-5V5c3.9,0,7,3.1,7,7S18.9,19,15,19z M15,16v-2c1.1,0,2-0.9,2-2s-0.9-2-2-2 V8c2.2,0,4,1.8,4,4S17.2,16,15,16z M7,8l4.3-3.7C11.9,3.7,13,4.1,13,5v14c0,0.9-1.1,1.3-1.7,0.7L7.2,16H4c-0.6,0-1-0.4-1-1V9 c0-0.6,0.4-1,1-1H7z M11,7.4L8.3,9.7C8.1,9.9,7.9,10,7.6,10H5v4h2.6c0.3,0,0.5,0.1,0.7,0.3l2.7,2.3V7.4z">
+                </path>
+              </svg>
+              Sounds
+              <label class="toggle-switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="relative w-full max-w-md">
+          <input type="text" class="input-container" id="messageInput" placeholder="Type a message..." class="w-full"
+            aria-label="Type a message" />
+          <div class="absolute right-2 top-2/5 -translate-y-1 flex items-center">
+            <button class="emoji-button text-black hover:text-black" aria-label="Open emoji picker">
+              <svg color="inherit" viewBox="0 0 32 32" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
+                <g id="emoji-smile" stroke="none" stroke-width="2" fill="none" fill-rule="evenodd"
+                  transform="translate(7, 7)">
+                  <path stroke="currentColor" id="changeable" stroke-linecap="round" stroke-linejoin="round"
+                    d="M0,9 C0,12.2153905 1.71539025,15.1865338 4.5,16.7942289 C7.28460967,18.4019241 10.7153903,18.4019241 13.5,16.7942289 C16.2846097,15.1865338 18,12.2153905 18,9 C18,5.78460984 16.2846098,2.81346659 13.5,1.2057714 C10.7153903,-0.401923799 7.28460966,-0.401923799 4.5,1.2057714 C1.71539023,2.81346659 0,5.78460984 0,9">
+                  </path>
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    d="M6,7.00000019 L6.01,7.00000019 M12,7.00000019 L12.01,7.00000019"></path>
+                  <path
+                    d="M6.5,12.0000002 C7.15831134,12.6718864 8.05935933,13.0505104 9,13.0505104 C9.94064067,13.0505104 10.8416887,12.6718864 11.5,12.0000002"
+                    stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                </g>
+              </svg>
+            </button>
+            <button class="attachment-button text-black hover:text-black" aria-label="Attach file">
+              <svg color="currentColor" viewBox="0 0 32 32" aria-hidden="true" class="w-7 h-7">
+                <g id="attachment-squircle" stroke="none" stroke-width="2" fill="none" fill-rule="evenodd">
+                  <path
+                    d="M16,7 C23.2,7 25,7 25,16 C25,23.2 23.2,25 16,25 C8.8,25 7,23.2 7,16 C7,8.8 7,7 16,7 Z M19,16 L13,16 M16,13 L16,19"
+                    stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" id="changeable"></path>
+                  <path d="M19,16 L13,16 M16,13 L16,19" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                </g>
+              </svg>
+            </button>
+            <button class="send-button rounded-lg p-1" aria-label="Send message">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6">
+                <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            </button>
+          </div>
+          <input type="file" id="attachmentInput" class="hidden" />
+          <div class="emoji-picker hidden absolute bottom-full mb-2 bg-white border rounded shadow-md p-2"
+            id="emojiPicker">
+            <span data-emoji="😊">😊</span>
+            <span data-emoji="👍">👍</span>
+            <span data-emoji="🚀">🚀</span>
+            <span data-emoji="❤️">❤️</span>
+            <span data-emoji="😂">😂</span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border border-gray-300 rounded-3xl shadow-2xl p-2.5 flex justify-between items-center footer-box">
+        <a href="#home"
+          class="no-underline text-sm flex flex-col items-center ml-9 gap-1.5 py-2 px-3 w-20 text-center transition-colors duration-300 font-bold sm:text-xs sm:py-1.5 sm:px-2.5 sm:w-[70px] selected"
+          id="homeButton">
+          <svg viewBox="0 0 24 24" width="25" height="25" class="home-icon">
+            <path d="M3 12l9-9 9 9v9a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2v-9z" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          Home
+        </a>
+        <a href="#livechat"
+          class="no-underline text-sm flex flex-col mr-9 items-center gap-1.5 py-2 px-3 w-20 text-center transition-colors duration-300 sm:text-xs sm:py-1.5 sm:px-2.5 sm:w-[70px]"
+          id="liveChatButton">
+          <svg viewBox="0 0 24 24" width="25" height="25" class="livechat-icon">
+            <path
+              d="M3.046875,12.9375 C1.46776039,9.98739221 2.28831494,6.32568237 4.9753792,4.33158492 C7.66244345,2.33748747 11.4048397,2.61298558 13.770927,4.97907295 C16.1370144,7.34516033 16.4125125,11.0875566 14.4184151,13.7746208 C12.4243176,16.4616851 8.76260779,17.2822396 5.8125,15.703125 L3.21,16.468125 C2.94676941,16.5454268 2.66233667,16.4728351 2.46834451,16.278843 C2.27435236,16.0848508 2.2017607,15.8004181 2.2790625,15.5371875 L3.046875,12.9375 Z"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path
+              d="M15.369375,7.5103125 C17.6739183,7.63560127 19.7547031,8.92965262 20.8861548,10.9412277 C22.0176064,12.9528028 22.0428658,15.4030266 20.953125,17.4375 L21.718125,20.04 C21.7954268,20.3032306 21.7228351,20.5876633 21.528843,20.7816555 C21.3348508,20.9756476 21.0504181,21.0482393 20.7871875,20.9709375 L18.1875,20.203125 C16.4496517,21.13252 14.3925777,21.256597 12.5556181,20.5428245 C10.7186584,19.829052 9.28503442,18.3486227 8.630625,16.4896875"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          LiveChat
+        </a>
+      </div>
+      <div class="chat-footer">Powered by LiveChat</div>
+    </div>
+  </div>
+
+  <script>
+    const chatButton = document.querySelector('.chat-button');
+    const modal = document.getElementById('chatModal');
+    const modalContent = document.getElementById('modalContent');
+    const closeButtons = document.querySelectorAll('.minimize-button');
+    const homeButton = document.getElementById('homeButton');
+    const liveChatButton = document.getElementById('liveChatButton');
+    const homeContent = document.getElementById('homeContent');
+    const liveChatContent = document.getElementById('liveChatContent');
+    const backButton = document.querySelector('.back-button');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.querySelector('.send-button');
+    const chatMessages = document.getElementById('chatMessages');
+    const emojiButton = document.querySelector('.emoji-button');
+    const emojiPicker = document.getElementById('emojiPicker');
+    const attachmentButton = document.querySelector('.attachment-button');
+    const attachmentInput = document.getElementById('attachmentInput');
+    const moreOptionsButton = document.querySelector('.more-options-button');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    let chatHistory = [];
+
+    const predefinedMessages = [
+      {
+        sender: 'LiveChat Bot',
+        timestamp: '07:41 PM',
+        text: 'Engage your customers effortlessly with our powerful LiveChat tools. Interested in exploring more?'
+      },
+      {
+        sender: 'LiveChat Bot',
+        timestamp: '07:41 PM',
+        text: 'I\'m your AI assistant, and I\'m ready to help. You can pick an option below or just type your question like you\'re chatting with a person. The more specific you are, the better I can help!'
+      }
+    ];
+
+    // Function to lighten a hex color for hover effect
+    function lightenColor(hex, percent) {
+      hex = hex.replace('#', '');
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const newR = Math.min(255, Math.floor(r + (255 - r) * percent));
+      const newG = Math.min(255, Math.floor(g + (255 - g) * percent));
+      const newB = Math.min(255, Math.floor(b + (255 - b) * percent));
+      return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    }
+
+    // Function to apply color settings from localStorage
+    function applyColorSettings() {
+      try {
+        const settings = JSON.parse(localStorage.getItem('chatSettings')) || {};
+        const root = document.documentElement;
+
+        // Bubble
+        if (settings.bubble) {
+          root.style.setProperty('--bubble-bg-color', settings.bubble.bgColor || '#1f2b37');
+          root.style.setProperty('--bubble-hover-bg-color', lightenColor(settings.bubble.bgColor || '#1f2b37', 0.2));
+          root.style.setProperty('--bubble-dot-color', settings.bubble.dotsColor || '#63524b');
+          root.style.setProperty('--bubble-icon-outer-color', '#ffffff');
+          root.style.setProperty('--bubble-icon-inner-color', settings.bubble.iconColor || '#655858');
+        }
+
+        // Chat Widget Landing and Open
+        if (settings.chatWidget) {
+          // Landing
+          root.style.setProperty('--modal-gradient-start', settings.chatWidget.modalBgColor || '#d3d3d3');
+          root.style.setProperty('--modal-gradient-end', '#e8e8e8');
+          root.style.setProperty('--modal-title-color', settings.chatWidget.modalTitleColor || '#000000');
+          root.style.setProperty('--chat-preview-bg-color', settings.chatWidget.chatPreviewBg || '#4f6aa1');
+          root.style.setProperty('--chat-preview-text-color', settings.chatWidget.chatPreviewTextColor || '#497cd0');
+          root.style.setProperty('--chat-now-btn-bg-color', settings.chatWidget.chatNowBtnBg || '#000000');
+          root.style.setProperty('--chat-now-btn-text-color', settings.chatWidget.chatNowBtnTextColor || '#ffffff');
+          root.style.setProperty('--chat-now-btn-hover-bg-color', lightenColor(settings.chatWidget.chatNowBtnBg || '#000000', 0.2));
+          root.style.setProperty('--link-item-bg-color', settings.chatWidget.linkItemBg || '#f3f4f6');
+          root.style.setProperty('--link-item-text-color', settings.chatWidget.linkItemTextColor || '#374151');
+          root.style.setProperty('--landing-icon-bg-color', settings.chatWidget.bubbleBorderColor || '#ff5101');
+          root.style.setProperty('--landing-icon-fill-color', '#ffffff');
+          // Open
+          root.style.setProperty('--bubble-bg-color-open', settings.chatWidget.bubbleBgColor || '#ffffff');
+          root.style.setProperty('--bubble-border-color', settings.chatWidget.bubbleBorderColor || '#ff5101');
+          root.style.setProperty('--bubble-title-color', settings.chatWidget.bubbleTitleColor || '#000000');
+          root.style.setProperty('--bubble-text-color', settings.chatWidget.bubbleTextColor || '#374151');
+          root.style.setProperty('--bot-msg-bg-color', settings.chatWidget.botMsgBgColor || '#ffffff');
+          root.style.setProperty('--user-msg-bg-color', settings.chatWidget.userMsgBgColor || '#8f8f8f');
+          root.style.setProperty('--msg-text-color', settings.chatWidget.msgTextColor || '#402626');
+          root.style.setProperty('--input-bg-color', settings.chatWidget.inputBgColor || '#674242');
+          root.style.setProperty('--send-btn-bg-color', settings.chatWidget.sendBtnBgColor || '#ff0000');
+          root.style.setProperty('--send-btn-icon-color', settings.chatWidget.sendBtnIconColor || '#ffffff');
+          root.style.setProperty('--bubble-icon-outer-color-open', settings.chatWidget.bubbleBorderColor || '#ff5101');
+          root.style.setProperty('--bubble-icon-inner-color-open', '#ffffff');
+          root.style.setProperty('--chat-footer-bg-color', settings.chatWidget.footerBgColor || '#f9fafb');
+          root.style.setProperty('--chat-footer-text-color', settings.chatWidget.footerTextColor || '#6b7280');
+          // Footer Box and Buttons
+          root.style.setProperty('--footer-box-bg', settings.chatWidget.footerBoxBg || '#ffffff');
+          root.style.setProperty('--home-btn-bg', settings.chatWidget.footerButtonsBg || '#f3f4f6');
+          root.style.setProperty('--livechat-btn-bg', settings.chatWidget.footerButtonsBg || '#f3f4f6');
+          root.style.setProperty('--home-btn-icon-color', settings.chatWidget.footerButtonsIconColor || '#374151');
+          root.style.setProperty('--livechat-btn-icon-color', settings.chatWidget.footerButtonsIconColor || '#374151');
+          root.style.setProperty('--hover-bg', lightenColor(settings.chatWidget.footerButtonsBg || '#f3f4f6', 0.2));
+          root.style.setProperty('--hover-icon-color', '#000000');
+        }
+
+        // Re-render messages to apply updated colors
+        renderMessages();
+      } catch (e) {
+        console.error('Failed to apply color settings:', e);
+      }
+    }
+
+    // Initial application of settings
+    applyColorSettings();
+
+    // Listen for localStorage changes
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'chatSettings') {
+        applyColorSettings();
+      }
+    });
+
+    chatButton.addEventListener('click', () => {
+      modal.style.display = 'block';
+      modal.setAttribute('aria-hidden', 'false');
+      modalContent.classList.remove('animate-slideDown');
+      modalContent.classList.add('animate-slideUp');
+      homeContent.classList.add('active');
+      liveChatContent.classList.remove('active');
+      homeButton.classList.add('selected');
+      liveChatButton.classList.remove('selected');
+      modalContent.focus();
+    });
+
+    function closeModal() {
+      modalContent.classList.remove('animate-slideUp');
+      modalContent.classList.add('animate-slideDown');
+      modalContent.addEventListener('animationend', () => {
+        if (modalContent.classList.contains('animate-slideDown')) {
+          modal.style.display = 'none';
+          modal.setAttribute('aria-hidden', 'true');
+          chatButton.focus();
+        }
+      }, { once: true });
+    }
+
+    closeButtons.forEach(button => {
+      button.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modal.style.display === 'block') {
+        closeModal();
+      }
+    });
+
+    function renderMessages() {
+      chatMessages.innerHTML = '';
+      [...predefinedMessages, ...chatHistory].forEach(msg => {
+        const isUser = msg.sender === 'You';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user' : ''}`;
+        messageDiv.innerHTML = `
+          <div>${msg.text}</div>
+        `;
+        chatMessages.appendChild(messageDiv);
+      });
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showLiveChatContent() {
+      homeContent.classList.remove('active');
+      liveChatContent.classList.add('active');
+      liveChatButton.classList.add('selected');
+      homeButton.classList.remove('selected');
+      renderMessages();
+      messageInput.focus();
+    }
+
+    liveChatButton.addEventListener('click', showLiveChatContent);
+    document.querySelector('.chat-now-btn').addEventListener('click', showLiveChatContent);
+
+    function showHomeContent() {
+      liveChatContent.classList.remove('active');
+      homeContent.classList.add('active');
+      homeButton.classList.add('selected');
+      liveChatButton.classList.remove('selected');
+      modalContent.focus();
+    }
+
+    homeButton.addEventListener('click', showHomeContent);
+    backButton.addEventListener('click', showHomeContent);
+
+    function toggleSendButton() {
+      if (messageInput.value.trim()) {
+        sendButton.classList.add('active');
+        sendButton.disabled = false;
+      } else {
+        sendButton.classList.remove('active');
+        sendButton.disabled = true;
+      }
+    }
+
+    sendButton.disabled = true;
+    sendButton.classList.remove('active');
+
+    messageInput.addEventListener('input', toggleSendButton);
+
+    function sendMessage() {
+      const messageText = messageInput.value.trim();
+      if (messageText && !sendButton.disabled) {
+        const newMessage = {
+          sender: 'You',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          text: messageText
+        };
+        chatHistory.push(newMessage);
+        messageInput.value = '';
+        renderMessages();
+        toggleSendButton();
+        setTimeout(() => {
+          const botResponse = {
+            sender: 'LiveChat Bot',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            text: 'How can I help you today?'
+          };
+          chatHistory.push(botResponse);
+          renderMessages();
+        }, 500);
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+
+    messageInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    emojiButton.addEventListener('click', () => {
+      emojiPicker.style.display = emojiPicker.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    emojiPicker.addEventListener('click', (event) => {
+      if (event.target.dataset.emoji) {
+        messageInput.value += event.target.dataset.emoji;
+        emojiPicker.style.display = 'none';
+        messageInput.focus();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!emojiButton.contains(event.target) && !emojiPicker.contains(event.target)) {
+        emojiPicker.style.display = 'none';
+      }
+    });
+
+    attachmentButton.addEventListener('click', () => {
+      attachmentInput.click();
+    });
+
+    moreOptionsButton.addEventListener('click', () => {
+      dropdownMenu.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!moreOptionsButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

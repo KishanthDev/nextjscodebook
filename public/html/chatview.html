@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Option - Eyecatcher</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="chatview.css">
+</head>
+
+<body class="min-h-screen">
+    <div class="w-fit mx-auto p-6 rounded-md space-y-8">
+        <div class="absolute top-6 right-6">
+            <button id="saveBtn" class="bg-orange-500 text-white p-2 rounded-sm hover:bg-orange-600">
+                <i class="fas fa-save"></i> Save
+            </button>
+        </div>
+
+        <form>
+            <fieldset class="mb-4">
+                <legend class="text-lg font-semibold mb-6 text-center">Choose a chat option:</legend>
+                <div class="flex flex-wrap justify-start gap-14">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="chat_option" value="eyecatcher" class="accent-blue-500" id="eyecatcherRadio">
+                        <span>Eyecatcher</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="chat_option" value="bubble" class="accent-blue-500">
+                        <span>Bubble</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="chat_option" value="chat_bar" class="accent-blue-500">
+                        <span>Chat Bar</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="chat_option" value="chat_widget" class="accent-blue-500">
+                        <span>Chat Widget Open</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="chat_option" value="chat_widget_landing" class="accent-blue-500">
+                        <span>Chat Widget Landing</span>
+                    </label>
+                </div>
+            </fieldset>
+        </form>
+
+        <div class="p-6 flex w-full max-w-6xl gap-10">
+            <div class="flex-1 space-y-6 border-r pr-6">
+                <h2 class="text-2xl font-bold mb-6 text-center">Customize Chat Options</h2>
+
+                <div id="eyecatcherInputs">
+                    <div>
+                        <label for="titleInput" class="block text-sm font-medium text-gray-700 mb-2">Welcome Message:</label>
+                        <input id="titleInput" type="text" placeholder="Hello" maxlength="20" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                        <label for="textInput" class="block text-sm font-medium text-gray-700 mb-2">Invitation Text:</label>
+                        <input id="textInput" type="text" placeholder="Click to chat" maxlength="36" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Eye catcher background color:</label>
+                        <div class="flex items-center border rounded-md overflow-hidden">
+                            <input type="text" placeholder="#FFFFFF" class="w-full px-2 py-2 text-sm focus:outline-none" id="bgColorInput" value="#007bff" />
+                            <input type="color" class="w-12 h-12 cursor-pointer border-l" id="bgColorPicker" value="#007bff" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Eye catcher text color:</label>
+                        <div class="flex items-center border rounded-md overflow-hidden">
+                            <input type="text" placeholder="#000000" class="w-full px-2 py-2 text-sm focus:outline-none" id="textColorInput" value="#ffffff" />
+                            <input type="color" class="w-12 h-12 cursor-pointer border-l" id="textColorPicker" value="#ffffff" />
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bubbleInputs" style="display: none;">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bubble Background Color:</label>
+                        <div class="flex items-center border rounded-md overflow-hidden">
+                            <input type="text" placeholder="#ff5101" class="w-full px-2 py-2 text-sm focus:outline-none" id="bubbleBgColorText" value="#ff5101" />
+                            <input type="color" class="w-12 h-12 cursor-pointer border-l" id="bubbleBgColorInput" value="#ff5101" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bubble Icon Color:</label>
+                        <div class="flex items-center border rounded-md overflow-hidden">
+                            <input type="text" placeholder="#ffffff" class="w-full px-2 py-2 text-sm focus:outline-none" id="bubbleIconColorText" value="#ffffff" />
+                            <input type="color" class="w-12 h-12 cursor-pointer border-l" id="bubbleIconColorInput" value="#ffffff" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bubble Dots Color:</label>
+                        <div class="flex items-center border rounded-md overflow-hidden">
+                            <input type="text" placeholder="#ff5101" class="w-full px-2 py-2 text-sm focus:outline-none" id="bubbleDotsColorText" value="#ff5101" />
+                            <input type="color" class="w-12 h-12 cursor-pointer border-l" id="bubbleDotsColorInput" value="#ff5101" />
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chatBarInputs" style="display: none;">
+                    <div>
+                        <label for="chatBarTextInput" class="block text-sm font-medium text-gray-700 mb-2">Chat Bar Text:</label>
+                        <input id="chatBarTextInput" type="text" placeholder="Chat with us" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Chat Bar Background Color:</label>
+                        <div class="flex items-center border rounded-md overflow-hidden">
+                            <input type="text" placeholder="#007bff" class="w-full px-2 py-2 text-sm focus:outline-none" id="chatBarBgColorText" value="#007bff" />
+                            <input type="color" class="w-12 h-12 cursor-pointer border-l" id="chatBarBgColorInput" value="#007bff" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Chat Bar Text Color:</label>
+                        <div class="flex items-center border rounded-md overflow-hidden">
+                            <input type="text" placeholder="#ffffff" class="w-full px-2 py-2 text-sm focus:outline-none" id="chatBarTextColorText" value="#ffffff" />
+                            <input type="color" class="w-12 h-12 cursor-pointer border-l" id="chatBarTextColorInput" value="#ffffff" />
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chatWidgetInputs" style="display: none;">
+                    <div id="chatWidgetOpenInputs">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bot Message Background Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#f3f4f6" class="w-full px-2 py-2 text-sm focus:outline-none" id="widgetBotMsgBgColorText" value="#f3f4f6" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="widgetBotMsgBgColorInput" value="#f3f4f6" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">User Message Background Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#fef08a" class="w-full px-2 py-2 text-sm focus:outline-none" id="widgetUserMsgBgColorText" value="#fef08a" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="widgetUserMsgBgColorInput" value="#fef08a" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Send Button Background Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#000000" class="w-full px-2 py-2 text-sm focus:outline-none" id="widgetSendBtnBgColorText" value="#000000" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="widgetSendBtnBgColorInput" value="#000000" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Send Button Icon Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#ffffff" class="w-full px-2 py-2 text-sm focus:outline-none" id="widgetSendBtnIconColorText" value="#ffffff" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="widgetSendBtnIconColorInput" value="#ffffff" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Footer Background Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#ffffff" class="w-full px-2 py-2 text-sm focus:outline-none" id="footerBgColorText" value="#ffffff" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="footerBgColorInput" value="#ffffff" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Footer Text Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#374151" class="w-full px-2 py-2 text-sm focus:outline-none" id="footerTextColorText" value="#374151" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="footerTextColorInput" value="#374151" />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="chatWidgetLandingInputs" style="display: none;">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Modal Background Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#d3d3d3" class="w-full px-2 py-2 text-sm focus:outline-none" id="modalBgColorText" value="#d3d3d3" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="modalBgColorInput" value="#d3d3d3" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Modal Title Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#000000" class="w-full px-2 py-2 text-sm focus:outline-none" id="modalTitleColorText" value="#000000" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="modalTitleColorInput" value="#000000" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Chat Preview Background:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#f3f4f6" class="w-full px-2 py-2 text-sm focus:outline-none" id="chatPreviewBgText" value="#f3f4f6" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="chatPreviewBgInput" value="#f3f4f6" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Chat Preview Text Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#374151" class="w-full px-2 py-2 text-sm focus:outline-none" id="chatPreviewTextColorText" value="#374151" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="chatPreviewTextColorInput" value="#374151" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Chat Now Button Background:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#000000" class="w-full px-2 py-2 text-sm focus:outline-none" id="chatNowBtnBgText" value="#000000" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="chatNowBtnBgInput" value="#000000" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Chat Now Button Text Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#ffffff" class="w-full px-2 py-2 text-sm focus:outline-none" id="chatNowBtnTextColorText" value="#ffffff" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="chatNowBtnTextColorInput" value="#ffffff" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Link Item Background:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#f3f4f6" class="w-full px-2 py-2 text-sm focus:outline-none" id="linkItemBgText" value="#f3f4f6" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="linkItemBgInput" value="#f3f4f6" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Link Item Text Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#374151" class="w-full px-2 py-2 text-sm focus:outline-none" id="linkItemTextColorText" value="#374151" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="linkItemTextColorInput" value="#374151" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Footer Box Background Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#ffffff" class="w-full px-2 py-2 text-sm focus:outline-none" id="footerBoxBgText" value="#ffffff" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="footerBoxBgInput" value="#ffffff" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Footer Buttons Background Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#f3f4f6" class="w-full px-2 py-2 text-sm focus:outline-none" id="footerButtonsBgText" value="#f3f4f6" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="footerButtonsBgInput" value="#f3f4f6" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Footer Buttons Icon Color:</label>
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <input type="text" placeholder="#374151" class="w-full px-2 py-2 text-sm focus:outline-none" id="footerButtonsIconColorText" value="#374151" />
+                                <input type="color" class="w-12 h-12 cursor-pointer border-l" id="footerButtonsIconColorInput" value="#374151" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col items-center justify-center space-y-4">
+                <div id="eyecatcherPreviewBox" class="eye-catcher-preview">
+                    <div class="emoji-wrapper">
+                        <span class="wave" style="font-size: 2rem;">👋</span>
+                    </div>
+                    <div class="text-content">
+                        <h3 id="eyecatcherPreviewTitle" style="font-weight: bold; margin-bottom: 4px;">Hello</h3>
+                        <p id="eyecatcherPreviewText" style="font-size: 14px;">
+                            Click to chat with us about your thoughts
+                        </p>
+                    </div>
+                </div>
+                <div id="bubblePreviewBox" class="bubble-preview" style="display: none;">
+                    <div class="chat-icon">
+                        <svg id="bubbleIcon" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+                            <path fill="#ffffff" d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z" />
+                            <path fill="#ff5101" d="M19.57,21.68h3.67a2.08,2.08,0,0,0,2.11-1.81,89.86,89.86,0,0,0,0-10.38,1.9,1.9,0,0,0-1.84-1.74,113.15,113.15,0,0,0-15,0A1.9,1.9,0,0,0,6.71,9.49a74.92,74.92,0,0,0-.06,10.38,2,2,0,0,0,2.1,1.81h3.81V26.5Z" />
+                        </svg>
+                    </div>
+                    <div class="flex gap-1 opacity-0 absolute dot-loader transition-opacity duration-300">
+                        <span class="dot" style="background-color: #ff5101;"></span>
+                        <span class="dot" style="background-color: #ff5101;"></span>
+                        <span class="dot" style="background-color: #ff5101;"></span>
+                    </div>
+                </div>
+                <div id="chatBarPreviewBox" class="chat-bar-preview" style="display: none; background-color: #007bff; color: #ffffff;">
+                    <span id="chatBarPreviewText">Chat with us</span>
+                </div>
+                <div id="chatWidgetPreviewBox" class="chat-widget" style="display: none;">
+                    <div id="chatWidgetOpenContent" class="p-3.5" style="display: none;">
+                        <div class="chat-header border-b pb-2.5 border-gray-900 flex items-center justify-between">
+                            <div class="company-logo">
+                                <img class="w-12 h-12 rounded-full border-1 border-gray-400 bg-gray-900" src="https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png" alt="LiveChat Logo" />
+                                <span>LiveChat</span>
+                            </div>
+                            <div class="header-buttons">
+                                <button class="back-button" aria-label="Back to home section">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <button class="more-options-button" aria-label="More options">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <button aria-label="More options">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu" id="dropdownMenu">
+                                <div class="dropdown-item" onclick="alert('Send transcript clicked')">
+                                    <svg color="inherit" viewBox="0 0 24 24" aria-hidden="true" class="lc-uz8pkq">
+                                        <path d="M5.5,6l6.5,5.7L18.5,6H5.5z M20,7.3l-7.3,6.4c-0.4,0.3-0.9,0.3-1.3,0L4,7.3V17c0,0.6,0.4,1,1,1h14 c0.6,0,1-0.4,1-1V7.3z M5,4h14c1.7,0,3,1.3,3,3v10c0,1.7-1.3,3-3,3H5c-1.7,0-3-1.3-3-3V7C2,5.3,3.3,4,5,4z"></path>
+                                    </svg>
+                                    Send transcript
+                                </div>
+                                <div class="dropdown-item" onclick="alert('Move chat to mobile clicked')">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="lc-uz8pkq">
+                                        <path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H7V4h10v16zm-5-3c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1z" />
+                                    </svg>
+                                    Move chat to mobile
+                                </div>
+                                <div class="dropdown-item">
+                                    <svg color="inherit" viewBox="0 0 24 24" aria-hidden="true" class="lc-uz8pkq">
+                                        <path d="M15,19v-2c2.8,0,5-2.2,5-5s-2.2-5-5-5V5c3.9,0,7,3.1,7,7S18.9,19,15,19z M15,16v-2c1.1,0,2-0.9,2-2s-0.9-2-2-2 V8c2.2,0,4,1.8,4,4S17.2,16,15,16z M7,8l4.3-3.7C11.9,3.7,13,4.1,13,5v14c0,0.9-1.1,1.3-1.7,0.7L7.2,16H4c-0.6,0-1-0.4-1-1V9 c0-0.6,0.4-1,1-1H7z M11,7.4L8.3,9.7C8.1,9.9,7.9,10,7.6,10H5v4h2.6c0.3,0,0.5,0.1,0.7,0.3l2.7,2.3V7.4z"></path>
+                                    </svg>
+                                    Sounds
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-messages" id="widgetMessagesPreview">
+                            <div class="chat-message">
+                                <div class="message-icon bot">
+                                    <svg viewBox="0 0 32 32" fill="none">
+                                        <path fill="#FFFFFF" d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z" />
+                                        <path fill="#FF5101" d="M19.57,21.68h3.67a2.08,2.08,0,0,0,2.11-1.81,89.86,89.86,0,0,0,0-10.38,1.9,1.9,0,0,0-1.84-1.74,113.15,113.15,0,0,0-15,0A1.9,1.9,0,0,0,6.71,9.49a74.92,74.92,0,0,0-.06,10.38,2,2,0,0,0,2.1,1.81h3.81V26.5Z" />
+                                    </svg>
+                                </div>
+                                <div style="background-color: #f3f4f6;">
+                                    Hello! How can I help you today?
+                                </div>
+                            </div>
+                            <div class="chat-message user">
+                                <div>I need help with my order</div>
+                            </div>
+                        </div>
+                        <div class="relative w-full max-w-md chat-input-container">
+                            <input type="text" id="widgetMessageInput" placeholder="Type a message..." class="w-full" aria-label="Type a message" />
+                            <div class="absolute right-2 top-2/5 flex items-center">
+                                <button class="emoji-button text-black hover:text-black" aria-label="Open emoji picker">
+                                    <svg color="inherit" viewBox="0 0 32 32" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
+                                        <g id="emoji-smile" stroke="none" stroke-width="2" fill="none" fill-rule="evenodd" transform="translate(7, 7)">
+                                            <path stroke="currentColor" id="changeable" stroke-linecap="round" stroke-linejoin="round" d="M0,9 C0,12.2153905 1.71539025,15.1865338 4.5,16.7942289 C7.28460967,18.4019241 10.7153903,18.4019241 13.5,16.7942289 C16.2846097,15.1865338 18,12.2153905 18,9 C18,5.78460984 16.2846098,2.81346659 13.5,1.2057714 C10.7153903,-0.401923799 7.28460966,-0.401923799 4.5,1.2057714 C1.71539023,2.81346659 0,5.78460984 0,9"></path>
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M6,7.00000019 L6.01,7.00000019 M12,7.00000019 L12.01,7.00000019"></path>
+                                            <path d="M6.5,12.0000002 C7.15831134,12.6718864 8.05935933,13.0505104 9,13.0505104 C9.94064067,13.0505104 10.8416887,12.6718864 11.5,12.0000002" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </g>
+                                    </svg>
+                                </button>
+                                <button class="attachment-button text-black hover:text-black" aria-label="Attach file">
+                                    <svg color="currentColor" viewBox="0 0 32 32" aria-hidden="true" class="w-7 h-7">
+                                        <g id="attachment-squircle" stroke="none" stroke-width="2" fill="none" fill-rule="evenodd">
+                                            <path d="M16,7 C23.2,7 25,7 25,16 C25,23.2 23.2,25 16,25 C8.8,25 7,23.2 7,16 C7,8.8 7,7 16,7 Z M19,16 L13,16 M16,13 L16,19" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" id="changeable"></path>
+                                            <path d="M19,16 L13,16 M16,13 L16,19" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </g>
+                                    </svg>
+                                </button>
+                                <button class="send-button rounded-lg p-1 active" aria-label="Send message">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6">
+                                        <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <input type="file" id="attachmentInput" class="hidden" />
+                            <div class="emoji-picker hidden absolute bottom-full mb-2 bg-white border rounded shadow-md p-2" id="emojiPicker">
+                                <span data-emoji="😊">😊</span>
+                                <span data-emoji="👍">👍</span>
+                                <span data-emoji="🚀">🚀</span>
+                                <span data-emoji="❤️">❤️</span>
+                                <span data-emoji="😂">😂</span>
+                            </div>
+                        </div>
+                        <div class="chat-footer">Powered by LiveChat</div>
+                    </div>
+                    <div id="homeContent" style="display: none;">
+                        <div class="modal-landing-bg rounded-2xl shadow-xl w-full" style="background: linear-gradient(to bottom, #d3d3d3, #e8e8e8);">
+                            <h2 id="modalTitle" class="text-5xl flex justify-between pl-2 pt-11 mb-3 font-bold modal-title-text" style="color: #000000;">Chat with us! <button aria-label="More options">
+                                    <i class="fas text-xl fa-minus"></i>
+                                </button></h2>
+                            <div class="border border-gray-300 rounded-2xl p-2 mb-2 chat-preview-bg" style="background-color: #f3f4f6;">
+                                <div class="flex items-start pl-5 pt-5 gap-4">
+                                    <div class="relative bg-[#ff5101] mt-3 rounded-full p-2">
+                                        <svg viewBox="0 0 32 32" aria-hidden="true" class="w-6 h-6 fill-white">
+                                            <path fill="#FFFFFF" d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z" />
+                                        </svg>
+                                        <span class="absolute top-0 left-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="font-light text-xs mb-1 chat-preview-text" style="color: #374151;">LiveChat Bot · 07:41 PM</div>
+                                        <p class="font-normal text-sm chat-preview-text" style="color: #374151;">Engage your customers effortlessly with our powerful LiveChat tools. Interested in...</p>
+                                    </div>
+                                </div>
+                                <button type="button" class="chat-now-btn-bg w-full mt-4 p-3 rounded-lg text-sm font-bold flex items-center justify-center gap-1 hover:bg-gray-800 transition-colors duration-300" style="background-color: #000000; color: #ffffff;">
+                                    Chat now
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 chat-now-btn-text" style="fill: #ffffff;">
+                                        <path d="M4.3880707,3.17638951 L20.4789623,11.1029371 C20.9743965,11.3469933 21.1781786,11.9464687 20.9341223,12.4419029 C20.8367142,12.6396414 20.6767008,12.7996548 20.4789623,12.8970629 L4.3743554,20.8303668 C3.87892124,21.074423 3.27944584,20.870641 3.03538961,20.3752068 C2.90852242,20.1176664 2.89846393,19.8180217 3.00777474,19.5525533 L6.12545221,11.9794521 L6.12845221,11.9204521 L3.02294371,4.4577144 C2.81072167,3.94783182 3.05202321,3.36245036 3.56190579,3.15022831 C3.82783088,3.03939996 4.12934099,3.04893645 4.3880707,3.17638951 Z M5.892,6.146 L7.91045221,10.9964521 L11.0011069,11.0000006 C11.5533913,11.0006119 12.0006107,11.4488225 12,12.0011069 C11.9993881,12.5533913 11.5511775,13.0006107 10.9988931,13 L7.86945221,12.9964521 L5.865,17.866 L17.773,12 L5.892,6.146 Z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div>
+                                <div class="border border-gray-300 rounded-xl p-2 mb-2 flex items-center justify-between hover:bg-[#e8e8e8] transition-colors duration-300 group content-item link-item-bg" style="background-color: #f3f4f6;">
+                                    <a href="#pricing" class="no-underline text-xs flex items-center gap-2 flex-1 link-item-text" style="color: #374151;">
+                                        <span>💰</span>
+                                        Pricing
+                                    </a>
+                                    <span class="w-6 h-6 bg-gray-500 border border-gray-300 rounded-full flex items-center justify-center arrow-container">
+                                        <i class="fas fa-arrow-right text-white text-sm arrow"></i>
+                                    </span>
+                                </div>
+                                <div class="border border-gray-300 rounded-xl p-1 mb-1 flex items-center justify-between hover:bg-[#e8e8e8] transition-colors duration-300 group content-item link-item-bg" style="background-color: #f3f4f6;">
+                                    <a href="#tour" class="no-underline text-xs flex items-center gap-2 flex-1 link-item-text" style="color: #374151;">
+                                        <span>👓</span>
+                                        Take a tour
+                                    </a>
+                                    <span class="w-6 h-6 bg-gray-500 border border-gray-300 rounded-full flex items-center justify-center arrow-container">
+                                        <i class="fas fa-arrow-right text-white text-sm arrow"></i>
+                                    </span>
+                                </div>
+                                <div class="border border-gray-300 rounded-xl p-1 mb-1 flex items-center justify-between hover:bg-[#e8e8e8] transition-colors duration-300 group content-item link-item-bg" style="background-color: #f3f4f6;">
+                                    <a href="#hire" class="no-underline text-xs flex items-center gap-2 flex-1 link-item-text" style="color: #374151;">
+                                        <span>🤖</span>
+                                        Hire AI-powered Chatbot
+                                    </a>
+                                    <span class="w-6 h-6 bg-gray-500 border border-gray-300 rounded-full flex items-center justify-center arrow-container">
+                                        <i class="fas fa-arrow-right text-white text-sm arrow"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="border border-gray-300 rounded-3xl shadow-2xl p-2.5 flex justify-between items-center bg-gray-100 footer-box">
+                                <a href="#home" class="text-gray-800 ml-7 no-underline text-sm flex flex-col items-center gap-1.5 py-2 px-3 w-20 text-center hover:text-gray-500 transition-colors duration-300 font-bold sm:text-xs sm:py-1.5 sm:px-2.5 sm:w-[70px] selected" id="homeButton">
+                                    <svg viewBox="0 0 24 24" width="25" height="25" class="home-icon">
+                                        <path d="M3 12l9-9 9 9v9a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2v-9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                    Home
+                                </a>
+                                <a href="#livechat" class="text-gray-800 mr-7 no-underline text-sm flex flex-col items-center gap-1.5 py-2 px-3 w-20 text-center hover:text-gray-500 transition-colors duration-300 sm:text-xs sm:py-1.5 sm:px-2.5 sm:w-[70px]" id="liveChatButton">
+                                    <svg viewBox="0 0 24 24" width="25" height="25" class="livechat-icon">
+                                        <path d="M3.046875,12.9375 C1.46776039,9.98739221 2.28831494,6.32568237 4.9753792,4.33158492 C7.66244345,2.33748747 11.4048397,2.61298558 13.770927,4.97907295 C16.1370144,7.34516033 16.4125125,11.0875566 14.4184151,13.7746208 C12.4243176,16.4616851 8.76260779,17.2822396 5.8125,15.703125 L3.21,16.468125 C2.94676941,16.5454268 2.66233667,16.4728351 2.46834451,16.278843 C2.27435236,16.0848508 2.2017607,15.8004181 2.2790625,15.5371875 L3.046875,12.9375 Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M15.369375,7.5103125 C17.6739183,7.63560127 19.7547031,8.92965262 20.8861548,10.9412277 C22.0176064,12.9528028 22.0428658,15.4030266 20.953125,17.4375 L21.718125,20.04 C21.7954268,20.3032306 21.7228351,20.5876633 21.528843,20.7816555 C21.3348508,20.9756476 21.0504181,21.0482393 20.7871875,20.9709375 L18.1875,20.203125 C16.4496517,21.13252 14.3925777,21.256597 12.5556181,20.5428245 C10.7186584,19.829052 9.28503442,18.3486227 8.630625,16.4896875" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                    LiveChat
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="chatview.js"></script>
+</body>
+
+</html>

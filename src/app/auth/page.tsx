@@ -36,7 +36,7 @@ const AuthPage: React.FC = () => {
     e.preventDefault();
     localStorage.setItem("login", "true");
     console.log("Login:", { email, password, rememberMe });
-    router.push("/home");
+    router.push("/dashboard");
   };
 
   return (

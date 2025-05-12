@@ -47,7 +47,7 @@ if (!resolvedTheme) return null;
           {/* Right Section (Mobile: Dropdown, Desktop: Inline) */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Mobile View (Dropdown) */}
-            <div className="block lg:hidden">
+            <div className="block md:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className={baseBtnClass}>
@@ -56,18 +56,20 @@ if (!resolvedTheme) return null;
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>
-                    <DarkModeSwitch />
+                    <DarkModeSwitch /> Dark mode
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <FullScreenToggle />
+                    <FullScreenToggle /> Full screen
                   </DropdownMenuItem>
-                  <DropdownMenuItem><UserDropdown/></DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <UserDropdown/> User Dropdown
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
 
             {/* Desktop View (Inline) */}
-            <div className="hidden lg:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
               <div className={baseBtnClass}>
                 <DarkModeSwitch />
               </div>

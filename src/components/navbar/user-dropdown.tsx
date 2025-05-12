@@ -29,10 +29,11 @@ const statusOptions = [
 ];
 
 export const UserDropdown = () => {
-    const { theme } = useTheme();
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === "dark";
+    
+    if (!resolvedTheme) return null;
     const router = useRouter();
-
-    const isDark = theme === "dark";
     const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
     const [isOpen, setIsOpen] = useState(false); // <-- track open state
 

@@ -30,8 +30,8 @@ import {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = {
-    name: 'shadcn',
-    email: 'm@example.com',
+    name: 'zoey',
+    email: 'zoey@example.com',
     avatar: '/avatars/shadcn.jpg'
   };
 

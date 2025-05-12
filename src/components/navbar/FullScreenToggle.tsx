@@ -12,6 +12,7 @@ const FullScreenToggle = () => {
     };
 
     document.addEventListener("fullscreenchange", handleChange);
+    
     return () => document.removeEventListener("fullscreenchange", handleChange);
   }, []);
 

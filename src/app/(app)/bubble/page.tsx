@@ -71,7 +71,7 @@ export default function BubbleComponent() {
         <div className="flex-1 space-y-4 border-r pr-4 ">
           {/* Background Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bubble Background Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">Bubble Background Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"
@@ -93,7 +93,7 @@ export default function BubbleComponent() {
 
           {/* Icon Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bubble Icon Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">Bubble Icon Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"
@@ -115,7 +115,7 @@ export default function BubbleComponent() {
 
           {/* Dots Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bubble Dots Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">Bubble Dots Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"

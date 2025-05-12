@@ -113,7 +113,7 @@ export default function ChatWidgetOpenComponent() {
         <div className="flex-1 space-y-4 border-r pr-4">
           {/* Bot Message Background */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bot Message Background Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">Bot Message Background Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"
@@ -135,7 +135,7 @@ export default function ChatWidgetOpenComponent() {
 
           {/* User Message Background */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">User Message Background Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">User Message Background Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"
@@ -157,7 +157,7 @@ export default function ChatWidgetOpenComponent() {
 
           {/* Send Button Background */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Send Button Background Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">Send Button Background Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"
@@ -179,7 +179,7 @@ export default function ChatWidgetOpenComponent() {
 
           {/* Send Button Icon Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Send Button Icon Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">Send Button Icon Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"
@@ -201,7 +201,7 @@ export default function ChatWidgetOpenComponent() {
 
           {/* Footer Background */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Footer Background Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">Footer Background Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"
@@ -223,7 +223,7 @@ export default function ChatWidgetOpenComponent() {
 
           {/* Footer Text Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Footer Text Color:</label>
+            <label className="block text-sm font-medium text-primary mb-2">Footer Text Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
               <input
                 type="text"

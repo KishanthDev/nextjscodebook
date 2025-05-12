@@ -13,10 +13,11 @@ import { UserDropdown } from "./user-dropdown";
 
 
 export const NavbarWrapper = () => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const { resolvedTheme } = useTheme();
+const isDark = resolvedTheme === "dark";
 
-  // Base button class for consistent styling
+if (!resolvedTheme) return null;
+
   const baseBtnClass =
     "inline-flex h-9 w-10 items-center justify-center rounded-md transition-colors hover:bg-gray-100 dark:hover:bg-gray-800";
 

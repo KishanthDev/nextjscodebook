@@ -1,4 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
+       const saveBtn = document.getElementById("saveBtn");
+    if (!saveBtn) {
+        console.error("Save button with ID 'saveBtn' not found in the DOM.");
+        return;
+    }
+    console.log("Save button found:", saveBtn);
+
+    // Attach click event listener to save button
+    saveBtn.addEventListener("click", (event) => {
+        event.preventDefault(); // Prevent form submission
+        console.log("Save button clicked");
+        saveSettings();
+    });
+
     // Input Elements
     const titleInput = document.getElementById("titleInput");
     const textInput = document.getElementById("textInput");
@@ -814,15 +828,6 @@ document.addEventListener("DOMContentLoaded", () => {
     handleRadioChange(); // Ensure the correct preview is shown on page load
 
     // Save Button
-    const saveBtn = document.getElementById("saveBtn");
-    if (saveBtn) {
-        saveBtn.addEventListener("click", () => {
-            console.log("Save button clicked");
-            saveSettings();
-        });
-    } else {
-        console.error("Save button not found in the DOM");
-    }
 
     // Emoji Picker Functionality
     const emojiButton = document.querySelector(".emoji-button");

@@ -19,6 +19,7 @@ const AuthPage: React.FC = () => {
     const timer = setTimeout(() => {
       setIsSignIn(true);
     }, 400);
+    
     return () => clearTimeout(timer);
   }, []);
 

@@ -1,16 +1,19 @@
-import Image from 'next/image';
+"use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import AuthPage from "./auth/page";
 
+export default function Home() {
+    const router = useRouter();
 
-const HomePage: React.FC = () => {
-    return (
-        <main className='mx-auto mt-6 flex max-w-7xl flex-col justify-center gap-6 px-3 font-[family-name:var(--font-geist-sans)] sm:mt-3 sm:gap-12 sm:px-0'>
-            <div className='justify-centersm:items-start row-start-2 flex flex-col items-center gap-8'>
-           <h1>WORLD</h1>
-           
-           </div>
-        </main>
-    );
-};
+    useEffect(() => {
+        const isLoggedIn = localStorage.getItem("login") === "true";
+        if (isLoggedIn) {
+            console.log("Home: Redirecting to /dashboard (isLoggedIn=true)");
+            router.push("/home");
+        }
+    }, [router]);
 
-export default HomePage;
+    return <AuthPage />;
+}

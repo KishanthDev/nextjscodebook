@@ -1,78 +1,72 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 
-export default function ChatWidgetOpenComponent() {
-  const [settings, setSettings] = useState({
-    botMsgBgColor: '',
-    userMsgBgColor: '',
-    sendBtnBgColor: '',
-    sendBtnIconColor: '',
-    footerBgColor: '',
-    footerTextColor: ''
-  });
+type Message = {
+  text: string;
+  isUser: boolean;
+};
 
-  const [messages, setMessages] = useState([
-    { text: 'Hello! How can I help you today?', isUser: false },
-    { text: 'I need help with my order', isUser: true }
-  ]);
+type ChatWidgetSettings = {
+  botMsgBgColor: string;
+  userMsgBgColor: string;
+  sendBtnBgColor: string;
+  sendBtnIconColor: string;
+  footerBgColor: string;
+  footerTextColor: string;
+};
 
+type Props = {
+  defaultSettings: ChatWidgetSettings;
+  initialMessages: Message[];
+};
+
+export default function ChatWidgetOpenComponent({ defaultSettings, initialMessages }: Props) {
+  const [settings, setSettings] = useState<ChatWidgetSettings | null>(null);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [soundsEnabled, setSoundsEnabled] = useState(true); // State for Sounds toggle
+  const [soundsEnabled, setSoundsEnabled] = useState(true);
 
-  // Load settings from localStorage on component mount
+  // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem('chatWidgetSettings');
-    console.log('Loaded from localStorage:', savedSettings);
     if (savedSettings) {
       try {
-        const parsedSettings = JSON.parse(savedSettings);
-        console.log('Parsed settings:', parsedSettings);
-        setSettings(parsedSettings);
+        const parsed = JSON.parse(savedSettings);
+        setSettings(parsed);
       } catch (error) {
         console.error('Error parsing localStorage settings:', error);
+        setSettings(defaultSettings);
       }
     } else {
-      setSettings({
-        botMsgBgColor: '#f3f4f6',
-        userMsgBgColor: '#fef08a',
-        sendBtnBgColor: '#000000',
-        sendBtnIconColor: '#ffffff',
-        footerBgColor: '#ffffff',
-        footerTextColor: '#374151'
-      });
+      setSettings(defaultSettings);
     }
-  }, []);
+  }, [defaultSettings]);
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
-    if (
-      settings.botMsgBgColor &&
-      settings.userMsgBgColor &&
-      settings.sendBtnBgColor &&
-      settings.sendBtnIconColor &&
-      settings.footerBgColor &&
-      settings.footerTextColor
-    ) {
-      console.log('Saving to localStorage:', settings);
+    if (settings) {
       localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
     }
   }, [settings]);
 
-  const handleInputChange = (e:any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSettings((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    if (settings) {
+      setSettings((prev) => ({
+        ...prev!,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
     setMessages((prev) => [
       ...prev,
-      { text: newMessage, isUser: true }
+      { text: newMessage, isUser: true },
     ]);
     setNewMessage('');
     setTimeout(() => {
@@ -83,19 +77,24 @@ export default function ChatWidgetOpenComponent() {
     }, 10);
   };
 
-  const addEmoji = (emoji:any) => {
-    setNewMessage(prev => prev + emoji);
+  const addEmoji = (emoji: string) => {
+    setNewMessage((prev) => prev + emoji);
     setShowEmojiPicker(false);
   };
 
   const handleSave = () => {
-    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
-    alert('Settings saved successfully!');
+    if (settings) {
+      localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+      alert('Settings saved successfully!');
+    }
   };
 
   const handleSoundsToggle = () => {
     setSoundsEnabled((prev) => !prev);
   };
+
+  // Avoid rendering until settings are initialized (hydration-safe)
+  if (!settings) return null;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -350,7 +349,7 @@ export default function ChatWidgetOpenComponent() {
             {/* Messages */}
             <div
               id="messagesContainer"
-              className="p-4 flex-1 Overflow-y-auto bg-white dark:bg-gray-900"
+              className="p-4 flex-1 overflow-y-auto bg-white dark:bg-gray-900"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               <div className="space-y-3">
@@ -362,7 +361,7 @@ export default function ChatWidgetOpenComponent() {
                     <div
                       className={`px-3 py-2 rounded-lg max-w-xs ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
                       style={{
-                        backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor
+                        backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor,
                       }}
                     >
                       {message.text}
@@ -423,7 +422,7 @@ export default function ChatWidgetOpenComponent() {
                     className={`p-1 rounded-lg ${newMessage.trim() ? 'bg-black text-white' : 'text-gray-400'}`}
                     style={{
                       backgroundColor: settings.sendBtnBgColor,
-                      color: settings.sendBtnIconColor
+                      color: settings.sendBtnIconColor,
                     }}
                     onClick={handleSendMessage}
                     disabled={!newMessage.trim()}
@@ -463,7 +462,7 @@ export default function ChatWidgetOpenComponent() {
               className="p-1 text-center text-xs border-t"
               style={{
                 backgroundColor: settings.footerBgColor,
-                color: settings.footerTextColor
+                color: settings.footerTextColor,
               }}
             >
               Powered by LiveChat

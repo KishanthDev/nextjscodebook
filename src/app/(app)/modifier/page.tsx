@@ -13,6 +13,8 @@ export default function SettingsPage() {
   const eyecatcherdata = data.eyecatcher;
   const bubbledata = data.bubble;
   const chatbardata = data.chatbar;
+  const chatwidgetdata = data.chatwidgetopen.colors;
+  const chatwidgetmessage = data.chatwidgetopen.messages;
 
   const renderSelectedComponent = () => {
     switch (selectedOption) {
@@ -23,7 +25,7 @@ export default function SettingsPage() {
       case 'chat-bar':
         return <ChatBar defaultSettings={chatbardata} />;
       case 'chat-widget-open':
-        return <ChatWidgetOpen />;
+        return <ChatWidgetOpen defaultSettings={chatwidgetdata} initialMessages={chatwidgetmessage} />;
       default:
         return null;
     }

@@ -14,5 +14,29 @@
     "text": "Chat with us",
     "bgColor": "#007bff",
     "textColor": "#ffffff"
+  },
+  "chatwidgetopen": {
+    "colors": {
+      "botMsgBgColor": "#f3f4f6",
+      "userMsgBgColor": "#fef08a",
+      "sendBtnBgColor": "#000000",
+      "sendBtnIconColor": "#ffffff",
+      "footerBgColor": "#ffffff",
+      "footerTextColor": "#374151"
+    },
+    "messages": [
+      {
+        "text": "Hello! How can I assist you today?",
+        "isUser": false
+      },
+      {
+        "text": "I need help with my order.",
+        "isUser": true
+      },
+      {
+        "text": "Sure, could you please provide your order number?",
+        "isUser": false
+      }
+    ]
   }
 }

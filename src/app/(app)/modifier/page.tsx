@@ -12,6 +12,7 @@ export default function SettingsPage() {
   const [selectedOption, setSelectedOption] = useState('eyecatcher');
   const eyecatcherdata = data.eyecatcher;
   const bubbledata = data.bubble;
+  const chatbardata = data.chatbar;
 
   const renderSelectedComponent = () => {
     switch (selectedOption) {
@@ -20,7 +21,7 @@ export default function SettingsPage() {
       case 'bubble':
         return <Bubble defaultSettings={bubbledata} />;
       case 'chat-bar':
-        return <ChatBar />;
+        return <ChatBar defaultSettings={chatbardata} />;
       case 'chat-widget-open':
         return <ChatWidgetOpen />;
       default:

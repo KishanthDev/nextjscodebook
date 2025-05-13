@@ -9,5 +9,10 @@
     "bgColor": "#ff5101",
     "iconColor": "#ffffff",
     "dotsColor": "#ff5101"
+  },
+  "chatbar": {
+    "text": "Chat with us",
+    "bgColor": "#007bff",
+    "textColor": "#ffffff"
   }
 }

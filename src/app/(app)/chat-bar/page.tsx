@@ -1,55 +1,62 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 
-export default function ChatBarComponent() {
-  const [settings, setSettings] = useState({
-    text: '',
-    bgColor: '',
-    textColor: ''
-  });
+type ChatBarSettings = {
+  text: string;
+  bgColor: string;
+  textColor: string;
+};
 
-  // Load settings from localStorage on component mount
+type Props = {
+  defaultSettings: ChatBarSettings;
+};
+
+export default function ChatBarComponent({ defaultSettings }: Props) {
+  const [settings, setSettings] = useState<ChatBarSettings | null>(null);
+
+  // Load from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem('chatBarSettings');
-    console.log('Loaded from localStorage:', savedSettings); // Debug log
     if (savedSettings) {
       try {
-        const parsedSettings = JSON.parse(savedSettings);
-        console.log('Parsed settings:', parsedSettings); // Debug log
-        setSettings(parsedSettings);
+        const parsed = JSON.parse(savedSettings);
+        setSettings(parsed);
       } catch (error) {
-        console.error('Error parsing localStorage settings:', error);
+        console.error('Failed to parse settings from localStorage', error);
+        setSettings(defaultSettings);
       }
     } else {
-      // Fallback to default settings
-      setSettings({
-        text: 'Chat with us',
-        bgColor: '#007bff',
-        textColor: '#ffffff'
-      });
+      setSettings(defaultSettings);
     }
-  }, []);
+  }, [defaultSettings]);
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
-    if (settings.text && settings.bgColor && settings.textColor) {
-      console.log('Saving to localStorage:', settings); // Debug log
+    if (settings) {
       localStorage.setItem('chatBarSettings', JSON.stringify(settings));
     }
   }, [settings]);
 
-  const handleInputChange = (e:any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSettings((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    if (settings) {
+      setSettings((prev) => ({
+        ...prev!,
+        [name]: value
+      }));
+    }
   };
 
   const handleSave = () => {
-    localStorage.setItem('chatBarSettings', JSON.stringify(settings));
-    alert('Settings saved successfully!');
+    if (settings) {
+      localStorage.setItem('chatBarSettings', JSON.stringify(settings));
+      alert('Settings saved successfully!');
+    }
   };
+
+  // Avoid rendering anything until settings are initialized (hydration-safe)
+  if (!settings) return null;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

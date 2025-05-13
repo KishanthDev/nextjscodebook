@@ -4,15 +4,18 @@ import { useState } from 'react';
 import Bubble from '../bubble/page';
 import ChatBar from '../chat-bar/page';
 import ChatWidgetOpen from '../chat-widget-open/page';
-import Eyecatcher from '../eye-catcher/page'; // You had a comment here, now properly imported
+import Eyecatcher from '../eye-catcher/page'; 
+import data from "../../../../data/modifier.json"
+
 
 export default function SettingsPage() {
   const [selectedOption, setSelectedOption] = useState('eyecatcher');
+  const eyecatcherdata = data.eyecatcher;
 
   const renderSelectedComponent = () => {
     switch (selectedOption) {
       case 'eyecatcher':
-        return <Eyecatcher />;
+        return <Eyecatcher defaultSettings={eyecatcherdata} />;
       case 'bubble':
         return <Bubble />;
       case 'chat-bar':

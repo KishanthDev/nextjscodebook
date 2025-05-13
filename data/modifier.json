@@ -1,0 +1,13 @@
+{
+  "eyecatcher": {
+    "title": "Hello",
+    "text": "Click to chat with us",
+    "bgColor": "#007bff",
+    "textColor": "#ffffff"
+  },
+  "bubble": {
+    "bgColor": "#ff5101",
+    "iconColor": "#ffffff",
+    "dotsColor": "#ff5101"
+  }
+}

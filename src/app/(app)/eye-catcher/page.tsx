@@ -1,60 +1,68 @@
 'use client';
 import { useEffect, useState } from 'react';
 
-export default function EyecatcherComponent() {
-    const [settings, setSettings] = useState({
+type EyecatcherSettings = {
+  title: string;
+  text: string;
+  bgColor: string;
+  textColor: string;
+};
+
+type EyecatcherComponentProps = {
+  defaultSettings?: EyecatcherSettings;
+};
+
+export default function EyecatcherComponent({ defaultSettings }: EyecatcherComponentProps) {
+  const [settings, setSettings] = useState<EyecatcherSettings | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('eyecatcherSettings');
+    if (savedSettings) {
+      try {
+        setSettings(JSON.parse(savedSettings));
+      } catch (error) {
+        console.error('Error parsing localStorage settings:', error);
+        setSettings(defaultSettings || {
+          title: '',
+          text: '',
+          bgColor: '',
+          textColor: ''
+        });
+      }
+    } else {
+      setSettings(defaultSettings || {
         title: '',
         text: '',
         bgColor: '',
         textColor: ''
-    });
+      });
+    }
+    setLoaded(true);
+  }, [defaultSettings]);
 
-    // Load settings from localStorage on component mount
-    useEffect(() => {
-        const savedSettings = localStorage.getItem('eyecatcherSettings');
-        console.log('Loaded from localStorage:', savedSettings); // Debug log
-        if (savedSettings) {
-            try {
-                const parsedSettings = JSON.parse(savedSettings);
-                console.log('Parsed settings:', parsedSettings); // Debug log
-                setSettings(parsedSettings);
-            } catch (error) {
-                console.error('Error parsing localStorage settings:', error);
-            }
-        } else {
-            // Fallback to default settings
-            setSettings({
-                title: 'Hello',
-                text: 'Click to chat with us',
-                bgColor: '#007bff',
-                textColor: '#ffffff'
-            });
-        }
-    }, []);
+  useEffect(() => {
+    if (settings && settings.title && settings.text && settings.bgColor && settings.textColor) {
+      localStorage.setItem('eyecatcherSettings', JSON.stringify(settings));
+    }
+  }, [settings]);
 
-    // Save settings to localStorage whenever they change
-    useEffect(() => {
-        if (settings.title && settings.text && settings.bgColor && settings.textColor) {
-            console.log('Saving to localStorage:', settings); // Debug log
-            localStorage.setItem('eyecatcherSettings', JSON.stringify(settings));
-        }
-    }, [settings]);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSettings((prev) => prev ? { ...prev, [name]: value } : prev);
+  };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setSettings((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+  const handleSave = () => {
+    if (settings) {
+      localStorage.setItem('eyecatcherSettings', JSON.stringify(settings));
+      alert('Settings saved successfully!');
+    }
+  };
 
-    const handleSave = () => {
-        localStorage.setItem('eyecatcherSettings', JSON.stringify(settings));
-        alert('Settings saved successfully!');
-    };
+  if (!loaded || !settings) return <p className="p-4 text-gray-500">Loading...</p>;
 
-    return (
-        <div className="p-6 max-w-4xl mx-auto">
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
             <div className="flex justify-between items-center mb-10">
                 <h2 className="text-2xl font-bold">Eyecatcher Customization</h2>
                 <button

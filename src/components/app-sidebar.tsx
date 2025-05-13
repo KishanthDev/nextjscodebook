@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { NavUser } from '@/registry/new-york-v4/blocks/sidebar-07/components/nav-user';
 import { TeamSwitcher } from '@/registry/new-york-v4/blocks/sidebar-07/components/team-switcher';
@@ -31,6 +32,8 @@ import {
 } from 'lucide-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname(); // ✅ current path
+
   const user = {
     name: 'zoey',
     email: 'zoey@example.com',
@@ -55,6 +58,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   ];
 
+  // Sidebar links config
+  const links = [
+    { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { href: '/chats', icon: MessageCircle, label: 'Chats' },
+    { href: '/ai-agent', icon: Bot, label: 'AI Agent' },
+    { href: '/modifier', icon: Settings2, label: 'Chat Customization' },
+    { href: '/bubble', icon: Circle, label: 'Bubble' },
+    { href: '/chat-widget-open', icon: MessagesSquare, label: 'Chat Widget Open' },
+    { href: '/eye-catcher', icon: MessagesSquare, label: 'Eye Catcher' },
+    { href: '/chat-bar', icon: MessagesSquare, label: 'Chat Bar' }
+  ];
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -65,78 +80,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/dashboard">
-                  <LayoutDashboard className="mr-2" />
-                  <span>Dashboard</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/chats">
-                  <MessageCircle className="mr-2" />
-                  <span>Chats</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/ai-agent">
-                  <Bot className="mr-2" />
-                  <span>AI Agent</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/modifier">
-                  <Settings2 className="mr-2" />
-                  <span>Chat Customization</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/bubble">
-                  <Circle className="mr-2" />
-                  <span>Bubble</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/chat-widget-open">
-                  <MessagesSquare className="mr-2" />
-                  <span>Chat Widget Open</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/eye-catcher">
-                  <MessagesSquare className="mr-2" />
-                  <span>Eye Catcher</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/chat-bar">
-                  <MessagesSquare className="mr-2" />
-                  <span>Chat Bar</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
+            {links.map(({ href, icon: Icon, label }) => (
+              <SidebarMenuItem key={href}>
+                <SidebarMenuButton asChild data-active={pathname === href} className="data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-purple-600 data-[active=true]:text-white data-[active=true]:shadow-lg"
+                >
+                  <Link href={href}>
+                    <Icon className="mr-2" />
+                    <span>{label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

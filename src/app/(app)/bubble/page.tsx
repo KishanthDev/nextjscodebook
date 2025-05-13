@@ -1,66 +1,58 @@
-"use client";
-import { useEffect, useState } from 'react';
+'use client';
+import { useState, useEffect } from 'react';
 
-export default function BubbleComponent() {
-  // Initialize with empty values to avoid overriding loaded settings
-  const [settings, setSettings] = useState({
-    bgColor: '',
-    iconColor: '',
-    dotsColor: ''
-  });
+type BubbleSettings = {
+  bgColor: string;
+  iconColor: string;
+  dotsColor: string;
+};
 
+type BubbleComponentProps = {
+  defaultSettings: BubbleSettings;
+};
+
+export default function BubbleComponent({ defaultSettings }: BubbleComponentProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Load settings from localStorage on component mount
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('bubbleSettings');
-    console.log('Loaded from localStorage:', savedSettings); // Debug log
-    if (savedSettings) {
-      try {
-        const parsedSettings = JSON.parse(savedSettings);
-        console.log('Parsed settings:', parsedSettings); // Debug log
-        setSettings(parsedSettings);
-      } catch (error) {
-        console.error('Error parsing localStorage settings:', error);
+  // ✅ Lazy initialization to immediately check localStorage
+  const [settings, setSettings] = useState<BubbleSettings>(() => {
+    if (typeof window !== 'undefined') {
+      const savedSettings = localStorage.getItem('bubbleSettings');
+      if (savedSettings) {
+        try {
+          return JSON.parse(savedSettings) as BubbleSettings;
+        } catch (error) {
+          console.error('Failed to parse saved settings:', error);
+        }
       }
-    } else {
-      // Fallback to default settings if no saved settings
-      setSettings({
-        bgColor: '#ff5101',
-        iconColor: '#ffffff',
-        dotsColor: '#ff5101'
-      });
     }
-  }, []);
+    return defaultSettings;
+  });
 
-  // Save settings to localStorage whenever they change
+  // 🔄 Keep localStorage in sync when settings change
   useEffect(() => {
     if (settings.bgColor && settings.iconColor && settings.dotsColor) {
-      console.log('Saving to localStorage:', settings); // Debug log
       localStorage.setItem('bubbleSettings', JSON.stringify(settings));
     }
   }, [settings]);
 
-  const handleInputChange = (e:any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSettings(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setSettings((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = () => {
     localStorage.setItem('bubbleSettings', JSON.stringify(settings));
-    alert('Settings saved successfully!');
+    alert('Settings saved!');
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-10">
-        <h2 className="text-2xl font-bold mt-17">Bubble Customization</h2>
+        <h2 className="text-2xl font-bold">Bubble Customization</h2>
         <button
           onClick={handleSave}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
         >
           Save
         </button>
@@ -68,107 +60,66 @@ export default function BubbleComponent() {
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Settings Panel */}
-        <div className="flex-1 space-y-4 border-r pr-4 ">
-          {/* Background Color */}
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">Bubble Background Color:</label>
-            <div className="flex items-center border rounded-md overflow-hidden">
-              <input
-                type="text"
-                name="bgColor"
-                placeholder="#ff5101"
-                className="w-full px-2 py-2 text-sm focus:outline-none"
-                value={settings.bgColor}
-                onChange={handleInputChange}
-              />
-              <input
-                type="color"
-                name="bgColor"
-                className="w-12 h-12 cursor-pointer border-l"
-                value={settings.bgColor}
-                onChange={handleInputChange}
-              />
+        <div className="flex-1 space-y-4 border-r pr-4">
+          {['bgColor', 'iconColor', 'dotsColor'].map((key) => (
+            <div key={key}>
+              <label className="block text-sm font-medium text-primary mb-2">
+                {key === 'bgColor'
+                  ? 'Bubble Background Color'
+                  : key === 'iconColor'
+                  ? 'Bubble Icon Color'
+                  : 'Bubble Dots Color'}
+                :
+              </label>
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  name={key}
+                  placeholder="#hex"
+                  className="w-full px-2 py-2 text-sm focus:outline-none"
+                  value={settings[key as keyof BubbleSettings]}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="color"
+                  name={key}
+                  className="w-12 h-12 cursor-pointer border-l"
+                  value={settings[key as keyof BubbleSettings]}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
-          </div>
-
-          {/* Icon Color */}
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">Bubble Icon Color:</label>
-            <div className="flex items-center border rounded-md overflow-hidden">
-              <input
-                type="text"
-                name="iconColor"
-                placeholder="#ffffff"
-                className="w-full px-2 py-2 text-sm focus:outline-none"
-                value={settings.iconColor}
-                onChange={handleInputChange}
-              />
-              <input
-                type="color"
-                name="iconColor"
-                className="w-12 h-12 cursor-pointer border-l"
-                value={settings.iconColor}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-
-          {/* Dots Color */}
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">Bubble Dots Color:</label>
-            <div className="flex items-center border rounded-md overflow-hidden">
-              <input
-                type="text"
-                name="dotsColor"
-                placeholder="#ff5101"
-                className="w-full px-2 py-2 text-sm focus:outline-none"
-                value={settings.dotsColor}
-                onChange={handleInputChange}
-              />
-              <input
-                type="color"
-                name="dotsColor"
-                className="w-12 h-12 cursor-pointer border-l"
-                value={settings.dotsColor}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Preview Panel */}
         <div className="flex-1 flex justify-center items-center">
-          <div 
+          <div
             className="relative flex items-center justify-center rounded-full w-16 h-16 transition-colors duration-300 cursor-pointer"
             style={{ backgroundColor: settings.bgColor }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
             {!isHovered ? (
-              <svg 
-                viewBox="0 0 32 32" 
-                width="28" 
-                height="28" 
-                aria-hidden="true"
-              >
-                <path 
-                  fill={settings.iconColor} 
-                  d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z" 
+              <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+                <path
+                  fill={settings.iconColor}
+                  d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z"
                 />
-                <path 
-                  fill={settings.bgColor} 
-                  d="M19.57,21.68h3.67a2.08,2.08,0,0,0,2.11-1.81,89.86,89.86,0,0,0,0-10.38,1.9,1.9,0,0,0-1.84-1.74,113.15,113.15,0,0,0-15,0A1.9,1.9,0,0,0,6.71,9.49a74.92,74.92,0,0,0-.06,10.38,2,2,0,0,0,2.1,1.81h3.81V26.5Z" 
+                <path
+                  fill={settings.bgColor}
+                  d="M19.57,21.68h3.67a2.08,2.08,0,0,0,2.11-1.81,89.86,89.86,0,0,0,0-10.38,1.9,1.9,0,0,0-1.84-1.74,113.15,113.15,0,0,0-15,0A1.9,1.9,0,0,0,6.71,9.49a74.92,74.92,0,0,0-.06,10.38,2,2,0,0,0,2.1,1.81h3.81V26.5Z"
                 />
               </svg>
             ) : (
               <div className="flex gap-1">
                 {[...Array(3)].map((_, i) => (
-                  <span 
+                  <span
                     key={i}
-                    className="dot w-2 h-2 rounded-full"
-                    style={{ 
+                    className="w-2 h-2 rounded-full"
+                    style={{
                       backgroundColor: settings.dotsColor,
-                      animation: `jump 1.2s infinite ease-in-out ${i * 0.2}s`
+                      animation: `jump 1.2s infinite ease-in-out ${i * 0.2}s`,
                     }}
                   />
                 ))}
@@ -180,8 +131,14 @@ export default function BubbleComponent() {
 
       <style jsx>{`
         @keyframes jump {
-          0%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-10px); }
+          0%,
+          80%,
+          100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-10px);
+          }
         }
       `}</style>
     </div>

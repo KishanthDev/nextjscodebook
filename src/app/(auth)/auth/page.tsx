@@ -44,7 +44,7 @@ const AuthPage: React.FC = () => {
       <div className={`relative h-screen w-screen overflow-hidden ${isSignIn ? "sign-in" : isSignIn === false ? "sign-up" : ""}`}>
         {/* Background Slide */}
         <div
-          className="absolute top-0 right-0 h-full w-[300%] transform transition-transform duration-1000 ease-in-out bg-gradient-to-br from-[#4EA685] to-[#57B894] z-10 shadow-2xl"
+          className="absolute top-0 right-0 h-full w-[300%] transform transition-transform duration-1000 ease-in-out bg-gradient-to-br from-[#4B5EAA] to-[#6B46C1] z-10 shadow-2xl"
           style={{
             transform: isSignIn ? "translateX(0)" : isSignIn === false ? "translateX(100%)" : "translateX(35%)",
             right: isSignIn || isSignIn === false ? "50%" : "0",

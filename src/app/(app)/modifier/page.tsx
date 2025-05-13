@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Bubble from '../bubble/page';
-import ChatBar from '../chat-bar/page';
-import ChatWidgetOpen from '../chat-widget-open/page';
-import Eyecatcher from '../eye-catcher/page'; 
+import Bubble from '../../../components/modifier/bubble';
+import ChatBar from '../../../components/modifier/chatBar';
+import ChatWidgetOpen from '../../../components/modifier/chat-widget-open';
+import Eyecatcher from '../../../components/modifier/eye-catcher'; 
 import data from "../../../../data/modifier.json"
 
 

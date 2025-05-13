@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import data from "../../../../data/modifier.json";
 
 type BubbleSettings = {
   bgColor: string;
@@ -7,26 +8,23 @@ type BubbleSettings = {
   dotsColor: string;
 };
 
-type BubbleComponentProps = {
-  defaultSettings: BubbleSettings;
-};
-
-export default function page({ defaultSettings }: BubbleComponentProps) {
+export default function Page() {
   const [isHovered, setIsHovered] = useState(false);
 
-  const [settings, setSettings] = useState<BubbleSettings>(() => {
-    if (typeof window !== 'undefined') {
-      const savedSettings = localStorage.getItem('bubbleSettings');
-      if (savedSettings) {
-        try {
-          return JSON.parse(savedSettings) as BubbleSettings;
-        } catch (error) {
-          console.error('Failed to parse saved settings:', error);
-        }
+  const defaultSettings: BubbleSettings = data.bubble
+
+  const [settings, setSettings] = useState<BubbleSettings>(defaultSettings);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('bubbleSettings');
+    if (saved) {
+      try {
+        setSettings(JSON.parse(saved));
+      } catch (e) {
+        console.error('Invalid settings in localStorage:', e);
       }
     }
-    return defaultSettings;
-  });
+  }, []);
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

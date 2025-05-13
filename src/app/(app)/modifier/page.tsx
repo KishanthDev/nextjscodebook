@@ -11,13 +11,14 @@ import data from "../../../../data/modifier.json"
 export default function SettingsPage() {
   const [selectedOption, setSelectedOption] = useState('eyecatcher');
   const eyecatcherdata = data.eyecatcher;
+  const bubbledata = data.bubble;
 
   const renderSelectedComponent = () => {
     switch (selectedOption) {
       case 'eyecatcher':
         return <Eyecatcher defaultSettings={eyecatcherdata} />;
       case 'bubble':
-        return <Bubble />;
+        return <Bubble defaultSettings={bubbledata} />;
       case 'chat-bar':
         return <ChatBar />;
       case 'chat-widget-open':

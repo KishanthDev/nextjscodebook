@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/registry/new-york-v4/ui/button";
+import clsx from "clsx";
 
 const AuthPage: React.FC = () => {
-  const [isSignIn, setIsSignIn] = useState<boolean>(true);
+  const [isSignIn, setIsSignIn] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -19,7 +21,7 @@ const AuthPage: React.FC = () => {
     const timer = setTimeout(() => {
       setIsSignIn(true);
     }, 400);
-    
+
     return () => clearTimeout(timer);
   }, []);
 
@@ -44,7 +46,7 @@ const AuthPage: React.FC = () => {
       <div className={`relative h-screen w-screen overflow-hidden ${isSignIn ? "sign-in" : isSignIn === false ? "sign-up" : ""}`}>
         {/* Background Slide */}
         <div
-          className="absolute top-0 right-0 h-full w-[300%] transform transition-transform duration-1000 ease-in-out bg-gradient-to-br from-[#4B5EAA] to-[#6B46C1] z-10 shadow-2xl"
+          className="absolute top-0 right-0 h-full w-[300%] transform transition-transform duration-1000 ease-in-out bg-gradient-to-r from-blue-500 to-purple-500 z-10 shadow-2xl"
           style={{
             transform: isSignIn ? "translateX(0)" : isSignIn === false ? "translateX(100%)" : "translateX(35%)",
             right: isSignIn || isSignIn === false ? "50%" : "0",
@@ -150,13 +152,17 @@ const AuthPage: React.FC = () => {
                     I agree to the Terms of Service and Privacy Policy
                   </label>
                 </div>
-                <button
+                <Button
                   type="submit"
                   disabled={!agreeToTerms}
-                  className={`w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${!agreeToTerms ? "cursor-not-allowed opacity-50" : ""}`}
+                  variant="default"
+                  className={clsx(
+                    "w-full group",
+                    !agreeToTerms && "cursor-not-allowed opacity-50"
+                  )}
                 >
                   Sign Up
-                </button>
+                </Button>
                 <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
                   Already have an account?{" "}
                   <button
@@ -239,12 +245,13 @@ const AuthPage: React.FC = () => {
                     Forgot password?
                   </button>
                 </div>
-                <button
+                <Button
                   type="submit"
-                  className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  variant="default"
+                  className="w-full group"
                 >
                   Log In
-                </button>
+                </Button>
                 <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
                   Don't have an account?{" "}
                   <button

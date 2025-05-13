@@ -94,7 +94,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="/html/chatview.html">
+                <Link href="/modifier">
                   <Settings2 className="mr-2" />
                   <span>Chat Customization</span>
                 </Link>

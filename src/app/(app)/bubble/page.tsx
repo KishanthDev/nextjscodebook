@@ -11,7 +11,7 @@ type BubbleComponentProps = {
   defaultSettings: BubbleSettings;
 };
 
-export default function BubbleComponent({ defaultSettings }: BubbleComponentProps) {
+export default function page({ defaultSettings }: BubbleComponentProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const [settings, setSettings] = useState<BubbleSettings>(() => {

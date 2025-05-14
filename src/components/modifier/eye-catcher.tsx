@@ -84,7 +84,7 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
                             name="title"
                             placeholder="Hello"
                             maxLength={20}
-                            className="w-full px-4 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                             value={settings.title}
                             onChange={handleInputChange}
                         />
@@ -98,7 +98,7 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
                             name="text"
                             placeholder="Click to chat with us"
                             maxLength={36}
-                            className="w-full px-4 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                             value={settings.text}
                             onChange={handleInputChange}
                         />
@@ -112,7 +112,7 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
                                 type="text"
                                 name="bgColor"
                                 placeholder="#007bff"
-                                className="w-full px-2 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none"
+                                className="w-full px-3 py-3 text-sm focus:outline-none"
                                 value={settings.bgColor}
                                 onChange={handleInputChange}
                             />
@@ -134,7 +134,7 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
                                 type="text"
                                 name="textColor"
                                 placeholder="#ffffff"
-                                className="w-full px-2 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none"
+                                className="w-full px-2 py-2 text-sm focus:outline-none"
                                 value={settings.textColor}
                                 onChange={handleInputChange}
                             />

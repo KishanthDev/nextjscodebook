@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../../registry/new-york-v4/ui/button";
 import { SidebarTrigger } from "@/registry/new-york-v4/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../registry/new-york-v4/ui/dropdown-menu";
@@ -12,13 +12,17 @@ import FullScreenToggle from "./FullScreenToggle";
 import { UserDropdown } from "./user-dropdown";
 
 export const NavbarWrapper = () => {
-  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme(); // ✅ Moved here
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   const isDark = resolvedTheme === "dark";
-
-  if (!resolvedTheme) return null;
-
-  const baseBtnClass =
-    "inline-flex h-9 w-10 items-center justify-center rounded-md transition-colors hover:bg-gray-100 dark:hover:bg-gray-800";
+  const baseBtnClass = "inline-flex h-9 w-10 items-center justify-center rounded-md transition-colors hover:bg-gray-100 dark:hover:bg-gray-800";
 
   return (
     <header

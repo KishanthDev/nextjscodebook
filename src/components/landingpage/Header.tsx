@@ -22,12 +22,12 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex h-[90px] justify-between items-center py-4">
           {/* Logo and Product Dropdown */}
           <div className="flex items-center space-x-6">
             <Link href="/" className="flex items-center">
               <Image
-                src="/lc-powered-by-logo.svg"
+                src="https://www.livechat.com/lc-powered-by-logo.59e4207fd8afaeef387d20bfdb42958c49652808777bfbc227d1d69247059393.svg"
                 alt="LiveChat logo"
                 width={134}
                 height={40}
@@ -38,12 +38,12 @@ export default function Header() {
             <NavigationMenu className="hidden lg:block">
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
+                  <NavigationMenuTrigger className="text-lg  text-black hover:text-gray-600">
                     Product
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="grid grid-cols-2 gap-4 p-4 w-[400px]">
-                      <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-4 w-[600px]">
+                      <div className="space-y-2 p-8">
                         <Link
                           href="/tour"
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
@@ -72,7 +72,7 @@ export default function Header() {
                           </span>
                         </Link>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 p-8">
                         <p className="px-4 py-2 text-sm font-semibold text-gray-900">
                           Solutions
                         </p>
@@ -98,7 +98,7 @@ export default function Header() {
                     </div>
                     <Link
                       href="/app"
-                      className="block px-4 py-2 text-blue-600 hover:bg-gray-100 rounded-md"
+                      className="block text-center px-4 py-2 text-blue-600 hover:bg-gray-100 rounded-md"
                     >
                       Get LiveChat® App
                     </Link>

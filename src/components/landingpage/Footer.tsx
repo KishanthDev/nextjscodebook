@@ -237,12 +237,12 @@ export default function Footer() {
                     <div className="flex flex-col lg:flex-row lg:justify-between items-center mb-6">
                         {/* Desktop CTA */}
                         <div className="hidden md:flex items-center flex-col md:flex-row mb-4 lg:mb-1">
-                            <p className="text-sm font-bold text-black mb-3 md:mb-0 md:mr-4">
+                            <p className="text-normal font-bold text-black mb-3 md:mb-0 md:mr-4">
                                 Start your free live chat trial
                             </p>
                             <Link
                                 href="https://accounts.livechat.com/signup?source_id=footer_cta_button&source_type=website&source_url=https%3A%2F%2Fwww.livechat.com%2F&utm_source=PP&utm_medium=link&utm_campaign=pp_10off&utm_term=1-g-Cj0KCQjw8cHABhC-ARIsAJnY12xUzSCGtPx1EeNvnYNy0DYue-7gCrv_0Mq0wBrVEV6KrZ7bgPtsOowaAtUhEALw_wcB&landing_page=https%3A%2F%2Fwww.livechat.com%2F&partner_id=PVDCS9SU0D"
-                                className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                                className="px-4 py-1 bg-red-600 text-white text-lg font-bold rounded-sm hover:bg-red-700"
                             >
                                 Sign up free
                             </Link>
@@ -262,7 +262,7 @@ export default function Footer() {
                         </div>
 
                         {/* Social Links */}
-                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-4 max-w-lg mx-auto lg:mr-0">
+                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-8 max-w-lg mx-auto lg:mr-0">
                             {[
                                 { href: 'https://twitter.com/intent/follow?screen_name=LiveChat', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path fill="currentColor" d="M18.2 2.3h3.3l-7.2 8.2 8.5 11.3H16L11 14.8l-6 6.8H1.6L9.4 13 1.2 2.2H8l4.8 6.3 5.4-6.3ZM17 19.8H19L7 4H5l12 15.7Z" /></svg>, label: 'Twitter' },
                                 { href: 'https://www.linkedin.com/company/livechat/', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M20.45 20.45H16.9v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.95v5.66H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM3.55 20.45h3.57V9H3.55v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z" fill="currentColor" /></svg>, label: 'LinkedIn' },

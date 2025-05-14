@@ -38,13 +38,14 @@ export default function ChatBarComponent() {
       {/* Preview Panel */}
       <div className="flex justify-center items-start">
         <div
+          data-testid="chatbar-container"
           className="w-full max-w-md p-3 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
           style={{
             backgroundColor: settings.bgColor,
             color: settings.textColor
           }}
         >
-          <span className="font-medium">{settings.text}</span>
+          <span data-testid="chatbar-text" className="font-medium">{settings.text}</span>
         </div>
       </div>
     </div>

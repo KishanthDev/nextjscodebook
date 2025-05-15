@@ -20,7 +20,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-[90px] justify-between items-center py-4">
           {/* Logo and Product Dropdown */}
@@ -46,28 +46,28 @@ export default function Header() {
                       <div className="space-y-2 p-8">
                         <Link
                           href="/tour"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                          className="block px-4 py-2 font-medium text-black hover:bg-gray-100 rounded-md"
                         >
                           Product Tour
-                          <span className="block text-sm text-gray-500">
+                          <span className="block font-light text-sm text-gray-500">
                             Feel the LiveChat® experience
                           </span>
                         </Link>
                         <Link
                           href="/features"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                          className="block px-4 py-2 font-medium text-black hover:bg-gray-100 rounded-md"
                         >
                           Features
-                          <span className="block text-sm text-gray-500">
+                          <span className="block font-light text-sm text-gray-500">
                             Everything you need
                           </span>
                         </Link>
                         <Link
                           href="/features/channels"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                          className="block px-4 py-2 font-medium text-black hover:bg-gray-100 rounded-md"
                         >
                           Channels
-                          <span className="block text-sm text-gray-500">
+                          <span className="block font-light text-sm text-gray-500">
                             Be where your customers are
                           </span>
                         </Link>
@@ -78,19 +78,19 @@ export default function Header() {
                         </p>
                         <Link
                           href="/solutions/customer-support"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                          className="block px-4 py-2 font-bold text-black hover:bg-gray-100 rounded-md"
                         >
                           Customer Support
                         </Link>
                         <Link
                           href="/solutions/sales-and-marketing"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                          className="block px-4 py-2 font-bold text-black hover:bg-gray-100 rounded-md"
                         >
                           Sales & Marketing
                         </Link>
                         <Link
                           href="/enterprise"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                          className="block px-4 py-2 font-bold text-black hover:bg-gray-100 rounded-md"
                         >
                           Enterprise
                         </Link>
@@ -98,7 +98,7 @@ export default function Header() {
                     </div>
                     <Link
                       href="/app"
-                      className="block text-center px-4 py-2 text-blue-600 hover:bg-gray-100 rounded-md"
+                      className="block text-center px-4 py-2 text-xl text-black font-bold rounded-md"
                     >
                       Get LiveChat® App
                     </Link>
@@ -229,7 +229,7 @@ export default function Header() {
                   </Link>
                   <Link
                     href="/app"
-                    className="block text-blue-600 hover:text-blue-700"
+                    className="block text-black"
                   >
                     Get LiveChat® App
                   </Link>

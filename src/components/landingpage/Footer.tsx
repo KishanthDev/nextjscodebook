@@ -15,15 +15,15 @@ export default function Footer() {
     return (
         <footer className="bg-gray-100 text-black">
             {/* App Downloads and Navigation */}
-            <div className="border-b border-gray-700">
+            <div className="border-b border-gray-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     {/* App Download Links */}
                     <div className="flex flex-wrap items-center mb-6">
-                        <p className="text-xs font-bold flex-1 min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] mb-3 text-black">
+                        <p className="text-sm font-bold flex-1 min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] mb-3 text-black">
                             Get LiveChat® App
                         </p>
                         <p className="flex-1 min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] mb-3">
-                            <Link href="/app/livechat-web-app/" className="flex items-center text-xs text-black hover:text-gray-700">
+                            <Link href="/app/livechat-web-app/" className="flex items-center text-sm text-black hover:text-gray-700">
                                 <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg">
                                     <g fill="currentColor" fillRule="evenodd">
                                         <path d="M7.57 14.51c1.12-.15 2.1-1.31 2.72-3.03-.9-.2-1.8-.3-2.72-.31v3.34zM9.36 14.24l.2-.06.16-.05.19-.07.16-.07.19-.07a7.87 7.87 0 0 0 1.6-.97l.15-.11.15-.14.13-.11.15-.15.13-.12.02-.02a8.81 8.81 0 0 0-1.8-.69 6.44 6.44 0 0 1-1.66 2.7l.06-.02.17-.05zM14.62 7.52h-3.13a13.4 13.4 0 0 1-.53 3.6c.69.18 1.35.44 1.98.78a7.23 7.23 0 0 0 1.68-4.38zM7.57 7h3.4a12.92 12.92 0 0 0-.52-3.46c-.95.21-1.91.33-2.88.34V7zM7.57.01v3.35c.91-.01 1.82-.12 2.72-.32C9.67 1.33 8.69.17 7.57.01zM7.57 10.65c.97 0 1.93.12 2.88.34.33-1.13.5-2.3.51-3.47H7.57v3.13zM12.94 2.62c-.63.34-1.3.6-1.98.79.34 1.17.51 2.38.53 3.6h3.13a7.23 7.23 0 0 0-1.68-4.39zM12.59 2.23l-.02-.02-.13-.13-.15-.14-.13-.12-.15-.13-.14-.11a5.59 5.59 0 0 0-.94-.63 7.23 7.23 0 0 0-.17-.1L10.6.77a5.78 5.78 0 0 0-.34-.16l-.19-.08a7.38 7.38 0 0 0-.72-.25L9.2.24 9.13.22a6.44 6.44 0 0 1 1.67 2.7 8.8 8.8 0 0 0 1.79-.69zM0 7h3.13c.01-1.21.2-2.42.53-3.6a9.1 9.1 0 0 1-1.98-.78A7.23 7.23 0 0 0 0 7zM7.05 14.51v-3.34c-.92 0-1.82.12-2.72.31.62 1.72 1.6 2.88 2.72 3.03zM7.05 7.52h-3.4c.02 1.18.2 2.34.52 3.47.94-.22 1.9-.33 2.88-.34V7.52zM7.05.01c-1.12.16-2.1 1.32-2.72 3.03.9.2 1.8.3 2.72.32V0zM7.05 3.88c-.97-.01-1.94-.13-2.88-.34-.33 1.12-.5 2.29-.51 3.46h3.39V3.88zM5.49.22l-.06.02-.17.04-.2.06L4.9.4l-.2.07-.15.06-.19.08a7.57 7.57 0 0 0-.82.42l-.17.1a6.85 6.85 0 0 0-.46.32l-.16.13-.14.1-.15.14-.13.12-.15.14-.13.13-.02.02c.57.3 1.17.52 1.8.68C4.13 1.9 4.71.97 5.48.22zM2.18 12.44l.15.14.13.12.15.14.14.1.16.13.14.1a7.4 7.4 0 0 0 .81.5l.16.09a6.08 6.08 0 0 0 .34.16l.19.07a7.38 7.38 0 0 0 .35.14l.17.05.2.06.16.05.06.01a6.44 6.44 0 0 1-1.67-2.7 8.8 8.8 0 0 0-1.79.7l.02.02.13.12zM1.68 11.9c.62-.34 1.3-.6 1.98-.78a13.4 13.4 0 0 1-.53-3.6H0c.06 1.6.65 3.15 1.68 4.38z" />
@@ -33,7 +33,7 @@ export default function Footer() {
                             </Link>
                         </p>
                         <p className="flex-1 min-w-[30%] sm:min-w-[10.33%] lg:min-w-[10.67%] mb-3">
-                            <Link href="/app/livechat-for-windows/" className="flex items-center text-xs text-black hover:text-gray-700">
+                            <Link href="/app/livechat-for-windows/" className="flex items-center text-sm text-black hover:text-gray-700">
                                 <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg">
                                     <g fill="currentColor" fillRule="evenodd">
                                         <path d="M0 12.5l6 .8V7.7H0zM0 6.9h6V1.2L0 2zM6.7 13.4l7.9 1.1V7.7H6.7zM6.8 1.1v5.7h7.7V0z" />
@@ -43,7 +43,7 @@ export default function Footer() {
                             </Link>
                         </p>
                         <p className="flex-1 min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] mb-3">
-                            <Link href="/app/livechat-for-android/" className="flex items-center text-xs text-black hover:text-gray-700">
+                            <Link href="/app/livechat-for-android/" className="flex items-center text-sm text-black hover:text-gray-700">
                                 <svg width="15" height="18" xmlns="http://www.w3.org/2000/svg">
                                     <g fill="currentColor" fillRule="evenodd">
                                         <path d="M1.08 5.58h-.05C.47 5.58 0 6.04 0 6.6v4.44c0 .57.47 1.02 1.03 1.02h.05c.56 0 1.03-.46 1.03-1.02V6.6c0-.56-.47-1.02-1.03-1.02zM2.6 12.76c0 .51.42.93.94.93h1.01v2.4c0 .57.47 1.02 1.03 1.02h.05c.57 0 1.03-.46 1.03-1.02v-2.4h1.41v2.4c0 .57.46 1.02 1.03 1.02h.04c.57 0 1.03-.46 1.03-1.02v-2.4h1.01c.52 0 .95-.42.95-.93V5.74H2.6v7.02z" />
@@ -55,7 +55,7 @@ export default function Footer() {
                             </Link>
                         </p>
                         <p className="flex-1 min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] mb-3">
-                            <Link href="/app/livechat-for-iphone/" className="flex items-center text-xs text-black hover:text-gray-700">
+                            <Link href="/app/livechat-for-iphone/" className="flex items-center text-sm text-black hover:text-gray-700">
                                 <svg width="19" height="16" viewBox="0 0 19 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M4.6 13.9l-1 1.5a1.2 1.2 0 01-2-1.1l.7-1.2c.2-.2.5-.5 1-.4 0 0 1.3 0 1.4.8l-.1.4zM17 10H13.9L11 4.8l-.2-.3c-.3-.4-.7.7-.7.7-.6 1.2 0 2.7.3 3l4 7.1a1.2 1.2 0 002-1.1l-1-1.8s0-.2.2-.2H17c.6 0 1.1-.5 1.1-1.1 0-.6-.5-1.2-1.1-1.2zm-5.3 1.6s.1.7-.5.7h-10a1.2 1.2 0 010-2.3h2.5c.5 0 .6-.2.6-.2l3.4-5.9v-.2l-1.2-2a1.2 1.2 0 012-1.1l.6.9.5-1a1.2 1.2 0 012 1.2L6.9 10l.1.1h2.8s1.6 0 1.9 1.6z" fill="currentColor" />
                                 </svg>
@@ -63,7 +63,7 @@ export default function Footer() {
                             </Link>
                         </p>
                         <p className="flex-1 min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] mb-3">
-                            <Link href="/app/livechat-for-mac/" className="flex items-center text-xs text-black hover:text-gray-700">
+                            <Link href="/app/livechat-for-mac/" className="flex items-center text-sm text-black hover:text-gray-700">
                                 <svg width="15" height="18" xmlns="http://www.w3.org/2000/svg">
                                     <g fill="currentColor" fillRule="evenodd">
                                         <path d="M12.4 9.3c0-2.2 1.8-3.3 1.9-3.3a4.1 4.1 0 0 0-3.2-1.8c-1.4-.1-2.7.8-3.4.8-.7 0-1.8-.7-3-.7-1.4 0-2.8.8-3.6 2.2C-.5 9.2.7 13 2.2 15.3c.8 1 1.7 2.3 2.8 2.2 1.1 0 1.6-.7 3-.7 1.3 0 1.6.7 2.8.7 1.2 0 2-1 2.7-2.1.9-1.3 1.2-2.5 1.3-2.5 0 0-2.4-1-2.4-3.6zM10.2 2.8c.6-.7 1-1.8.9-2.8a4 4 0 0 0-2.6 1.3C7.9 2 7.4 3 7.5 4c1 .1 2-.5 2.7-1.2z" />
@@ -77,9 +77,9 @@ export default function Footer() {
                     {/* Navigation Sections */}
                     <nav className="flex flex-wrap mb-8">
                         <div className="min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] pr-2 mb-4">
-                            <p className="text-xs font-bold text-black mb-2">Product</p>
+                            <p className="text-sm font-bold text-black mb-3">Product</p>
                             <NavigationMenu>
-                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-2">
+                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-1">
                                     {[
                                         { href: '/pricing/', label: 'Pricing' },
                                         { href: '/benefits/', label: 'LiveChat® Benefits' },
@@ -94,7 +94,7 @@ export default function Footer() {
                                         <NavigationMenuItem key={item.href}>
                                             <Link
                                                 href={item.href}
-                                                className="text-xs text-black hover:text-gray-700 block"
+                                                className="text-sm text-black hover:text-gray-700 block"
                                                 {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
                                             >
                                                 {item.label}
@@ -107,16 +107,16 @@ export default function Footer() {
 
                         {/* Solutions */}
                         <div className="min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] pr-2 mb-4">
-                            <p className="text-xs font-bold text-black mb-2">Solutions</p>
+                            <p className="text-sm font-bold text-black mb-3">Solutions</p>
                             <NavigationMenu>
-                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-2">
+                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-1">
                                     {[
                                         { href: '/solutions/customer-support/', label: 'Customer Support' },
                                         { href: '/solutions/sales-and-marketing/', label: 'Sales & Marketing' },
                                         { href: '/enterprise/', label: 'Enterprise' },
                                     ].map((item) => (
                                         <NavigationMenuItem key={item.href}>
-                                            <Link href={item.href} className="text-xs text-black hover:text-gray-700 block">
+                                            <Link href={item.href} className="text-sm text-black hover:text-gray-700 block">
                                                 {item.label}
                                             </Link>
                                         </NavigationMenuItem>
@@ -127,9 +127,9 @@ export default function Footer() {
 
                         {/* Customers */}
                         <div className="min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] pr-2 mb-4">
-                            <p className="text-xs font-bold text-black mb-2">Customers</p>
+                            <p className="text-sm font-bold text-black mb-3">Customers</p>
                             <NavigationMenu>
-                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-2">
+                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-1">
                                     {[
                                         { href: '/customers/#industries', label: 'Industries' },
                                         { href: '/customers/', label: 'Customers' },
@@ -137,7 +137,7 @@ export default function Footer() {
                                         { href: '/customers/customer-stories/', label: 'Case Studies' },
                                     ].map((item) => (
                                         <NavigationMenuItem key={item.href}>
-                                            <Link href={item.href} className="text-xs text-black hover:text-gray-700 block">
+                                            <Link href={item.href} className="text-sm text-black hover:text-gray-700 block">
                                                 {item.label}
                                             </Link>
                                         </NavigationMenuItem>
@@ -148,9 +148,9 @@ export default function Footer() {
 
                         {/* Resources */}
                         <div className="min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] pr-2 mb-4">
-                            <p className="text-xs font-bold text-black mb-2">Resources</p>
+                            <p className="text-sm font-bold text-black mb-3">Resources</p>
                             <NavigationMenu>
-                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-2">
+                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-1">
                                     {[
                                         { href: '/success/', label: 'Success by LiveChat®', external: true },
                                         { href: '/success/customer-service-guide/', label: 'Customer Service Guide', external: true },
@@ -164,7 +164,7 @@ export default function Footer() {
                                         <NavigationMenuItem key={item.href}>
                                             <Link
                                                 href={item.href}
-                                                className="text-xs text-black hover:text-gray-700 block"
+                                                className="text-sm text-black hover:text-gray-700 block"
                                                 {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
                                             >
                                                 {item.label}
@@ -177,9 +177,9 @@ export default function Footer() {
 
                         {/* Support */}
                         <div className="min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.44%] pr-2 mb-4">
-                            <p className="text-xs font-bold text-black mb-2">Support</p>
+                            <p className="text-sm font-bold text-black mb-2">Support</p>
                             <NavigationMenu>
-                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-2">
+                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-1">
                                     {[
                                         { href: '/help/', label: 'Help Center' },
                                         { href: '/webinars/', label: 'Webinars' },
@@ -191,7 +191,7 @@ export default function Footer() {
                                         <NavigationMenuItem key={item.href}>
                                             <Link
                                                 href={item.href}
-                                                className="text-xs text-black hover:text-gray-700 block"
+                                                className="text-sm text-black hover:text-gray-700 block"
                                                 {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
                                             >
                                                 {item.label}
@@ -204,9 +204,9 @@ export default function Footer() {
 
                         {/* Company */}
                         <div className="min-w-[50%] sm:min-w-[33.33%] lg:min-w-[16.67%] pr-2 mb-4">
-                            <p className="text-xs font-bold text-black mb-2">Company</p>
+                            <p className="text-sm font-bold text-black mb-2">Company</p>
                             <NavigationMenu>
-                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-2">
+                                <NavigationMenuList className="flex flex-col items-start justify-start space-y-1">
                                     {[
                                         { href: 'https://text.com/?utm_source=livechat.com&utm_medium=referral&utm_content=footer', label: 'About Text', external: true },
                                         { href: '/contact/', label: 'Contact' },
@@ -221,7 +221,7 @@ export default function Footer() {
                                         <NavigationMenuItem key={item.href}>
                                             <Link
                                                 href={item.href}
-                                                className="text-xs text-black hover:text-gray-700 block"
+                                                className="text-sm text-black hover:text-gray-700 block"
                                                 {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
                                             >
                                                 {item.label}
@@ -291,22 +291,22 @@ export default function Footer() {
 
             {/* Legal Text */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                <p className="text-[0.625rem] mb-3">
+                <p className="text-xs text-gray-500 mb-3">
                     LiveChat® is the best AI live chat software for business, designed for B2B SaaS companies and{' '}
-                    <Link href="/solutions/ecommerce/" className="underline text-black hover:text-gray-700">
+                    <Link href="/solutions/ecommerce/" className="underline text-gray-700">
                         ecommerce
                     </Link>{' '}
                     stores. This powerful customer service software helps you connect with customers, provide real-time support, and drive sales across multiple communication channels. If you’re looking for the best live chat software for website engagement and customer satisfaction, LiveChat® will help you grow your business.
                     <br />
                     Copyright © 2025 Text, Inc. All rights reserved.
                 </p>
-                <p className="text-[0.625rem]">
+                <p className="text-xs text-gray-500">
                     We use cookies and similar technologies to enhance your interactions with our website and Services, including when you reach out to us on chat. This comprises traffic analysis, delivering personalized content, and supporting our marketing efforts. By accessing our website, interacting with our Services, you agree to let us and our partners employ cookies and similar technologies on your computer or devices. Click the{' '}
-                    <Link href="/legal/cookies-policy/" className="font-bold text-black hover:text-gray-700">
+                    <Link href="/legal/cookies-policy/" className="font-bold text-gray-700">
                         Cookies Policy
                     </Link>{' '}
                     to check how you can control the use of them through your device. To understand how we process your data, including through cookies, and different forms of interactions with us, please read our{' '}
-                    <Link href="/legal/privacy-policy/" className="font-bold text-black hover:text-gray-700">
+                    <Link href="/legal/privacy-policy/" className="font-bold text-gray-700">
                         Privacy Policy
                     </Link>.
                 </p>

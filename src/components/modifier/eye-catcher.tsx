@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useTheme } from 'next-themes';
+import { toast } from 'sonner';
 
 type EyecatcherSettings = {
   title: string;
@@ -62,26 +63,25 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
     setSettings((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
 
-  const handleSave = async () => {
-    if (!settings) return;
-    try {
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: 'eyeCatcher', data: settings }),
-      });
-      const result = await response.json();
+const handleSave = async () => {
+  try {
+    const response = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section: 'eyeCatcher', data: settings }),
+    });
+    const result = await response.json();
 
-      if (response.ok) {
-        alert('Settings saved!');
-      } else {
-        alert('Failed to save settings: ' + result.error);
-      }
-    } catch (err) {
-      alert('Error saving settings');
-      console.error(err);
+    if (response.ok) {
+      toast.success('Settings saved!');
+    } else {
+      toast.error('Failed to save settings: ' + (result.message || 'Unknown error'));
     }
-  };
+  } catch (err) {
+    toast.error('Error saving settings');
+    console.error(err);
+  }
+};
 
   if (!mounted) return null;
 

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useTheme } from 'next-themes';
+import { toast } from 'sonner';
 
 type BubbleSettings = {
   bgColor: string;
@@ -62,25 +63,25 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
     setSettings((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-    try {
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: 'bubble', data: settings }),
-      });
-      const result = await response.json();
+const handleSave = async () => {
+  try {
+    const response = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section: 'bubble', data: settings }),
+    });
+    const result = await response.json();
 
-      if (response.ok) {
-        alert('Settings saved!');
-      } else {
-        alert('Failed to save settings: ' + (result.message || 'Unknown error'));
-      }
-    } catch (err) {
-      alert('Error saving settings');
-      console.error(err);
+    if (response.ok) {
+      toast.success('Settings saved!');
+    } else {
+      toast.error('Failed to save settings: ' + (result.message || 'Unknown error'));
     }
-  };
+  } catch (err) {
+    toast.error('Error saving settings');
+    console.error(err);
+  }
+};
 
   if (!mounted) return null;
 

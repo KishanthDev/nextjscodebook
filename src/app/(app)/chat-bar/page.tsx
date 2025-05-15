@@ -1,8 +1,10 @@
 'use client';
-
+import { useState, useEffect } from 'react';
 import { useSettings } from '@/hooks/useSettings';
 import data from '../../../../data/modifier.json';
-import Loader from '@/components/loader/Loader';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+import { useTheme } from 'next-themes';
 
 type ChatBarSettings = {
   text: string;
@@ -12,17 +14,40 @@ type ChatBarSettings = {
 
 export default function ChatBarComponent() {
   const defaultSettings: ChatBarSettings = data.chatbar;
-
   const { settings, loading } = useSettings<ChatBarSettings>({
     section: 'chatBar',
     defaultSettings,
   });
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
 
-  if (loading) return (
-    <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-      <Loader />
-    </div>
-  );
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      setIsDarkMode(resolvedTheme === 'dark');
+    }
+  }, [mounted, resolvedTheme]);
+
+  if (!mounted) return null;
+
+  if (loading) {
+    return (
+      <SkeletonTheme
+        baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
+        highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
+      >
+        <div className="p-6 max-w-4xl mx-auto">
+          <div className="flex justify-center items-start">
+            <Skeleton width={448} height={48} borderRadius={8} />
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

@@ -13,7 +13,7 @@ import { UserDropdown } from "./user-dropdown";
 
 export const NavbarWrapper = () => {
   const [mounted, setMounted] = useState(false);
-  const { resolvedTheme } = useTheme(); // ✅ Moved here
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);

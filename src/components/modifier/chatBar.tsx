@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useTheme } from 'next-themes';
+import { toast } from 'sonner';
 
 type ChatBarSettings = {
   text: string;
@@ -62,26 +63,26 @@ export default function ChatBarComponent({ defaultSettings }: Props) {
       }));
     }
   };
-  
-  const handleSave = async () => {
-    try {
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: 'chatBar', data: settings }),
-      });
-      const result = await response.json();
 
-      if (response.ok) {
-        alert('Settings saved!');
-      } else {
-        alert('Failed to save settings: ' + result.error);
-      }
-    } catch (err) {
-      alert('Error saving settings');
-      console.error(err);
+const handleSave = async () => {
+  try {
+    const response = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section: 'chatBar', data: settings }),
+    });
+    const result = await response.json();
+
+    if (response.ok) {
+      toast.success('Settings saved!');
+    } else {
+      toast.error('Failed to save settings: ' + (result.message || 'Unknown error'));
     }
-  };
+  } catch (err) {
+    toast.error('Error saving settings');
+    console.error(err);
+  }
+};
 
   if (!mounted) return null;
 

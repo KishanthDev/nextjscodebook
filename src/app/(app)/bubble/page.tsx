@@ -1,9 +1,10 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSettings } from '@/hooks/useSettings';
 import data from "../../../../data/modifier.json";
-import Loader from '@/components/loader/Loader';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+import { useTheme } from 'next-themes';
 
 type BubbleSettings = {
   bgColor: string;
@@ -13,17 +14,42 @@ type BubbleSettings = {
 
 export default function Page() {
   const [isHovered, setIsHovered] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   const defaultSettings: BubbleSettings = data.bubble;
-
   const { settings, loading } = useSettings<BubbleSettings>({
     section: 'bubble',
     defaultSettings,
   });
 
-  if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-    <Loader />
-  </div>;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      setIsDarkMode(resolvedTheme === 'dark');
+    }
+  }, [mounted, resolvedTheme]);
+
+  if (!mounted) return null;
+
+  if (loading) {
+    return (
+      <SkeletonTheme
+        baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
+        highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
+      >
+        <div className="p-6 max-w-4xl mx-auto">
+          <div className="flex justify-center items-center">
+            <Skeleton circle height={64} width={64} />
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

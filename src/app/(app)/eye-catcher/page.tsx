@@ -1,7 +1,9 @@
 'use client';
-
-import Loader from '@/components/loader/Loader';
+import { useEffect, useState } from 'react';
 import { useSettings } from '@/hooks/useSettings';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+import { useTheme } from 'next-themes';
 
 type EyecatcherSettings = {
   title: string;
@@ -23,10 +25,37 @@ export default function EyecatcherPreview() {
     defaultSettings,
   });
 
-  if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-    <Loader />
-  </div>;
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      setIsDarkMode(resolvedTheme === 'dark');
+    }
+  }, [mounted, resolvedTheme]);
+
+  if (!mounted) return null;
+
+  if (loading) {
+    return (
+      <SkeletonTheme
+        baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
+        highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
+      >
+        <div className="flex justify-center items-start p-6">
+          <Skeleton width={208} height={96} borderRadius={8} />
+        </div>
+      </SkeletonTheme>
+    );
+  }
+
   if (!settings) return null;
+
   return (
     <div className="flex justify-center items-start p-6">
       <div
@@ -36,12 +65,9 @@ export default function EyecatcherPreview() {
           color: settings.textColor,
         }}
       >
-        {/* Emoji on the left */}
         <span className="text-3xl animate-wave flex-shrink-0 mr-3" style={{ animationDuration: '1.5s' }}>
           👋
         </span>
-
-        {/* Text on the right */}
         <div className="flex flex-col min-w-0">
           <h3 className="font-bold text-sm leading-tight break-words">{settings.title}</h3>
           <p className="text-xs break-words whitespace-normal">{settings.text}</p>

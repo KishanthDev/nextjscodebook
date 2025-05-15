@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useSettings } from '@/hooks/useSettings';
 
 type EyecatcherSettings = {
   title: string;
@@ -10,34 +10,20 @@ type EyecatcherSettings = {
 };
 
 export default function EyecatcherPreview() {
-  const [settings, setSettings] = useState<EyecatcherSettings | null>(null);
+  const defaultSettings: EyecatcherSettings = {
+    title: 'Hello',
+    text: 'Click to chat with us',
+    bgColor: '#007bff',
+    textColor: '#ffffff',
+  };
 
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('eyecatcherSettings');
-    if (savedSettings) {
-      try {
-        setSettings(JSON.parse(savedSettings));
-      } catch (error) {
-        console.error('Error parsing localStorage settings:', error);
-        setSettings({
-          title: 'Hello',
-          text: 'Click to chat with us',
-          bgColor: '#007bff',
-          textColor: '#ffffff',
-        });
-      }
-    } else {
-      setSettings({
-        title: 'Hello',
-        text: 'Click to chat with us',
-        bgColor: '#007bff',
-        textColor: '#ffffff',
-      });
-    }
-  }, []);
+  const { settings, loading } = useSettings<EyecatcherSettings>({
+    section: 'eyeCatcher',
+    defaultSettings,
+  });
 
-  if (!settings) return <p className="p-4 text-gray-500">Loading...</p>;
-
+  if (loading) return <p className="p-4 text-gray-500">Loading...</p>;
+  if (!settings) return null;
   return (
     <div className="flex justify-center items-start p-6">
       <div

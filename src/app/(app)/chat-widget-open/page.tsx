@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useSettings } from '@/hooks/useSettings';
 import data from '../../../../data/modifier.json';
 
 type Message = {
@@ -17,52 +18,30 @@ type ChatWidgetSettings = {
   footerTextColor: string;
 };
 
-
-
 export default function ChatWidgetPreview() {
-  const [settings, setSettings] = useState<ChatWidgetSettings | null>(null);
+  const defaultSettings: ChatWidgetSettings = {
+    botMsgBgColor: '#f3f4f6',
+    userMsgBgColor: '#fef08a',
+    sendBtnBgColor: '#000000',
+    sendBtnIconColor: '#ffffff',
+    footerBgColor: '#ffffff',
+    footerTextColor: '#374151',
+  };
+
+  const { settings, loading } = useSettings<ChatWidgetSettings>({
+    section: 'chatWidget',
+    defaultSettings,
+  });
+
   const [messages, setMessages] = useState<Message[]>(data.chatwidgetopen.messages);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [soundsEnabled, setSoundsEnabled] = useState(true);
 
-  // Load settings from localStorage on mount
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('chatWidgetSettings');
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings);
-        setSettings(parsed);
-      } catch (error) {
-        console.error('Error parsing localStorage settings:', error);
-        setSettings({
-          botMsgBgColor: '#f3f4f6',
-          userMsgBgColor: '#fef08a',
-          sendBtnBgColor: '#000000',
-          sendBtnIconColor: '#ffffff',
-          footerBgColor: '#ffffff',
-          footerTextColor: '#374151',
-        });
-      }
-    } else {
-      setSettings({
-        botMsgBgColor: '#f3f4f6',
-        userMsgBgColor: '#fef08a',
-        sendBtnBgColor: '#000000',
-        sendBtnIconColor: '#ffffff',
-        footerBgColor: '#ffffff',
-        footerTextColor: '#374151',
-      });
-    }
-  }, []);
-
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
-    setMessages((prev) => [
-      ...prev,
-      { text: newMessage, isUser: true },
-    ]);
+    setMessages((prev) => [...prev, { text: newMessage, isUser: true }]);
     setNewMessage('');
     setTimeout(() => {
       const messagesContainer = document.getElementById('messagesContainer');
@@ -81,7 +60,10 @@ export default function ChatWidgetPreview() {
     setSoundsEnabled((prev) => !prev);
   };
 
-  // Avoid rendering until settings are initialized (hydration-safe)
+  if (loading) {
+    return <div className="p-6 text-center text-gray-500">Loading...</div>;
+  }
+
   if (!settings) return null;
 
   return (

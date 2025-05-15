@@ -1,5 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
+import { useSettings } from '@/hooks/useSettings';
 import data from "../../../../data/modifier.json";
 
 type BubbleSettings = {
@@ -11,20 +13,16 @@ type BubbleSettings = {
 export default function Page() {
   const [isHovered, setIsHovered] = useState(false);
 
-  const defaultSettings: BubbleSettings = data.bubble
+  const defaultSettings: BubbleSettings = data.bubble;
 
-  const [settings, setSettings] = useState<BubbleSettings>(defaultSettings);
+  const { settings, loading } = useSettings<BubbleSettings>({
+    section: 'bubble',
+    defaultSettings,
+  });
 
-  useEffect(() => {
-    const saved = localStorage.getItem('bubbleSettings');
-    if (saved) {
-      try {
-        setSettings(JSON.parse(saved));
-      } catch (e) {
-        console.error('Invalid settings in localStorage:', e);
-      }
-    }
-  }, []);
+  if (loading) {
+    return <div className="p-6 text-center text-gray-500">Loading...</div>;
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -37,7 +35,13 @@ export default function Page() {
           onMouseLeave={() => setIsHovered(false)}
         >
           {!isHovered ? (
-            <svg  data-testid="bubble-icon" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+            <svg
+              data-testid="bubble-icon"
+              viewBox="0 0 32 32"
+              width="28"
+              height="28"
+              aria-hidden="true"
+            >
               <path
                 fill={settings.iconColor}
                 d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z"
@@ -51,7 +55,7 @@ export default function Page() {
             <div className="flex gap-1">
               {[...Array(3)].map((_, i) => (
                 <span
-                data-testid="bubble-dot"
+                  data-testid="bubble-dot"
                   key={i}
                   className="w-2 h-2 rounded-full"
                   style={{

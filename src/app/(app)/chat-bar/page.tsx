@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSettings } from '@/hooks/useSettings';
 import data from '../../../../data/modifier.json';
 
 type ChatBarSettings = {
@@ -11,26 +11,17 @@ type ChatBarSettings = {
 
 
 export default function ChatBarComponent() {
-  const [settings, setSettings] = useState<ChatBarSettings | null>(null);
   const defaultSettings: ChatBarSettings = data.chatbar;
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('chatBarSettings');
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings);
-        setSettings(parsed);
-      } catch (error) {
-        console.error('Failed to parse settings from localStorage', error);
-        setSettings(defaultSettings);
-      }
-    } else {
-      setSettings(defaultSettings);
-    }
-  }, [defaultSettings]);
+  const { settings, loading } = useSettings<ChatBarSettings>({
+    section: 'chatBar',
+    defaultSettings,
+  });
 
-  // Avoid rendering anything until settings are initialized (hydration-safe)
+  if (loading) {
+    return <div className="p-6 text-center text-gray-500">Loading...</div>;
+  }
+
   if (!settings) return null;
 
   return (

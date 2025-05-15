@@ -15,19 +15,17 @@ type Props = {
 
 export default function ChatBarComponent({ defaultSettings }: Props) {
   const [settings, setSettings] = useState<ChatBarSettings | null>(null);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchSettings() {
+      setLoading(true);
+
       try {
         const res = await fetch('/api/settings?section=chatBar');
         if (res.ok) {
           const json = await res.json();
-          if (json.settings) {
-            setSettings(json.settings);
-          } else {
-            setSettings(defaultSettings);
-          }
+          setSettings(json.settings ?? defaultSettings);
         } else {
           setSettings(defaultSettings);
         }
@@ -72,9 +70,14 @@ export default function ChatBarComponent({ defaultSettings }: Props) {
     }
   };
 
-  if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-    <Loader />
-  </div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
+        <Loader />
+      </div>
+    );
+  }
+
   if (!settings) return null;
 
   return (

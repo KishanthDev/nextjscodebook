@@ -10,7 +10,6 @@ type ChatBarSettings = {
   textColor: string;
 };
 
-
 export default function ChatBarComponent() {
   const defaultSettings: ChatBarSettings = data.chatbar;
 
@@ -19,17 +18,14 @@ export default function ChatBarComponent() {
     defaultSettings,
   });
 
-  if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-    <Loader />
-  </div>;
-
-  if (!settings) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-    <Loader />
-  </div>;;
+  if (loading) return (
+    <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
+      <Loader />
+    </div>
+  );
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      {/* Preview Panel */}
       <div className="flex justify-center items-start">
         <div
           data-testid="chatbar-container"

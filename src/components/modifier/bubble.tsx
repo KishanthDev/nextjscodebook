@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Loader from '../loader/Loader';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 type BubbleSettings = {
   bgColor: string;
@@ -16,6 +17,11 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
   const [isHovered, setIsHovered] = useState(false);
   const [settings, setSettings] = useState<BubbleSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    setIsDarkMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, []);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -67,9 +73,43 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
     }
   };
 
-   if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-     <Loader />
-   </div>;
+  if (loading) {
+    return (
+      <SkeletonTheme
+        baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
+        highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
+      >
+        <div className="p-6 max-w-4xl mx-auto">
+          {/* Header Skeleton */}
+          <div className="flex justify-between items-center mb-10">
+            <Skeleton width={200} height={32} />
+            <Skeleton width={80} height={40} borderRadius={6} />
+          </div>
+
+          {/* Main Content Skeleton */}
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Left Panel Skeleton (Settings) */}
+            <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton width={150} height={16} />
+                  <div className="flex items-center">
+                    <Skeleton width="100%" height={40} borderRadius={6} containerClassName="flex-1" />
+                    <Skeleton width={48} height={40} borderRadius={0} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Right Panel Skeleton (Preview) */}
+            <div className="flex-1 flex justify-center items-center">
+              <Skeleton circle height={64} width={64} />
+            </div>
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -92,8 +132,8 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                 {key === 'bgColor'
                   ? 'Bubble Background Color'
                   : key === 'iconColor'
-                  ? 'Bubble Icon Color'
-                  : 'Bubble Dots Color'}
+                    ? 'Bubble Icon Color'
+                    : 'Bubble Dots Color'}
                 :
               </label>
               <div className="flex items-center border rounded-md overflow-hidden">

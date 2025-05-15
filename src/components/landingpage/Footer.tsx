@@ -1,15 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import {
     NavigationMenu,
-    NavigationMenuContent,
     NavigationMenuItem,
     NavigationMenuList,
-    NavigationMenuTrigger,
 } from '../../registry/new-york-v4/ui/navigation-menu';
-import { cn } from '@/lib/utils';
 
 export default function Footer() {
     return (

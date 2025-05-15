@@ -28,29 +28,34 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [soundsEnabled, setSoundsEnabled] = useState(true);
+  const [loading, setLoading] = useState(true);
+
 
   // Load settings from localStorage on mount
   useEffect(() => {
-    const savedSettings = localStorage.getItem('chatWidgetSettings');
-    if (savedSettings) {
+    async function fetchSettings() {
       try {
-        const parsed = JSON.parse(savedSettings);
-        setSettings(parsed);
-      } catch (error) {
-        console.error('Error parsing localStorage settings:', error);
+        const res = await fetch('/api/settings?section=chatWidget');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.settings) {
+            setSettings(json.settings);
+          } else {
+            setSettings(defaultSettings);
+          }
+        } else {
+          setSettings(defaultSettings);
+        }
+      } catch (err) {
+        console.error('Failed to fetch settings', err);
         setSettings(defaultSettings);
+      } finally {
+        setLoading(false);
       }
-    } else {
-      setSettings(defaultSettings);
     }
-  }, [defaultSettings]);
 
-  // Save settings to localStorage whenever they change
-  useEffect(() => {
-    if (settings) {
-      localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
-    }
-  }, [settings]);
+    fetchSettings();
+  }, [defaultSettings]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -82,10 +87,23 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
     setShowEmojiPicker(false);
   };
 
-  const handleSave = () => {
-    if (settings) {
-      localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
-      alert('Settings saved successfully!');
+  const handleSave = async () => {
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section: 'chatWidget', data: settings }),
+      });
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Settings saved!');
+      } else {
+        alert('Failed to save settings: ' + result.error);
+      }
+    } catch (err) {
+      alert('Error saving settings');
+      console.error(err);
     }
   };
 
@@ -93,9 +111,9 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
     setSoundsEnabled((prev) => !prev);
   };
 
-  // Avoid rendering until settings are initialized (hydration-safe)
+  if (loading) return <p>Loading settings...</p>;
   if (!settings) return null;
-
+  
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-10">

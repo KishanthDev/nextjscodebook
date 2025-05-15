@@ -13,36 +13,60 @@ type BubbleComponentProps = {
 
 export default function BubbleComponent({ defaultSettings }: BubbleComponentProps) {
   const [isHovered, setIsHovered] = useState(false);
-
-  const [settings, setSettings] = useState<BubbleSettings>(() => {
-    if (typeof window !== 'undefined') {
-      const savedSettings = localStorage.getItem('bubbleSettings');
-      if (savedSettings) {
-        try {
-          return JSON.parse(savedSettings) as BubbleSettings;
-        } catch (error) {
-          console.error('Failed to parse saved settings:', error);
-        }
-      }
-    }
-    return defaultSettings;
-  });
+  const [settings, setSettings] = useState<BubbleSettings>(defaultSettings);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (settings.bgColor && settings.iconColor && settings.dotsColor) {
-      localStorage.setItem('bubbleSettings', JSON.stringify(settings));
+    async function fetchSettings() {
+      try {
+        const res = await fetch('/api/settings?section=bubble');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.settings) {
+            setSettings(json.settings);
+          } else {
+            setSettings(defaultSettings);
+          }
+        } else {
+          setSettings(defaultSettings);
+        }
+      } catch (err) {
+        console.error('Failed to fetch settings', err);
+        setSettings(defaultSettings);
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [settings]);
+
+    fetchSettings();
+  }, [defaultSettings]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSettings((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    localStorage.setItem('bubbleSettings', JSON.stringify(settings));
-    alert('Settings saved!');
+  const handleSave = async () => {
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section: 'bubble', data: settings }),
+      });
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Settings saved!');
+      } else {
+        alert('Failed to save settings: ' + (result.message || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Error saving settings');
+      console.error(err);
+    }
   };
+
+  if (loading) return <p>Loading settings...</p>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

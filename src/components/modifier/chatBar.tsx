@@ -14,27 +14,32 @@ type Props = {
 
 export default function ChatBarComponent({ defaultSettings }: Props) {
   const [settings, setSettings] = useState<ChatBarSettings | null>(null);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const savedSettings = localStorage.getItem('chatBarSettings');
-    if (savedSettings) {
+    async function fetchSettings() {
       try {
-        const parsed = JSON.parse(savedSettings);
-        setSettings(parsed);
-      } catch (error) {
-        console.error('Failed to parse settings from localStorage', error);
+        const res = await fetch('/api/settings?section=chatBar');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.settings) {
+            setSettings(json.settings);
+          } else {
+            setSettings(defaultSettings);
+          }
+        } else {
+          setSettings(defaultSettings);
+        }
+      } catch (err) {
+        console.error('Failed to fetch settings', err);
         setSettings(defaultSettings);
+      } finally {
+        setLoading(false);
       }
-    } else {
-      setSettings(defaultSettings);
     }
-  }, [defaultSettings]);
 
-  useEffect(() => {
-    if (settings) {
-      localStorage.setItem('chatBarSettings', JSON.stringify(settings));
-    }
-  }, [settings]);
+    fetchSettings();
+  }, [defaultSettings]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,13 +51,27 @@ export default function ChatBarComponent({ defaultSettings }: Props) {
     }
   };
 
-  const handleSave = () => {
-    if (settings) {
-      localStorage.setItem('chatBarSettings', JSON.stringify(settings));
-      alert('Settings saved successfully!');
+  const handleSave = async () => {
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section: 'chatBar', data: settings }),
+      });
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Settings saved!');
+      } else {
+        alert('Failed to save settings: ' + result.error);
+      }
+    } catch (err) {
+      alert('Error saving settings');
+      console.error(err);
     }
   };
 
+  if (loading) return <p>Loading settings...</p>;
   if (!settings) return null;
 
   return (

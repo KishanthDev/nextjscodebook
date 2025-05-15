@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useTheme } from 'next-themes';
 
 type EyecatcherSettings = {
   title: string;
@@ -18,10 +19,18 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
   const [settings, setSettings] = useState<EyecatcherSettings | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    setIsDarkMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      setIsDarkMode(resolvedTheme === 'dark');
+    }
+  }, [mounted, resolvedTheme]);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -74,6 +83,8 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
     }
   };
 
+  if (!mounted) return null;
+
   if (!loaded) {
     return (
       <SkeletonTheme
@@ -81,15 +92,11 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
         highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
       >
         <div className="p-6 max-w-4xl mx-auto">
-          {/* Header Skeleton */}
           <div className="flex justify-between items-center mb-10">
             <Skeleton width={220} height={32} />
             <Skeleton width={80} height={40} borderRadius={6} />
           </div>
-
-          {/* Main Content Skeleton */}
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Settings Panel Skeleton */}
             <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="space-y-2">
@@ -105,8 +112,6 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
                 </div>
               ))}
             </div>
-
-            {/* Preview Panel Skeleton */}
             <div className="flex-1 flex justify-center items-start">
               <Skeleton width={208} height={96} borderRadius={8} />
             </div>
@@ -131,9 +136,7 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Settings Panel */}
         <div className="flex-1 space-y-4 border-r pr-4">
-          {/* Welcome Message */}
           <div>
             <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">Welcome Message:</label>
             <input
@@ -146,8 +149,6 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
               onChange={handleInputChange}
             />
           </div>
-
-          {/* Invitation Text */}
           <div>
             <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">Invitation Text:</label>
             <input
@@ -160,8 +161,6 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
               onChange={handleInputChange}
             />
           </div>
-
-          {/* Background Color */}
           <div>
             <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">Background Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
@@ -182,8 +181,6 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
               />
             </div>
           </div>
-
-          {/* Text Color */}
           <div>
             <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">Text Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">
@@ -205,8 +202,6 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
             </div>
           </div>
         </div>
-
-        {/* Preview Panel */}
         <div className="flex-1 flex justify-center items-start">
           <div
             className="flex w-[13rem] p-4 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md"
@@ -215,12 +210,9 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
               color: settings.textColor,
             }}
           >
-            {/* Emoji on the left */}
             <span className="text-3xl animate-wave flex-shrink-0 mr-3" style={{ animationDuration: '1.5s' }}>
               👋
             </span>
-
-            {/* Text on the right */}
             <div className="flex flex-col min-w-0">
               <h3 className="font-bold text-sm leading-tight break-words">{settings.title}</h3>
               <p className="text-xs break-words whitespace-normal">{settings.text}</p>

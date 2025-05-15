@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useTheme } from 'next-themes';
 
 type Message = {
   text: string;
@@ -31,10 +32,18 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
   const [soundsEnabled, setSoundsEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    setIsDarkMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      setIsDarkMode(resolvedTheme === 'dark');
+    }
+  }, [mounted, resolvedTheme]);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -115,6 +124,8 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
     setSoundsEnabled((prev) => !prev);
   };
 
+  if (!mounted) return null;
+
   if (loading) {
     return (
       <SkeletonTheme
@@ -122,15 +133,11 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
         highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
       >
         <div className="p-6 max-w-4xl mx-auto">
-          {/* Header Skeleton */}
           <div className="flex justify-between items-center mb-10">
             <Skeleton width={240} height={32} />
             <Skeleton width={80} height={40} borderRadius={6} />
           </div>
-
-          {/* Main Content Skeleton */}
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Settings Panel Skeleton */}
             <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="space-y-2">
@@ -142,11 +149,8 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                 </div>
               ))}
             </div>
-
-            {/* Preview Panel Skeleton */}
             <div className="flex-1 flex justify-center items-start">
               <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden">
-                {/* Header Skeleton */}
                 <div className="p-3 border-b flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <Skeleton circle width={32} height={32} />
@@ -158,8 +162,6 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                     <Skeleton width={24} height={24} borderRadius={4} />
                   </div>
                 </div>
-
-                {/* Messages Area Skeleton */}
                 <div className="p-4 flex-1">
                   <div className="space-y-3">
                     {[...Array(3)].map((_, i) => (
@@ -169,15 +171,11 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                     ))}
                   </div>
                 </div>
-
-                {/* Input Area Skeleton */}
                 <div className="p-3 border-t">
                   <div className="flex">
                     <Skeleton width="100%" height={40} borderRadius={8} />
                   </div>
                 </div>
-
-                {/* Footer Skeleton */}
                 <div className="p-1 border-t">
                   <Skeleton width={120} height={12} containerClassName="flex justify-center" />
                 </div>
@@ -204,9 +202,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Settings Panel */}
         <div className="flex-1 space-y-4 border-r pr-4">
-          {/* Bot Message Background */}
           <div>
             <label className="block text-sm font-medium text-primary mb-2">Bot Message Background Color:</label>
             <div className="flex items-center border rounded-md overflow-hidden">

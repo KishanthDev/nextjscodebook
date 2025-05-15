@@ -1,7 +1,7 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-import Loader from '../loader/Loader';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 type Message = {
   text: string;
@@ -30,9 +30,12 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
   const [showDropdown, setShowDropdown] = useState(false);
   const [soundsEnabled, setSoundsEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
+  useEffect(() => {
+    setIsDarkMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, []);
 
-  // Load settings from localStorage on mount
   useEffect(() => {
     async function fetchSettings() {
       try {
@@ -112,11 +115,82 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
     setSoundsEnabled((prev) => !prev);
   };
 
-    if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-      <Loader />
-    </div>;
+  if (loading) {
+    return (
+      <SkeletonTheme
+        baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
+        highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
+      >
+        <div className="p-6 max-w-4xl mx-auto">
+          {/* Header Skeleton */}
+          <div className="flex justify-between items-center mb-10">
+            <Skeleton width={240} height={32} />
+            <Skeleton width={80} height={40} borderRadius={6} />
+          </div>
+
+          {/* Main Content Skeleton */}
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Settings Panel Skeleton */}
+            <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton width={180} height={16} />
+                  <div className="flex items-center">
+                    <Skeleton width="100%" height={40} borderRadius={6} containerClassName="flex-1" />
+                    <Skeleton width={48} height={40} borderRadius={0} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Preview Panel Skeleton */}
+            <div className="flex-1 flex justify-center items-start">
+              <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden">
+                {/* Header Skeleton */}
+                <div className="p-3 border-b flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Skeleton circle width={32} height={32} />
+                    <Skeleton width={80} height={16} />
+                  </div>
+                  <div className="flex gap-2">
+                    <Skeleton width={24} height={24} borderRadius={4} />
+                    <Skeleton width={24} height={24} borderRadius={4} />
+                    <Skeleton width={24} height={24} borderRadius={4} />
+                  </div>
+                </div>
+
+                {/* Messages Area Skeleton */}
+                <div className="p-4 flex-1">
+                  <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="flex justify-start">
+                        <Skeleton width={200} height={40} borderRadius={8} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Input Area Skeleton */}
+                <div className="p-3 border-t">
+                  <div className="flex">
+                    <Skeleton width="100%" height={40} borderRadius={8} />
+                  </div>
+                </div>
+
+                {/* Footer Skeleton */}
+                <div className="p-1 border-t">
+                  <Skeleton width={120} height={12} containerClassName="flex justify-center" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
+
   if (!settings) return null;
-  
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-10">

@@ -1,7 +1,7 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-import Loader from '../loader/Loader';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 type ChatBarSettings = {
   text: string;
@@ -16,11 +16,15 @@ type Props = {
 export default function ChatBarComponent({ defaultSettings }: Props) {
   const [settings, setSettings] = useState<ChatBarSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    setIsDarkMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, []);
 
   useEffect(() => {
     async function fetchSettings() {
       setLoading(true);
-
       try {
         const res = await fetch('/api/settings?section=chatBar');
         if (res.ok) {
@@ -72,9 +76,43 @@ export default function ChatBarComponent({ defaultSettings }: Props) {
 
   if (loading) {
     return (
-      <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
-        <Loader />
-      </div>
+      <SkeletonTheme
+        baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
+        highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
+      >
+        <div className="p-6 max-w-4xl mx-auto">
+          {/* Header Skeleton */}
+          <div className="flex justify-between items-center mb-10">
+            <Skeleton width={200} height={32} />
+            <Skeleton width={80} height={40} borderRadius={6} />
+          </div>
+
+          {/* Main Content Skeleton */}
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Settings Panel Skeleton */}
+            <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton width={150} height={16} />
+                  {i === 0 ? (
+                    <Skeleton width="100%" height={40} borderRadius={6} />
+                  ) : (
+                    <div className="flex items-center">
+                      <Skeleton width="100%" height={40} borderRadius={6} containerClassName="flex-1" />
+                      <Skeleton width={48} height={40} borderRadius={0} />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Preview Panel Skeleton */}
+            <div className="flex-1 flex justify-center items-start">
+              <Skeleton width={448} height={48} borderRadius={8} />
+            </div>
+          </div>
+        </div>
+      </SkeletonTheme>
     );
   }
 

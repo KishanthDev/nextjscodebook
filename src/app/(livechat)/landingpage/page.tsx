@@ -11,7 +11,9 @@ function Page() {
       <div className="border-b rounded-4xl shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]">
         <Hero1 />
       </div>
-      <Preview />
+      <div className='my-10'>
+        <Preview />
+      </div>
       <Footer />
     </div>
   )

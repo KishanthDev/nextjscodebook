@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Loader from '../loader/Loader';
 
 type ChatBarSettings = {
   text: string;
@@ -71,7 +72,9 @@ export default function ChatBarComponent({ defaultSettings }: Props) {
     }
   };
 
-  if (loading) return <p>Loading settings...</p>;
+  if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
+    <Loader />
+  </div>;
   if (!settings) return null;
 
   return (

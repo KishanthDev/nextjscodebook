@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Loader from '../loader/Loader';
 
 type BubbleSettings = {
   bgColor: string;
@@ -66,7 +67,9 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
     }
   };
 
-  if (loading) return <p>Loading settings...</p>;
+   if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
+     <Loader />
+   </div>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

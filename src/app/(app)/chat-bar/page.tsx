@@ -2,6 +2,7 @@
 
 import { useSettings } from '@/hooks/useSettings';
 import data from '../../../../data/modifier.json';
+import Loader from '@/components/loader/Loader';
 
 type ChatBarSettings = {
   text: string;
@@ -18,11 +19,13 @@ export default function ChatBarComponent() {
     defaultSettings,
   });
 
-  if (loading) {
-    return <div className="p-6 text-center text-gray-500">Loading...</div>;
-  }
+  if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
+    <Loader />
+  </div>;
 
-  if (!settings) return null;
+  if (!settings) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
+    <Loader />
+  </div>;;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

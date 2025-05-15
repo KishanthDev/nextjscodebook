@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Loader from '../loader/Loader';
 
 type EyecatcherSettings = {
   title: string;
@@ -67,6 +68,9 @@ export default function EyecatcherComponent({ defaultSettings }: EyecatcherCompo
     }
   };
 
+  if (!loaded) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
+    <Loader />
+  </div>;
   if (!loaded || !settings) return <p className="p-4 text-gray-500">Loading...</p>;
 
   return (

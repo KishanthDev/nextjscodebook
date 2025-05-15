@@ -1,5 +1,6 @@
 'use client';
 
+import Loader from '@/components/loader/Loader';
 import { useSettings } from '@/hooks/useSettings';
 
 type EyecatcherSettings = {
@@ -22,7 +23,9 @@ export default function EyecatcherPreview() {
     defaultSettings,
   });
 
-  if (loading) return <p className="p-4 text-gray-500">Loading...</p>;
+  if (loading) return <div className="flex justify-center min-h-[calc(100vh-64px)] items-center">
+    <Loader />
+  </div>;
   if (!settings) return null;
   return (
     <div className="flex justify-center items-start p-6">

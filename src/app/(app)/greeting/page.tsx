@@ -73,7 +73,7 @@ const GreetingImage = ({ src, alt, fallbackSrc }: { src: string; alt: string; fa
   </div>
 );
 
-export default function Greeting({ showSettingsForm = false }: GreetingProps) {
+function GreetingContent({ showSettingsForm = false }: GreetingProps) {
   const defaultSettings: ChatWidgetSettings = {
     headingColor: '#333333',
     paraColor: '#666666',
@@ -124,7 +124,6 @@ export default function Greeting({ showSettingsForm = false }: GreetingProps) {
   };
 
   const handleSave = async () => {
-    // Validation
     if (!localSettings.headingText.trim() || !localSettings.paraText.trim()) {
       toast.error('Heading and paragraph text cannot be empty');
       return;
@@ -327,4 +326,9 @@ export default function Greeting({ showSettingsForm = false }: GreetingProps) {
       </div>
     </div>
   );
+}
+
+export default function Greeting() {
+  const showSettingsForm = false; 
+  return <GreetingContent showSettingsForm={showSettingsForm} />;
 }

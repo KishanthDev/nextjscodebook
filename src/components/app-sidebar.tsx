@@ -67,7 +67,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/bubble', icon: Circle, label: 'Bubble' },
     { href: '/chat-widget-open', icon: MessagesSquare, label: 'Chat Widget Open' },
     { href: '/eye-catcher', icon: MessagesSquare, label: 'Eye Catcher' },
-    { href: '/chat-bar', icon: MessagesSquare, label: 'Chat Bar' }
+    { href: '/chat-bar', icon: MessagesSquare, label: 'Chat Bar' },
+    { href: '/greeting', icon: MessagesSquare, label: 'Greeting' }
+
   ];
 
   return (

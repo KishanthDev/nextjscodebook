@@ -6,6 +6,7 @@ import ChatBar from '../../../components/modifier/chatBar';
 import ChatWidgetOpen from '../../../components/modifier/chat-widget-open';
 import Eyecatcher from '../../../components/modifier/eye-catcher'; 
 import data from "../../../../data/modifier.json"
+import Greeting from '@/components/modifier/greeting';
 
 
 export default function SettingsPage() {
@@ -15,6 +16,7 @@ export default function SettingsPage() {
   const chatbardata = data.chatbar;
   const chatwidgetdata = data.chatwidgetopen.colors;
   const chatwidgetmessage = data.chatwidgetopen.messages;
+  const greeting = data.greeting
 
   const renderSelectedComponent = () => {
     switch (selectedOption) {
@@ -26,6 +28,8 @@ export default function SettingsPage() {
         return <ChatBar defaultSettings={chatbardata} />;
       case 'chat-widget-open':
         return <ChatWidgetOpen defaultSettings={chatwidgetdata} initialMessages={chatwidgetmessage} />;
+      case 'chat-widget-greeting':
+        return <Greeting defaultSettings={greeting}/>
       default:
         return null;
     }
@@ -79,6 +83,17 @@ export default function SettingsPage() {
               onChange={(e) => setSelectedOption(e.target.value)}
             />
             <span>Chat Widget Open</span>
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="settingOption"
+              value="chat-widget-greeting"
+              checked={selectedOption === 'chat-widget-greeting'}
+              onChange={(e) => setSelectedOption(e.target.value)}
+            />
+            <span>Chat Widget Greeting</span>
           </label>
         </div>
       </div>

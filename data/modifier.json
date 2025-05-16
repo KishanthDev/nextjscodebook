@@ -38,5 +38,11 @@
         "isUser": false
       }
     ]
+  },
+  "greeting": {
+    "headingColor": "#333333",
+    "paraColor": "#666666",
+    "freeTrialBtnColor": "#f97316",
+    "expertBtnColor": "#000000"
   }
 }

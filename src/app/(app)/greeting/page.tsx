@@ -12,6 +12,9 @@ type ChatWidgetSettings = {
   paraColor: string;
   freeTrialBtnColor: string;
   expertBtnColor: string;
+  headingText: string;
+  paraText: string;
+  imageUrl: string;
 };
 
 const CloseIcon = () => (
@@ -26,6 +29,9 @@ export default function Greeting() {
     paraColor: '#666666',
     freeTrialBtnColor: '#f97316',
     expertBtnColor: '#000000',
+    headingText: 'Welcome to LiveChat!',
+    paraText: 'Sign up free or talk with our product experts',
+    imageUrl: '/landingpage/hello01.png',
   };
 
   const [isHovered, setIsHovered] = useState(false);
@@ -78,63 +84,64 @@ export default function Greeting() {
     );
   }
 
-  return (
-    <div className="flex justify-center items-center p-6">
+ return (
+  <div className="flex justify-center items-center p-6">
+    <div
+      className="relative w-[230px] mx-auto group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div
-        className="relative w-[230px] mx-auto group"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className={`absolute -top-7 right-0 z-20 transition-opacity duration-300 ${
+          isHovered ? 'opacity-100' : 'opacity-0'
+        }`}
       >
-        <div
-          className={`absolute -top-7 right-0 z-20 transition-opacity duration-300 ${
-            isHovered ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <button aria-label="Hide greeting" style={{ color: settings.headingColor }}>
-            <CloseIcon />
-          </button>
+        <button aria-label="Hide greeting" style={{ color: settings.headingColor }}>
+          <CloseIcon />
+        </button>
+      </div>
+
+      <div className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="flex">
+          <Image
+            src={settings.imageUrl || "/landingpage/hello01.png"}
+            alt="Hello"
+            width={230}
+            height={150}
+            className="object-cover w-full"
+          />
         </div>
 
-        <div className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="flex">
-            <Image
-              src="/landingpage/hello01.png"
-              alt="Hello"
-              width={230}
-              height={150}
-              className="object-contain"
-            />
-          </div>
-
-          <div className="p-3.5">
-            <h2 className="mb-2" style={{ color: settings.headingColor }}>
-              Welcome to LiveChat!
-            </h2>
-            <p style={{ color: settings.paraColor }}>
-              Sign up free or talk with our product experts
-            </p>
-          </div>
-
-          <ul className="flex flex-col gap-2 px-2 pb-2 pt-[7px]">
-            <li>
-              <button
-                className="w-full flex justify-center px-4 py-2 text-white rounded-md transition"
-                style={{ backgroundColor: settings.freeTrialBtnColor }}
-              >
-                Free trial
-              </button>
-            </li>
-            <li>
-              <button
-                className="w-full flex justify-center items-center px-4 py-2 text-white rounded-md transition"
-                style={{ backgroundColor: settings.expertBtnColor }}
-              >
-                <span className="mr-2">💬</span> Product expert
-              </button>
-            </li>
-          </ul>
+        <div className="p-3.5 text-sm leading-snug break-words w-full overflow-hidden">
+          <h2 className="mb-2 font-semibold" style={{ color: settings.headingColor }}>
+            {settings.headingText}
+          </h2>
+          <p style={{ color: settings.paraColor }}>
+            {settings.paraText}
+          </p>
         </div>
+
+        <ul className="flex flex-col gap-2 px-2 pb-2 pt-[7px]">
+          <li>
+            <button
+              className="w-full flex justify-center px-4 py-2 text-white rounded-md transition text-sm"
+              style={{ backgroundColor: settings.freeTrialBtnColor }}
+            >
+              Free trial
+            </button>
+          </li>
+          <li>
+            <button
+              className="w-full flex justify-center items-center px-4 py-2 text-white rounded-md transition text-sm"
+              style={{ backgroundColor: settings.expertBtnColor }}
+            >
+              <span className="mr-2">💬</span> Product expert
+            </button>
+          </li>
+        </ul>
       </div>
     </div>
-  );
+  </div>
+);
+
 }

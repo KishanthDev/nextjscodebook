@@ -40,9 +40,12 @@
     ]
   },
   "greeting": {
-    "headingColor": "#333333",
-    "paraColor": "#666666",
-    "freeTrialBtnColor": "#f97316",
-    "expertBtnColor": "#000000"
+    "headingColor": "#000000",
+    "paraColor": "#333333",
+    "freeTrialBtnColor": "#007bff",
+    "expertBtnColor": "#28a745",
+    "headingText": "Welcome to LiveChat!",
+    "paraText": "Sign up free or talk with our product experts",
+    "imageUrl": "/landingpage/hello01.png"
   }
 }

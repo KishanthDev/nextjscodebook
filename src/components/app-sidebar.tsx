@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useUserStatus } from '@/context/UserStatusContext';
 
 import { NavUser } from '@/registry/new-york-v4/blocks/sidebar-07/components/nav-user';
 import { TeamSwitcher } from '@/registry/new-york-v4/blocks/sidebar-07/components/team-switcher';
@@ -16,7 +17,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail
+  SidebarRail,
 } from '@/registry/new-york-v4/ui/sidebar';
 
 import {
@@ -28,37 +29,37 @@ import {
   AudioWaveform,
   Command,
   Circle,
-  MessagesSquare
+  MessagesSquare,
 } from 'lucide-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname(); // ✅ current path
+  const pathname = usePathname();
+  const { acceptChats } = useUserStatus();
 
   const user = {
     name: 'zoey',
     email: 'zoey@example.com',
-    avatar: '/avatars/shadcn.jpg'
+    avatar: '/avatars/shadcn.jpg',
   };
 
   const teams = [
     {
       name: 'Acme Inc',
       logo: GalleryVerticalEnd,
-      plan: 'Enterprise'
+      plan: 'Enterprise',
     },
     {
       name: 'Acme Corp.',
       logo: AudioWaveform,
-      plan: 'Startup'
+      plan: 'Startup',
     },
     {
       name: 'Evil Corp.',
       logo: Command,
-      plan: 'Free'
-    }
+      plan: 'Free',
+    },
   ];
 
-  // Sidebar links config
   const links = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/chats', icon: MessageCircle, label: 'Chats' },
@@ -68,8 +69,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/chat-widget-open', icon: MessagesSquare, label: 'Chat Widget Open' },
     { href: '/eye-catcher', icon: MessagesSquare, label: 'Eye Catcher' },
     { href: '/chat-bar', icon: MessagesSquare, label: 'Chat Bar' },
-    { href: '/greeting', icon: MessagesSquare, label: 'Greeting' }
-
+    { href: '/greeting', icon: MessagesSquare, label: 'Greeting' },
   ];
 
   return (
@@ -84,7 +84,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu>
             {links.map(({ href, icon: Icon, label }) => (
               <SidebarMenuItem key={href}>
-                <SidebarMenuButton asChild data-active={pathname === href} className="data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-purple-600 data-[active=true]:text-white data-[active=true]:shadow-lg"
+                <SidebarMenuButton
+                  asChild
+                  data-active={pathname === href}
+                  className="data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-purple-600 data-[active=true]:text-white data-[active=true]:shadow-lg"
                 >
                   <Link href={href}>
                     <Icon className="mr-2" />
@@ -98,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={user} isOnline={acceptChats} />
       </SidebarFooter>
 
       <SidebarRail />

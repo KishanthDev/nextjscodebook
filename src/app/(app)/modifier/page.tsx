@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const eyecatcherdata = data.eyecatcher;
   const bubbledata = data.bubble;
   const chatbardata = data.chatbar;
-  const chatwidgetdata = data.chatwidgetopen.colors;
+  const chatwidgetdata = data.chatwidgetopen;
   const chatwidgetmessage = data.chatwidgetopen.messages;
   const greeting = data.greeting
 

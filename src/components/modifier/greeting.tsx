@@ -11,11 +11,15 @@ import Loader from '../loader/Loader';
 type ChatWidgetSettings = {
   headingColor: string;
   paraColor: string;
-  freeTrialBtnColor: string;
-  expertBtnColor: string;
+  primaryBtnColor: string;
+  secondaryBtnColor: string;
   headingText: string;
   paraText: string;
   imageUrl: string;
+  primaryBtnText: string;
+  secondaryBtnText: string;
+  showPrimaryBtn: boolean;
+  showSecondaryBtn: boolean;
 };
 
 type LiveChatWidgetProps = {
@@ -28,16 +32,60 @@ const CloseIcon = () => (
   </svg>
 );
 
+const CustomButton = ({
+  text,
+  bgColor,
+  icon,
+  isVisible,
+}: {
+  text: string;
+  bgColor: string;
+  icon?: React.ReactNode;
+  isVisible: boolean;
+}) => {
+  if (!isVisible) return null;
+  return (
+    <li>
+      <button
+        className="w-full flex justify-center items-center px-4 py-2 text-white rounded-md transition text-sm break-words max-w-full"
+        style={{ backgroundColor: bgColor }}
+      >
+        {icon && <span className="mr-2">{icon}</span>}
+        {text}
+      </button>
+    </li>
+  );
+};
+
+const GreetingImage = ({ src, alt, fallbackSrc }: { src: string; alt: string; fallbackSrc: string }) => (
+  <div className="flex">
+    <Image
+      src={src || fallbackSrc}
+      alt={alt}
+      width={230}
+      height={150}
+      className="object-contain"
+      onError={(e) => {
+        e.currentTarget.src = fallbackSrc;
+      }}
+    />
+  </div>
+);
+
 export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [settings, setSettings] = useState<ChatWidgetSettings>({
     headingColor: defaultSettings.headingColor || '#000000',
     paraColor: defaultSettings.paraColor || '#333333',
-    freeTrialBtnColor: defaultSettings.freeTrialBtnColor || '#007bff',
-    expertBtnColor: defaultSettings.expertBtnColor || '#28a745',
+    primaryBtnColor: defaultSettings.primaryBtnColor || '#007bff',
+    secondaryBtnColor: defaultSettings.secondaryBtnColor || '#28a745',
     headingText: defaultSettings.headingText || 'Welcome to LiveChat!',
     paraText: defaultSettings.paraText || 'Sign up free or talk with our product experts',
     imageUrl: defaultSettings.imageUrl || '/landingpage/hello01.png',
+    primaryBtnText: defaultSettings.primaryBtnText || 'Primary',
+    secondaryBtnText: defaultSettings.secondaryBtnText || 'Secondary',
+    showPrimaryBtn: defaultSettings.showPrimaryBtn ?? true,
+    showSecondaryBtn: defaultSettings.showSecondaryBtn ?? true,
   });
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -65,45 +113,20 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
             setSettings({
               headingColor: json.settings.headingColor || defaultSettings.headingColor || '#000000',
               paraColor: json.settings.paraColor || defaultSettings.paraColor || '#333333',
-              freeTrialBtnColor: json.settings.freeTrialBtnColor || defaultSettings.freeTrialBtnColor || '#007bff',
-              expertBtnColor: json.settings.expertBtnColor || defaultSettings.expertBtnColor || '#28a745',
+              primaryBtnColor: json.settings.primaryBtnColor || defaultSettings.primaryBtnColor || '#007bff',
+              secondaryBtnColor: json.settings.secondaryBtnColor || defaultSettings.secondaryBtnColor || '#28a745',
               headingText: json.settings.headingText || defaultSettings.headingText || 'Welcome to LiveChat!',
               paraText: json.settings.paraText || defaultSettings.paraText || 'Sign up free or talk with our product experts',
               imageUrl: json.settings.imageUrl || defaultSettings.imageUrl || '/landingpage/hello01.png',
-            });
-          } else {
-            setSettings({
-              headingColor: defaultSettings.headingColor || '#000000',
-              paraColor: defaultSettings.paraColor || '#333333',
-              freeTrialBtnColor: defaultSettings.freeTrialBtnColor || '#007bff',
-              expertBtnColor: defaultSettings.expertBtnColor || '#28a745',
-              headingText: defaultSettings.headingText || 'Welcome to LiveChat!',
-              paraText: defaultSettings.paraText || 'Sign up free or talk with our product experts',
-              imageUrl: defaultSettings.imageUrl || '/landingpage/hello01.png',
+              primaryBtnText: json.settings.primaryBtnText || defaultSettings.primaryBtnText || 'Primary',
+              secondaryBtnText: json.settings.secondaryBtnText || defaultSettings.secondaryBtnText || 'Secondary',
+              showPrimaryBtn: json.settings.showPrimaryBtn ?? defaultSettings.showPrimaryBtn ?? true,
+              showSecondaryBtn: json.settings.showSecondaryBtn ?? defaultSettings.showSecondaryBtn ?? true,
             });
           }
-        } else {
-          setSettings({
-            headingColor: defaultSettings.headingColor || '#000000',
-            paraColor: defaultSettings.paraColor || '#333333',
-            freeTrialBtnColor: defaultSettings.freeTrialBtnColor || '#007bff',
-            expertBtnColor: defaultSettings.expertBtnColor || '#28a745',
-            headingText: defaultSettings.headingText || 'Welcome to LiveChat!',
-            paraText: defaultSettings.paraText || 'Sign up free or talk with our product experts',
-            imageUrl: defaultSettings.imageUrl || '/landingpage/hello01.png',
-          });
         }
       } catch (err) {
         console.error('Failed to fetch settings', err);
-        setSettings({
-          headingColor: defaultSettings.headingColor || '#000000',
-          paraColor: defaultSettings.paraColor || '#333333',
-          freeTrialBtnColor: defaultSettings.freeTrialBtnColor || '#007bff',
-          expertBtnColor: defaultSettings.expertBtnColor || '#28a745',
-          headingText: defaultSettings.headingText || 'Welcome to LiveChat!',
-          paraText: defaultSettings.paraText || 'Sign up free or talk with our product experts',
-          imageUrl: defaultSettings.imageUrl || '/landingpage/hello01.png',
-        });
       } finally {
         setLoading(false);
       }
@@ -113,8 +136,11 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
   }, [defaultSettings]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSettings((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setSettings((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   const handleSave = async () => {
@@ -125,6 +151,14 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
     }
     if (!settings.imageUrl.trim()) {
       toast.error('Image URL cannot be empty');
+      return;
+    }
+    if (settings.showPrimaryBtn && !settings.primaryBtnText.trim()) {
+      toast.error('Primary button text cannot be empty when button is shown');
+      return;
+    }
+    if (settings.showSecondaryBtn && !settings.secondaryBtnText.trim()) {
+      toast.error('Secondary button text cannot be empty when button is shown');
       return;
     }
 
@@ -165,7 +199,7 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
           </div>
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
-              {[...Array(7)].map((_, i) => (
+              {[...Array(9)].map((_, i) => (
                 <div key={i} className="space-y-2">
                   <Skeleton width={150} height={16} />
                   <div className="flex items-center">
@@ -206,38 +240,74 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 space-y-4 border-r pr-4">
             {[
-              { key: 'headingText', label: 'Heading Text', type: 'text', placeholder: 'Enter heading' },
-              { key: 'paraText', label: 'Paragraph Text', type: 'text', placeholder: 'Enter paragraph' },
+              { key: 'headingText', label: 'Heading Text', type: 'text', placeholder: 'Enter heading', maxLength: 19 },
+              { key: 'paraText', label: 'Paragraph Text', type: 'text', placeholder: 'Enter paragraph', maxLength: 38 },
               { key: 'imageUrl', label: 'Image URL', type: 'text', placeholder: 'Enter image URL' },
               { key: 'headingColor', label: 'Heading Color', type: 'color' },
               { key: 'paraColor', label: 'Paragraph Color', type: 'color' },
-              { key: 'freeTrialBtnColor', label: 'Free Trial Button Color', type: 'color' },
-              { key: 'expertBtnColor', label: 'Product Expert Button Color', type: 'color' },
-            ].map(({ key, label, type, placeholder }) => (
+              {
+                key: 'primaryBtnText',
+                label: 'Primary Button Text',
+                type: 'text',
+                placeholder: 'Enter primary button text',
+                maxLength: 20,
+                checkboxKey: 'showPrimaryBtn',
+                checkboxLabel: 'Show',
+              },
+              {
+                key: 'secondaryBtnText',
+                label: 'Secondary Button Text',
+                type: 'text',
+                placeholder: 'Enter secondary button text',
+                maxLength: 20,
+                checkboxKey: 'showSecondaryBtn',
+                checkboxLabel: 'Show',
+              },
+              { key: 'primaryBtnColor', label: 'Primary Button Color', type: 'color' },
+              { key: 'secondaryBtnColor', label: 'Secondary Button Color', type: 'color' },
+            ].map(({ key, label, type, placeholder, maxLength, checkboxKey, checkboxLabel }) => (
               <div key={key}>
-                <label className="block text-sm font-medium text-primary mb-2">{label}:</label>
-                <div className="flex items-center border rounded-md overflow-hidden">
-                  <input
-                    type={type === 'color' ? 'text' : type}
-                    maxLength={placeholder==="Enter heading"?19:38 }
-                    name={key}
-                    placeholder={type === 'color' ? '#hex' : placeholder}
-                    className="w-full px-2 py-2 text-sm focus:outline-none"
-                    value={settings[key as keyof ChatWidgetSettings] || ''}
-                    onChange={handleInputChange}
-                    disabled={isSaving}
-                  />
-                  {type === 'color' && (
+                <div className="flex items-center flex-wrap gap-2 mb-2">
+                  <label className="block text-sm font-medium text-primary">{label}:</label>
+                  {checkboxKey && (
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name={checkboxKey}
+                        checked={settings[checkboxKey as keyof ChatWidgetSettings] as boolean}
+                        onChange={handleInputChange}
+                        disabled={isSaving}
+                        className="mr-1"
+                        aria-label={checkboxLabel}
+                      />
+                      <span className="text-sm">{checkboxLabel}</span>
+                    </label>
+                  )}
+                </div>
+                {type !== 'checkbox' && (
+                  <div className="flex items-center border rounded-md overflow-hidden">
                     <input
-                      type="color"
+                      type={type === 'color' ? 'text' : type}
                       name={key}
-                      className="w-12 h-12 cursor-pointer border-l"
-                      value={settings[key as keyof ChatWidgetSettings] || '#000000'}
+                      placeholder={type === 'color' ? '#hex' : placeholder}
+                      maxLength={maxLength}
+                      className="w-full px-2 py-2 text-sm focus:outline-none"
+                      value={settings[key as keyof ChatWidgetSettings] as string}
                       onChange={handleInputChange}
                       disabled={isSaving}
                     />
-                  )}
-                </div>
+                    {type === 'color' && (
+                      <input
+                        type="color"
+                        name={key}
+                        className="w-12 h-12 cursor-pointer border-l"
+                        value={settings[key as keyof ChatWidgetSettings] as string}
+                        onChange={handleInputChange}
+                        disabled={isSaving}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -258,28 +328,21 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
               </div>
 
               <div className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden min-h-[300px]">
-                <div className="flex">
-                  <Image
-                    src={settings.imageUrl || '/landingpage/hello01.png'}
-                    alt="Greeting image"
-                    width={230}
-                    height={150}
-                    className="object-contain"
-                    onError={(e) => {
-                      e.currentTarget.src = '/landingpage/hello01.png';
-                    }}
-                  />
-                </div>
+                <GreetingImage
+                  src={settings.imageUrl}
+                  alt="Greeting image"
+                  fallbackSrc="/landingpage/hello01.png"
+                />
 
                 <div className="p-3.5">
                   <h2
-                    className="mb-2 break-words w-full box-border"
+                    className="mb-2 break-words max-w-full box-border"
                     style={{ color: settings.headingColor }}
                   >
                     {settings.headingText}
                   </h2>
                   <p
-                    className="break-words w-full box-border"
+                    className="break-words max-w-full box-border"
                     style={{ color: settings.paraColor }}
                   >
                     {settings.paraText}
@@ -287,22 +350,17 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
                 </div>
 
                 <ul className="flex flex-col gap-2 px-2 pb-2 pt-[7px] mt-auto">
-                  <li>
-                    <button
-                      className="w-full flex justify-center px-4 py-2 text-white rounded-md transition"
-                      style={{ backgroundColor: settings.freeTrialBtnColor }}
-                    >
-                      Free trial
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      className="w-full flex justify-center items-center px-4 py-2 text-white rounded-md transition"
-                      style={{ backgroundColor: settings.expertBtnColor }}
-                    >
-                      <span className="mr-2">💬</span> Product expert
-                    </button>
-                  </li>
+                  <CustomButton
+                    text={settings.primaryBtnText}
+                    bgColor={settings.primaryBtnColor}
+                    isVisible={settings.showPrimaryBtn}
+                  />
+                  <CustomButton
+                    text={settings.secondaryBtnText}
+                    bgColor={settings.secondaryBtnColor}
+                    icon={<span>💬</span>}
+                    isVisible={settings.showSecondaryBtn}
+                  />
                 </ul>
               </div>
             </div>

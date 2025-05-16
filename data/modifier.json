@@ -16,14 +16,16 @@
     "textColor": "#ffffff"
   },
   "chatwidgetopen": {
-    "colors": {
-      "botMsgBgColor": "#f3f4f6",
-      "userMsgBgColor": "#fef08a",
-      "sendBtnBgColor": "#000000",
-      "sendBtnIconColor": "#ffffff",
-      "footerBgColor": "#ffffff",
-      "footerTextColor": "#374151"
-    },
+    "botMsgBgColor": "#f3f4f6",
+    "userMsgBgColor": "#fef08a",
+    "sendBtnBgColor": "#000000",
+    "sendBtnIconColor": "#ffffff",
+    "footerBgColor": "#ffffff",
+    "footerTextColor": "#374151",
+    "footerText": "Powered by LiveChat",
+    "inputPlaceholder": "Type a message...",
+    "logoUrl": "https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png",
+    "chatTitle": "LiveChat",
     "messages": [
       {
         "text": "Hello! How can I assist you today?",
@@ -37,15 +39,19 @@
         "text": "Sure, could you please provide your order number?",
         "isUser": false
       }
-    ]
+  ]
   },
   "greeting": {
     "headingColor": "#000000",
     "paraColor": "#333333",
-    "freeTrialBtnColor": "#007bff",
-    "expertBtnColor": "#28a745",
+    "primaryBtnColor": "#007bff",
+    "secondaryBtnColor": "#28a745",
     "headingText": "Welcome to LiveChat!",
     "paraText": "Sign up free or talk with our product experts",
-    "imageUrl": "/landingpage/hello01.png"
+    "imageUrl": "/landingpage/hello01.png",
+    "primaryBtnText": "Sign Up",
+    "secondaryBtnText": "Chat Now",
+    "showPrimaryBtn": true,
+    "showSecondaryBtn": true
   }
 }

@@ -18,6 +18,10 @@ type ChatWidgetSettings = {
   sendBtnIconColor: string;
   footerBgColor: string;
   footerTextColor: string;
+  footerText: string;
+  inputPlaceholder: string;
+  logoUrl: string;
+  chatTitle: string;
 };
 
 type Props = {
@@ -26,8 +30,8 @@ type Props = {
 };
 
 export default function ChatWidgetOpenComponent({ defaultSettings, initialMessages }: Props) {
-  const [settings, setSettings] = useState<ChatWidgetSettings | null>(null);
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [settings, setSettings] = useState<ChatWidgetSettings>(defaultSettings);
+  const [messages, setMessages] = useState<Message[]>(initialMessages.length > 0 ? initialMessages : [{ text: "Hi, I have a question!", isUser: true }]);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -55,16 +59,11 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
         if (res.ok) {
           const json = await res.json();
           if (json.settings) {
-            setSettings(json.settings);
-          } else {
-            setSettings(defaultSettings);
+            setSettings({ ...defaultSettings, ...json.settings });
           }
-        } else {
-          setSettings(defaultSettings);
         }
       } catch (err) {
         console.error('Failed to fetch settings', err);
-        setSettings(defaultSettings);
       } finally {
         setLoading(false);
       }
@@ -75,12 +74,10 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (settings) {
-      setSettings((prev) => ({
-        ...prev!,
-        [name]: value,
-      }));
-    }
+    setSettings((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSendMessage = () => {
@@ -144,12 +141,12 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
           </div>
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
-              {[...Array(6)].map((_, i) => (
+              {[...Array(10)].map((_, i) => (
                 <div key={i} className="space-y-2">
                   <Skeleton width={180} height={16} />
                   <div className="flex items-center">
                     <Skeleton width="100%" height={40} borderRadius={6} containerClassName="flex-1" />
-                    <Skeleton width={48} height={40} borderRadius={0} />
+                    {i < 6 && <Skeleton width={48} height={40} borderRadius={0} />}
                   </div>
                 </div>
               ))}
@@ -192,8 +189,6 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
     );
   }
 
-  if (!settings) return null;
-
   return (
     <div className="relative p-6 max-w-4xl mx-auto">
       {isSaving && (
@@ -215,6 +210,67 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
 
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 space-y-4 border-r pr-4">
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">Company Name:</label>
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  name="chatTitle"
+                  placeholder="LiveChat"
+                  maxLength={20}
+                  className="w-full px-2 py-2 text-sm focus:outline-none"
+                  value={settings.chatTitle}
+                  onChange={handleInputChange}
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">Logo URL:</label>
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  name="logoUrl"
+                  placeholder="https://example.com/logo.png"
+                  className="w-full px-2 py-2 text-sm focus:outline-none"
+                  value={settings.logoUrl}
+                  onChange={handleInputChange}
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">Input Placeholder:</label>
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  name="inputPlaceholder"
+                  placeholder="Type a message..."
+                  className="w-full px-2 py-2 text-sm focus:outline-none"
+                  value={settings.inputPlaceholder}
+                  onChange={handleInputChange}
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">Footer Text:</label>
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  name="footerText"
+                  placeholder="Powered by LiveChat"
+                  className="w-full px-2 py-2 text-sm focus:outline-none"
+                  value={settings.footerText}
+                  onChange={handleInputChange}
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-primary mb-2">Bot Message Background Color:</label>
               <div className="flex items-center border rounded-md overflow-hidden">
@@ -360,11 +416,12 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                 <div className="flex items-center gap-2">
                   <div className="relative flex items-center gap-2">
                     <img
-                      src="https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png"
-                      alt="LiveChat Logo"
+                      src={settings.logoUrl}
+                      alt={`${settings.chatTitle} Logo`}
                       className="w-8 h-8 rounded-full border"
+                      onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/32')}
                     />
-                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">LiveChat</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{settings.chatTitle}</span>
                   </div>
                 </div>
 
@@ -457,7 +514,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
 
               <div
                 id="messagesContainer"
-                className="p-4 flex-1 overflow-y-auto bg-white dark:bg-gray-900"
+                className="p-4 flex-1 overflow-y-auto overflow-x-hidden bg-white dark:bg-gray-900"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
                 <div className="space-y-3">
@@ -467,7 +524,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                       className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`px-3 py-2 rounded-lg max-w-xs ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
+                        className={`px-3 py-2 rounded-lg max-w-xs break-all whitespace-normal ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
                         style={{
                           backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor,
                         }}
@@ -480,17 +537,17 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
               </div>
 
               <div className="p-3 border-t relative bg-white dark:bg-gray-800">
-                <div className="flex">
+                <div className="flex items-center relative">
                   <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type a message..."
-                    className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    placeholder={settings.inputPlaceholder}
+                    className="flex-1 max-w-full border rounded-lg px-3 py-2 pr-24 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     disabled={isSaving}
                   />
-                  <div className="absolute right-5 top-1/2 transform -translate-y-1/2 flex gap-1">
+                  <div className="absolute right-2 flex gap-1">
                     <button
                       className="p-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -577,7 +634,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   color: settings.footerTextColor,
                 }}
               >
-                Powered by LiveChat
+                {settings.footerText}
               </div>
             </div>
           </div>

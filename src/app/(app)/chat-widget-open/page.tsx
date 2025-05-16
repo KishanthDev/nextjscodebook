@@ -18,6 +18,10 @@ type ChatWidgetSettings = {
   sendBtnIconColor: string;
   footerBgColor: string;
   footerTextColor: string;
+  footerText: string;
+  inputPlaceholder: string;
+  logoUrl: string;
+  chatTitle: string;
 };
 
 export default function ChatWidgetPreview() {
@@ -28,6 +32,10 @@ export default function ChatWidgetPreview() {
     sendBtnIconColor: '#ffffff',
     footerBgColor: '#ffffff',
     footerTextColor: '#374151',
+    footerText: 'Powered by LiveChat',
+    inputPlaceholder: 'Type a message...',
+    logoUrl: 'https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png',
+    chatTitle: 'LiveChat',
   };
 
   const { settings, loading } = useSettings<ChatWidgetSettings>({
@@ -85,7 +93,6 @@ export default function ChatWidgetPreview() {
       >
         <div className="flex justify-center items-start p-6">
           <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden">
-            {/* Header Skeleton */}
             <div className="p-3 border-b flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Skeleton circle width={32} height={32} />
@@ -97,7 +104,6 @@ export default function ChatWidgetPreview() {
                 <Skeleton width={24} height={24} borderRadius={4} />
               </div>
             </div>
-            {/* Messages Area Skeleton */}
             <div className="p-4 flex-1">
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
@@ -107,13 +113,11 @@ export default function ChatWidgetPreview() {
                 ))}
               </div>
             </div>
-            {/* Input Area Skeleton */}
             <div className="p-3 border-t">
               <div className="flex">
                 <Skeleton width="100%" height={40} borderRadius={8} />
               </div>
             </div>
-            {/* Footer Skeleton */}
             <div className="p-1 border-t">
               <Skeleton width={120} height={12} containerClassName="flex justify-center" />
             </div>
@@ -123,21 +127,19 @@ export default function ChatWidgetPreview() {
     );
   }
 
-  if (!settings) return null;
-
   return (
     <div className="flex justify-center items-start p-6">
       <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden shadow-lg flex flex-col">
-        {/* Header */}
         <div className="p-3 border-b flex justify-between items-center bg-white dark:bg-gray-800">
           <div className="flex items-center gap-2">
             <div className="relative flex items-center gap-2">
               <img
-                src="https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png"
-                alt="LiveChat Logo"
+                src={settings.logoUrl}
+                alt={`${settings.chatTitle} Logo`}
                 className="w-8 h-8 rounded-full border"
+                onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/32')}
               />
-              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">LiveChat</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{settings.chatTitle}</span>
             </div>
           </div>
 
@@ -227,10 +229,9 @@ export default function ChatWidgetPreview() {
           </div>
         </div>
 
-        {/* Messages */}
         <div
           id="messagesContainer"
-          className="p-4 flex-1 overflow-y-auto bg-white dark:bg-gray-900"
+          className="p-4 flex-1 overflow-y-auto overflow-x-hidden bg-white dark:bg-gray-900"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <div className="space-y-3">
@@ -240,7 +241,7 @@ export default function ChatWidgetPreview() {
                 className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`px-3 py-2 rounded-lg max-w-xs ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
+                  className={`px-3 py-2 rounded-lg max-w-xs break-all whitespace-normal ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
                   style={{
                     backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor,
                   }}
@@ -252,18 +253,17 @@ export default function ChatWidgetPreview() {
           </div>
         </div>
 
-        {/* Input Area */}
         <div className="p-3 border-t relative bg-white dark:bg-gray-800">
-          <div className="flex">
+          <div className="flex items-center relative">
             <input
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              placeholder={settings.inputPlaceholder}
+              className="flex-1 max-w-full border rounded-lg px-3 py-2 pr-24 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             />
-            <div className="absolute right-5 top-1/2 transform -translate-y-1/2 flex gap-1">
+            <div className="absolute right-2 flex gap-1">
               <button
                 className="p-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -338,7 +338,6 @@ export default function ChatWidgetPreview() {
           )}
         </div>
 
-        {/* Footer */}
         <div
           className="p-1 text-center text-xs border-t"
           style={{
@@ -346,7 +345,7 @@ export default function ChatWidgetPreview() {
             color: settings.footerTextColor,
           }}
         >
-          Powered by LiveChat
+          {settings.footerText}
         </div>
       </div>
     </div>

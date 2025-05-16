@@ -13,29 +13,27 @@ import {
 import { User2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils"; 
+import { cn } from "@/lib/utils";
+import { useUserStatus } from "@/context/UserStatusContext";
 
 const Divider = () => (
     <div className="my-2 h-px bg-gray-200 dark:bg-zinc-700" />
 );
 
-
-
+// Only Online and Offline now
 const statusOptions = [
-    { label: "Online", color: "bg-green-500" },
-    { label: "Away", color: "bg-yellow-400" },
-    { label: "Busy", color: "bg-red-500" },
-    { label: "Offline", color: "bg-gray-400" },
+    { label: "Online", color: "bg-green-500", value: true },
+    { label: "Offline", color: "bg-gray-400", value: false },
 ];
 
 export const UserDropdown = () => {
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === "dark";
-    
     if (!resolvedTheme) return null;
+
     const router = useRouter();
-    const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
-    const [isOpen, setIsOpen] = useState(false); // <-- track open state
+    const { acceptChats, toggleAcceptChats } = useUserStatus();
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleLogout = () => {
         localStorage.clear();
@@ -54,14 +52,12 @@ export const UserDropdown = () => {
                         isOpen ? "ring-2 ring-primary" : "focus:outline-none focus:ring-2 focus:ring-primary"
                     )}
                 >
-                    <User2
-                        className={cn("h-8 w-8", isDark ? "text-white" : "text-black")}
-                    />
+                    <User2 className={cn("h-8 w-8", isDark ? "text-white" : "text-black")} />
                     <span
                         className={cn(
                             "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2",
                             isDark ? "border-zinc-900" : "border-white",
-                            selectedStatus.color
+                            acceptChats ? "bg-green-500" : "bg-gray-400"
                         )}
                     />
                 </button>
@@ -86,12 +82,7 @@ export const UserDropdown = () => {
                         </span>
 
                         <div className="inline-flex flex-col items-start">
-                            <span
-                                className={cn(
-                                    "font-bold text-base",
-                                    isDark ? "text-white" : "text-black"
-                                )}
-                            >
+                            <span className={cn("font-bold text-base", isDark ? "text-white" : "text-black")}>
                                 Signed in as
                             </span>
                             <span
@@ -106,11 +97,9 @@ export const UserDropdown = () => {
                     </div>
                 </DropdownMenuItem>
 
-                {/* Second divider */}
                 <div className="px-1 py-1">
                     <Divider />
                 </div>
-
 
                 <DropdownMenuItem
                     className={cn(
@@ -124,12 +113,9 @@ export const UserDropdown = () => {
                 {/* Status submenu */}
                 <DropdownMenuSub>
                     <DropdownMenuSubTrigger
-                        className={cn(
-                            "text-base",
-                            isDark ? "text-white" : "text-black"
-                        )}
+                        className={cn("text-base", isDark ? "text-white" : "text-black")}
                     >
-                        <span>Status</span>
+                        Status
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent
                         className={cn(
@@ -137,14 +123,18 @@ export const UserDropdown = () => {
                             isDark ? "bg-zinc-900 text-white" : "bg-white text-black"
                         )}
                     >
-                        {statusOptions.map(({ label, color }) => (
+                        {statusOptions.map(({ label, color, value }) => (
                             <DropdownMenuItem
                                 key={label}
-                                onClick={() => setSelectedStatus({ label, color })}
                                 className={cn(
                                     "flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm",
                                     isDark ? "hover:bg-zinc-800" : "hover:bg-gray-100"
                                 )}
+                                onClick={() => {
+                                    if (acceptChats !== value) {
+                                        toggleAcceptChats();
+                                    }
+                                }}
                             >
                                 <span className={cn("h-2.5 w-2.5 rounded-full", color)} />
                                 {label}
@@ -153,11 +143,9 @@ export const UserDropdown = () => {
                     </DropdownMenuSubContent>
                 </DropdownMenuSub>
 
-                {/* Second divider */}
                 <div className="px-1 py-1">
                     <Divider />
                 </div>
-
 
                 <DropdownMenuItem
                     onClick={handleLogout}

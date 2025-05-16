@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/registry/new-york-v4/ui/avatar";
+import { useUserStatus } from "@/context/UserStatusContext";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,18 +20,18 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/registry/new-york-v4/ui/sidebar";
-import { 
-    AlertTriangle, 
-    Bell, 
-    Building, 
-    ChevronsUpDown, 
-    Download, 
-    Keyboard, 
-    LifeBuoy, 
-    LogOut, 
-    MessageCircle, 
-    Moon, 
-    Sliders 
+import {
+    AlertTriangle,
+    Bell,
+    Building,
+    ChevronsUpDown,
+    Download,
+    Keyboard,
+    LifeBuoy,
+    LogOut,
+    MessageCircle,
+    Moon,
+    Sliders
 } from "lucide-react";
 import Link from "next/link";
 
@@ -44,13 +46,14 @@ export function NavUser({
 }) {
     const { isMobile } = useSidebar();
     const { theme, setTheme } = useTheme();
-    const [acceptChats, setAcceptChats] = useState(false);
+    const { acceptChats, toggleAcceptChats } = useUserStatus();
 
     // Toggle handlers
-    const handleAcceptChatsToggle = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent click from closing the dropdown
-        setAcceptChats((prev) => !prev);
+    const handleAcceptChatsToggle = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        toggleAcceptChats()
     };
+
 
     const handleDarkModeToggle = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent click from closing the dropdown
@@ -110,20 +113,18 @@ export function NavUser({
                                         type="checkbox"
                                         className="sr-only"
                                         checked={acceptChats}
-                                        onChange={() => {}}
+                                        onChange={() => { }}
                                         onClick={handleAcceptChatsToggle}
                                         aria-label="Accept chats"
                                         data-testid="accept-chats-toggle"
                                     />
                                     <div
-                                        className={`w-10 h-6 rounded-full transition-colors duration-500 ease-in-out ${
-                                            acceptChats ? "bg-green-500" : "bg-gray-300"
-                                        }`}
+                                        className={`w-10 h-6 rounded-full transition-colors duration-500 ease-in-out ${acceptChats ? "bg-green-500" : "bg-gray-300"
+                                            }`}
                                     >
                                         <div
-                                            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition duration-500 ease-in-out mt-1 ml-1 ${
-                                                acceptChats ? "translate-x-4 scale-110" : "translate-x-0 scale-100"
-                                            }`}
+                                            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition duration-500 ease-in-out mt-1 ml-1 ${acceptChats ? "translate-x-4 scale-110" : "translate-x-0 scale-100"
+                                                }`}
                                         ></div>
                                     </div>
                                 </label>
@@ -142,20 +143,18 @@ export function NavUser({
                                         type="checkbox"
                                         className="sr-only"
                                         checked={theme === "dark"}
-                                        onChange={() => {}}
+                                        onChange={() => { }}
                                         onClick={handleDarkModeToggle}
                                         aria-label="Dark mode"
                                         data-testid="dark-mode-toggle"
                                     />
                                     <div
-                                        className={`w-10 h-6 rounded-full transition-colors duration-500 ease-in-out ${
-                                            theme === "dark" ? "bg-blue-500" : "bg-gray-300"
-                                        }`}
+                                        className={`w-10 h-6 rounded-full transition-colors duration-500 ease-in-out ${theme === "dark" ? "bg-blue-500" : "bg-gray-300"
+                                            }`}
                                     >
                                         <div
-                                            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition duration-500 ease-in-out mt-1 ml-1 ${
-                                                theme === "dark" ? "translate-x-4 scale-110" : "translate-x-0 scale-100"
-                                            }`}
+                                            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition duration-500 ease-in-out mt-1 ml-1 ${theme === "dark" ? "translate-x-4 scale-110" : "translate-x-0 scale-100"
+                                                }`}
                                         ></div>
                                     </div>
                                 </label>

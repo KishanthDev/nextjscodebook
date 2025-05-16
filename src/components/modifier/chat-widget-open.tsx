@@ -242,36 +242,6 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-primary mb-2">Input Placeholder:</label>
-              <div className="flex items-center border rounded-md overflow-hidden">
-                <input
-                  type="text"
-                  name="inputPlaceholder"
-                  placeholder="Type a message..."
-                  className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.inputPlaceholder}
-                  onChange={handleInputChange}
-                  disabled={isSaving}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">Footer Text:</label>
-              <div className="flex items-center border rounded-md overflow-hidden">
-                <input
-                  type="text"
-                  name="footerText"
-                  placeholder="Powered by LiveChat"
-                  className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.footerText}
-                  onChange={handleInputChange}
-                  disabled={isSaving}
-                />
-              </div>
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-primary mb-2">Bot Message Background Color:</label>
               <div className="flex items-center border rounded-md overflow-hidden">
                 <input
@@ -318,6 +288,22 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
             </div>
 
             <div>
+              <label className="block text-sm font-medium text-primary mb-2">Input Placeholder:</label>
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  name="inputPlaceholder"
+                  placeholder="Type a message..."
+                  className="w-full px-2 py-2 text-sm focus:outline-none"
+                  value={settings.inputPlaceholder}
+                  onChange={handleInputChange}
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+
+
+            <div>
               <label className="block text-sm font-medium text-primary mb-2">Send Button Background Color:</label>
               <div className="flex items-center border rounded-md overflow-hidden">
                 <input
@@ -357,6 +343,21 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="sendBtnIconColor"
                   className="w-12 h-12 cursor-pointer border-l"
                   value={settings.sendBtnIconColor}
+                  onChange={handleInputChange}
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">Footer Text:</label>
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  name="footerText"
+                  placeholder="Powered by LiveChat"
+                  className="w-full px-2 py-2 text-sm focus:outline-none"
+                  value={settings.footerText}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />

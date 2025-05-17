@@ -11,11 +11,11 @@ import Greeting from '@/components/modifier/greeting';
 
 export default function SettingsPage() {
   const [selectedOption, setSelectedOption] = useState('eyecatcher');
-  const eyecatcherdata = data.eyecatcher;
+  const eyecatcherdata = data.eyeCatcher;
   const bubbledata = data.bubble;
   const chatbardata = data.chatbar;
-  const chatwidgetdata = data.chatwidgetopen;
-  const chatwidgetmessage = data.chatwidgetopen.messages;
+  const chatwidgetdata = data.chatWidget;
+  const chatwidgetmessage = data.chatWidget.messages;
   const greeting = data.greeting
 
   const renderSelectedComponent = () => {

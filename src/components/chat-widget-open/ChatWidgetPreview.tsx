@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { Message, ChatWidgetSettings } from '@/types/WidgetOpen';
+import { Message, ChatWidgetSettings } from '@/types/Modifier';
 import ChatHeader from './ChatHeader';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';

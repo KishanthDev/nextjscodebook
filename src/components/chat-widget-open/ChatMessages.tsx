@@ -1,5 +1,5 @@
 'use client';
-import { Message, ChatWidgetSettings } from '@/types/WidgetOpen';
+import { Message, ChatWidgetSettings } from '@/types/Modifier';
 
 type ChatMessagesProps = {
   messages: Message[];

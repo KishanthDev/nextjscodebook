@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { ChatWidgetSettings } from '@/types/WidgetOpen';
+import { ChatWidgetSettings } from '@/types/Modifier';
 
 type ChatHeaderProps = {
   settings: ChatWidgetSettings;

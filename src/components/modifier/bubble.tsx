@@ -1,3 +1,4 @@
+// src/components/BubbleComponent.tsx
 'use client';
 import { useState, useEffect } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
@@ -5,12 +6,8 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import Loader from '../loader/Loader';
-
-type BubbleSettings = {
-  bgColor: string;
-  iconColor: string;
-  dotsColor: string;
-};
+import { useSettingsStore } from '@/stores/settingsStore';
+import { BubbleSettings } from '@/types/Modifier';
 
 type BubbleComponentProps = {
   defaultSettings: BubbleSettings;
@@ -18,16 +15,22 @@ type BubbleComponentProps = {
 
 export default function BubbleComponent({ defaultSettings }: BubbleComponentProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [settings, setSettings] = useState<BubbleSettings>(defaultSettings);
-  const [loading, setLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { resolvedTheme } = useTheme();
+  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
+
+  const bubbleSettings: BubbleSettings = {
+    ...defaultSettings,
+    ...settings.bubble,
+  };
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('Fetching bubble settings...');
+    fetchSettings('bubble', defaultSettings);
+  }, [fetchSettings, defaultSettings]);
 
   useEffect(() => {
     if (mounted) {
@@ -35,51 +38,16 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
     }
   }, [mounted, resolvedTheme]);
 
-  useEffect(() => {
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/settings?section=bubble');
-        if (res.ok) {
-          const json = await res.json();
-          if (json.settings) {
-            setSettings(json.settings);
-          } else {
-            setSettings(defaultSettings);
-          }
-        } else {
-          setSettings(defaultSettings);
-        }
-      } catch (err) {
-        console.error('Failed to fetch settings', err);
-        setSettings(defaultSettings);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSettings();
-  }, [defaultSettings]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSettings((prev) => ({ ...prev, [name]: value }));
+    updateSettings('bubble', { [name]: value });
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: 'bubble', data: settings }),
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.success('Settings saved!');
-      } else {
-        toast.error('Failed to save settings: ' + (result.message || 'Unknown error'));
-      }
+      await updateSettings('bubble', bubbleSettings);
+      toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
       console.error(err);
@@ -159,7 +127,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                     name={key}
                     placeholder="#hex"
                     className="w-full px-2 py-2 text-sm focus:outline-none"
-                    value={settings[key as keyof BubbleSettings]}
+                    value={bubbleSettings[key as keyof BubbleSettings]}
                     onChange={handleInputChange}
                     disabled={isSaving}
                   />
@@ -167,7 +135,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                     type="color"
                     name={key}
                     className="w-12 h-12 cursor-pointer border-l"
-                    value={settings[key as keyof BubbleSettings]}
+                    value={bubbleSettings[key as keyof BubbleSettings]}
                     onChange={handleInputChange}
                     disabled={isSaving}
                   />
@@ -178,18 +146,18 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
           <div className="flex-1 flex justify-center items-center">
             <div
               className="relative flex items-center justify-center rounded-full w-16 h-16 transition-colors duration-300 cursor-pointer"
-              style={{ backgroundColor: settings.bgColor }}
+              style={{ backgroundColor: bubbleSettings.bgColor }}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               {!isHovered ? (
                 <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
                   <path
-                    fill={settings.iconColor}
+                    fill={bubbleSettings.iconColor}
                     d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z"
                   />
                   <path
-                    fill={settings.bgColor}
+                    fill={bubbleSettings.bgColor}
                     d="M19.57,21.68h3.67a2.08,2.08,0,0,0,2.11-1.81,89.86,89.86,0,0,0,0-10.38,1.9,1.9,0,0,0-1.84-1.74,113.15,113.15,0,0,0-15,0A1.9,1.9,0,0,0,6.71,9.49a74.92,74.92,0,0,0-.06,10.38,2,2,0,0,0,2.1,1.81h3.81V26.5Z"
                   />
                 </svg>
@@ -200,7 +168,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                       key={i}
                       className="w-2 h-2 rounded-full"
                       style={{
-                        backgroundColor: settings.dotsColor,
+                        backgroundColor: bubbleSettings.dotsColor,
                         animation: `jump 1.2s infinite ease-in-out ${i * 0.2}s`,
                       }}
                     />

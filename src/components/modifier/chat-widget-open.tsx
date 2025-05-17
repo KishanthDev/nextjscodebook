@@ -5,23 +5,12 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import Loader from '../loader/Loader';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { ChatWidgetSettings } from '@/types/Modifier';
 
 type Message = {
   text: string;
   isUser: boolean;
-};
-
-type ChatWidgetSettings = {
-  botMsgBgColor: string;
-  userMsgBgColor: string;
-  sendBtnBgColor: string;
-  sendBtnIconColor: string;
-  footerBgColor: string;
-  footerTextColor: string;
-  footerText: string;
-  inputPlaceholder: string;
-  logoUrl: string;
-  chatTitle: string;
 };
 
 type Props = {
@@ -30,21 +19,27 @@ type Props = {
 };
 
 export default function ChatWidgetOpenComponent({ defaultSettings, initialMessages }: Props) {
-  const [settings, setSettings] = useState<ChatWidgetSettings>(defaultSettings);
   const [messages, setMessages] = useState<Message[]>(initialMessages.length > 0 ? initialMessages : [{ text: "Hi, I have a question!", isUser: true }]);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [soundsEnabled, setSoundsEnabled] = useState(true);
-  const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
+
+  const chatWidgetSettings: ChatWidgetSettings = {
+    ...defaultSettings,
+    ...settings.chatWidget,
+  };
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('Fetching chat widget settings...');
+    fetchSettings('chatWidget', defaultSettings);
+  }, [fetchSettings, defaultSettings]);
 
   useEffect(() => {
     if (mounted) {
@@ -52,35 +47,12 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
     }
   }, [mounted, resolvedTheme]);
 
-  useEffect(() => {
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/settings?section=chatWidget');
-        if (res.ok) {
-          const json = await res.json();
-          if (json.settings) {
-            setSettings({ ...defaultSettings, ...json.settings });
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch settings', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSettings();
-  }, [defaultSettings]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSettings((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    updateSettings('chatWidget', { [name]: value });
   };
 
-  const handleSendMessage = () => {
+  const handleSENDMessage = () => {
     if (newMessage.trim() === '') return;
     setMessages((prev) => [
       ...prev,
@@ -103,17 +75,8 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: 'chatWidget', data: settings }),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        toast.success('Settings saved!');
-      } else {
-        toast.error('Failed to save settings: ' + (result.message || 'Unknown error'));
-      }
+      await updateSettings('chatWidget', chatWidgetSettings);
+      toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
       console.error(err);
@@ -219,7 +182,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   placeholder="LiveChat"
                   maxLength={20}
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.chatTitle}
+                  value={chatWidgetSettings.chatTitle}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -234,7 +197,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="logoUrl"
                   placeholder="https://example.com/logo.png"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.logoUrl}
+                  value={chatWidgetSettings.logoUrl}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -249,7 +212,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="botMsgBgColor"
                   placeholder="#f3f4f6"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.botMsgBgColor}
+                  value={chatWidgetSettings.botMsgBgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -257,7 +220,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   type="color"
                   name="botMsgBgColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={settings.botMsgBgColor}
+                  value={chatWidgetSettings.botMsgBgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -272,7 +235,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="userMsgBgColor"
                   placeholder="#fef08a"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.userMsgBgColor}
+                  value={chatWidgetSettings.userMsgBgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -280,7 +243,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   type="color"
                   name="userMsgBgColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={settings.userMsgBgColor}
+                  value={chatWidgetSettings.userMsgBgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -295,13 +258,12 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="inputPlaceholder"
                   placeholder="Type a message..."
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.inputPlaceholder}
+                  value={chatWidgetSettings.inputPlaceholder}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
               </div>
             </div>
-
 
             <div>
               <label className="block text-sm font-medium text-primary mb-2">Send Button Background Color:</label>
@@ -311,7 +273,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="sendBtnBgColor"
                   placeholder="#000000"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.sendBtnBgColor}
+                  value={chatWidgetSettings.sendBtnBgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -319,7 +281,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   type="color"
                   name="sendBtnBgColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={settings.sendBtnBgColor}
+                  value={chatWidgetSettings.sendBtnBgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -334,7 +296,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="sendBtnIconColor"
                   placeholder="#ffffff"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.sendBtnIconColor}
+                  value={chatWidgetSettings.sendBtnIconColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -342,7 +304,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   type="color"
                   name="sendBtnIconColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={settings.sendBtnIconColor}
+                  value={chatWidgetSettings.sendBtnIconColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -357,7 +319,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="footerText"
                   placeholder="Powered by LiveChat"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.footerText}
+                  value={chatWidgetSettings.footerText}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -372,7 +334,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="footerBgColor"
                   placeholder="#ffffff"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.footerBgColor}
+                  value={chatWidgetSettings.footerBgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -380,7 +342,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   type="color"
                   name="footerBgColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={settings.footerBgColor}
+                  value={chatWidgetSettings.footerBgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -395,7 +357,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   name="footerTextColor"
                   placeholder="#374151"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={settings.footerTextColor}
+                  value={chatWidgetSettings.footerTextColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -403,7 +365,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                   type="color"
                   name="footerTextColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={settings.footerTextColor}
+                  value={chatWidgetSettings.footerTextColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -417,12 +379,12 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                 <div className="flex items-center gap-2">
                   <div className="relative flex items-center gap-2">
                     <img
-                      src={settings.logoUrl}
-                      alt={`${settings.chatTitle} Logo`}
+                      src={chatWidgetSettings.logoUrl}
+                      alt={`${chatWidgetSettings.chatTitle} Logo`}
                       className="w-8 h-8 rounded-full border"
                       onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/32')}
                     />
-                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{settings.chatTitle}</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{chatWidgetSettings.chatTitle}</span>
                   </div>
                 </div>
 
@@ -431,7 +393,9 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path
                         fillRule="evenodd"
-                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.
+
+414l4-4a1 1 0 011.414 0z"
                         clipRule="evenodd"
                       />
                     </svg>
@@ -527,7 +491,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                       <div
                         className={`px-3 py-2 rounded-lg max-w-xs break-all whitespace-normal ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
                         style={{
-                          backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor,
+                          backgroundColor: message.isUser ? chatWidgetSettings.userMsgBgColor : chatWidgetSettings.botMsgBgColor,
                         }}
                       >
                         {message.text}
@@ -543,9 +507,9 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={settings.inputPlaceholder}
+                    placeholder={chatWidgetSettings.inputPlaceholder}
                     className="flex-1 max-w-full border rounded-lg px-3 py-2 pr-24 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSENDMessage()}
                     disabled={isSaving}
                   />
                   <div className="absolute right-2 flex gap-1">
@@ -591,10 +555,10 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                     <button
                       className={`p-1 rounded-lg ${newMessage.trim() ? 'bg-black text-white' : 'text-gray-400'}`}
                       style={{
-                        backgroundColor: settings.sendBtnBgColor,
-                        color: settings.sendBtnIconColor,
+                        backgroundColor: chatWidgetSettings.sendBtnBgColor,
+                        color: chatWidgetSettings.sendBtnIconColor,
                       }}
-                      onClick={handleSendMessage}
+                      onClick={handleSENDMessage}
                       disabled={!newMessage.trim() || isSaving}
                     >
                       <svg
@@ -631,11 +595,11 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
               <div
                 className="p-1 text-center text-xs border-t"
                 style={{
-                  backgroundColor: settings.footerBgColor,
-                  color: settings.footerTextColor,
+                  backgroundColor: chatWidgetSettings.footerBgColor,
+                  color: chatWidgetSettings.footerTextColor,
                 }}
               >
-                {settings.footerText}
+                {chatWidgetSettings.footerText}
               </div>
             </div>
           </div>

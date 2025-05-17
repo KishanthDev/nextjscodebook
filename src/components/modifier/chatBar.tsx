@@ -6,21 +6,31 @@ import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import Loader from '../loader/Loader';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { AppSettings } from '@/types/Modifier';
+import { ChatbarSettings } from '@/types/Modifier';
 
-type ChatBarSettings = AppSettings['chatBar'];
-
-export default function ChatBarComponent({ defaultSettings }: { defaultSettings?: ChatBarSettings }) {
+export default function ChatBarComponent({ defaultSettings }: { defaultSettings?: ChatbarSettings }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
-
   const { settings, fetchSettings, updateSettings, loading } = useSettingsStore();
+
+  const chatBarSettings: ChatbarSettings = {
+    ...settings.chatBar,
+    text: settings.chatBar?.text ?? defaultSettings?.text ?? 'Chat with us',
+    bgColor: settings.chatBar?.bgColor ?? defaultSettings?.bgColor ?? '#007bff',
+    textColor: settings.chatBar?.textColor ?? defaultSettings?.textColor ?? '#ffffff',
+  };
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('Fetching chat bar settings...');
+    fetchSettings('chatBar', defaultSettings ?? {
+      text: 'Chat with us',
+      bgColor: '#007bff',
+      textColor: '#ffffff',
+    });
+  }, [defaultSettings, fetchSettings]);
 
   useEffect(() => {
     if (mounted) {
@@ -28,38 +38,16 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
     }
   }, [mounted, resolvedTheme]);
 
-  useEffect(() => {
-    fetchSettings('chatBar', defaultSettings ?? {
-      text: '',
-      bgColor: '#007bff',
-      textColor: '#ffffff',
-    });
-  }, [defaultSettings, fetchSettings]);
-
-  const chatBar = settings?.chatBar;
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     updateSettings('chatBar', { [name]: value });
   };
 
   const handleSave = async () => {
-    if (!chatBar) return;
-
     setIsSaving(true);
     try {
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: 'chatBar', data: chatBar }),
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.success('Settings saved!');
-      } else {
-        toast.error('Failed to save settings: ' + (result.message || 'Unknown error'));
-      }
+      await updateSettings('chatBar', chatBarSettings);
+      toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
       console.error(err);
@@ -70,7 +58,7 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
 
   if (!mounted) return null;
 
-  if (loading || !chatBar) {
+  if (loading || !settings.chatBar) {
     return (
       <SkeletonTheme
         baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
@@ -135,7 +123,7 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
                 placeholder="Chat with us"
                 maxLength={36}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={chatBar.text}
+                value={chatBarSettings.text}
                 onChange={handleInputChange}
                 disabled={isSaving}
               />
@@ -148,7 +136,7 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
                   name="bgColor"
                   placeholder="#007bff"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={chatBar.bgColor}
+                  value={chatBarSettings.bgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -156,7 +144,7 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
                   type="color"
                   name="bgColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={chatBar.bgColor}
+                  value={chatBarSettings.bgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -170,7 +158,7 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
                   name="textColor"
                   placeholder="#ffffff"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={chatBar.textColor}
+                  value={chatBarSettings.textColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -178,7 +166,7 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
                   type="color"
                   name="textColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={chatBar.textColor}
+                  value={chatBarSettings.textColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -189,11 +177,11 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
             <div
               className="w-full max-w-md p-3 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
               style={{
-                backgroundColor: chatBar.bgColor,
-                color: chatBar.textColor,
+                backgroundColor: chatBarSettings.bgColor,
+                color: chatBarSettings.textColor,
               }}
             >
-              <span className="font-medium">{chatBar.text}</span>
+              <span className="font-medium">{chatBarSettings.text}</span>
             </div>
           </div>
         </div>

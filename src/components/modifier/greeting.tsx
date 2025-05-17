@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
@@ -7,23 +6,11 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import Loader from '../loader/Loader';
-
-type ChatWidgetSettings = {
-  headingColor: string;
-  paraColor: string;
-  primaryBtnColor: string;
-  secondaryBtnColor: string;
-  headingText: string;
-  paraText: string;
-  imageUrl: string;
-  primaryBtnText: string;
-  secondaryBtnText: string;
-  showPrimaryBtn: boolean;
-  showSecondaryBtn: boolean;
-};
+import { useSettingsStore } from '@/stores/settingsStore';
+import { GreetingSettings } from '@/types/Modifier';
 
 type LiveChatWidgetProps = {
-  defaultSettings: ChatWidgetSettings;
+  defaultSettings: GreetingSettings;
 };
 
 const CloseIcon = () => (
@@ -74,28 +61,32 @@ const GreetingImage = ({ src, alt, fallbackSrc }: { src: string; alt: string; fa
 
 export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [settings, setSettings] = useState<ChatWidgetSettings>({
-    headingColor: defaultSettings.headingColor || '#000000',
-    paraColor: defaultSettings.paraColor || '#333333',
-    primaryBtnColor: defaultSettings.primaryBtnColor || '#007bff',
-    secondaryBtnColor: defaultSettings.secondaryBtnColor || '#28a745',
-    headingText: defaultSettings.headingText || 'Welcome to LiveChat!',
-    paraText: defaultSettings.paraText || 'Sign up free or talk with our product experts',
-    imageUrl: defaultSettings.imageUrl || '/landingpage/hello01.png',
-    primaryBtnText: defaultSettings.primaryBtnText || 'Primary',
-    secondaryBtnText: defaultSettings.secondaryBtnText || 'Secondary',
-    showPrimaryBtn: defaultSettings.showPrimaryBtn ?? true,
-    showSecondaryBtn: defaultSettings.showSecondaryBtn ?? true,
-  });
-  const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const { settings, fetchSettings, updateSettings, loading } = useSettingsStore();
+
+  const greetingSettings: GreetingSettings = {
+    ...settings.greeting,
+    headingColor: settings.greeting?.headingColor || defaultSettings.headingColor || '#000000',
+    paraColor: settings.greeting?.paraColor || defaultSettings.paraColor || '#333333',
+    primaryBtnColor: settings.greeting?.primaryBtnColor || defaultSettings.primaryBtnColor || '#007bff',
+    secondaryBtnColor: settings.greeting?.secondaryBtnColor || defaultSettings.secondaryBtnColor || '#28a745',
+    headingText: settings.greeting?.headingText || defaultSettings.headingText || 'Welcome to LiveChat!',
+    paraText: settings.greeting?.paraText || defaultSettings.paraText || 'Sign up free or talk with our product experts',
+    imageUrl: settings.greeting?.imageUrl || defaultSettings.imageUrl || '/landingpage/hello01.png',
+    primaryBtnText: settings.greeting?.primaryBtnText || defaultSettings.primaryBtnText || 'Primary',
+    secondaryBtnText: settings.greeting?.secondaryBtnText || defaultSettings.secondaryBtnText || 'Secondary',
+    showPrimaryBtn: settings.greeting?.showPrimaryBtn ?? defaultSettings.showPrimaryBtn ?? true,
+    showSecondaryBtn: settings.greeting?.showSecondaryBtn ?? defaultSettings.showSecondaryBtn ?? true,
+  };
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('Fetching greeting settings...');
+    fetchSettings('greeting', defaultSettings);
+  }, [defaultSettings, fetchSettings]);
 
   useEffect(() => {
     if (mounted) {
@@ -103,79 +94,34 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
     }
   }, [mounted, resolvedTheme]);
 
-  useEffect(() => {
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/settings?section=greeting');
-        if (res.ok) {
-          const json = await res.json();
-          if (json.settings) {
-            setSettings({
-              headingColor: json.settings.headingColor || defaultSettings.headingColor || '#000000',
-              paraColor: json.settings.paraColor || defaultSettings.paraColor || '#333333',
-              primaryBtnColor: json.settings.primaryBtnColor || defaultSettings.primaryBtnColor || '#007bff',
-              secondaryBtnColor: json.settings.secondaryBtnColor || defaultSettings.secondaryBtnColor || '#28a745',
-              headingText: json.settings.headingText || defaultSettings.headingText || 'Welcome to LiveChat!',
-              paraText: json.settings.paraText || defaultSettings.paraText || 'Sign up free or talk with our product experts',
-              imageUrl: json.settings.imageUrl || defaultSettings.imageUrl || '/landingpage/hello01.png',
-              primaryBtnText: json.settings.primaryBtnText || defaultSettings.primaryBtnText || 'Primary',
-              secondaryBtnText: json.settings.secondaryBtnText || defaultSettings.secondaryBtnText || 'Secondary',
-              showPrimaryBtn: json.settings.showPrimaryBtn ?? defaultSettings.showPrimaryBtn ?? true,
-              showSecondaryBtn: json.settings.showSecondaryBtn ?? defaultSettings.showSecondaryBtn ?? true,
-            });
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch settings', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSettings();
-  }, [defaultSettings]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setSettings((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    updateSettings('greeting', { [name]: type === 'checkbox' ? checked : value });
   };
 
   const handleSave = async () => {
     // Basic validation
-    if (!settings.headingText.trim() || !settings.paraText.trim()) {
+    if (!greetingSettings.headingText.trim() || !greetingSettings.paraText.trim()) {
       toast.error('Heading and paragraph text cannot be empty');
       return;
     }
-    if (!settings.imageUrl.trim()) {
+    if (!greetingSettings.imageUrl.trim()) {
       toast.error('Image URL cannot be empty');
       return;
     }
-    if (settings.showPrimaryBtn && !settings.primaryBtnText.trim()) {
+    if (greetingSettings.showPrimaryBtn && !greetingSettings.primaryBtnText.trim()) {
       toast.error('Primary button text cannot be empty when button is shown');
       return;
     }
-    if (settings.showSecondaryBtn && !settings.secondaryBtnText.trim()) {
+    if (greetingSettings.showSecondaryBtn && !greetingSettings.secondaryBtnText.trim()) {
       toast.error('Secondary button text cannot be empty when button is shown');
       return;
     }
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: 'greeting', data: settings }),
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.success('Settings saved!');
-      } else {
-        toast.error('Failed to save settings: ' + (result.message || 'Unknown error'));
-      }
+      await updateSettings('greeting', greetingSettings);
+      toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
       console.error(err);
@@ -186,7 +132,7 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
 
   if (!mounted) return null;
 
-  if (loading) {
+  if (loading || !settings.greeting) {
     return (
       <SkeletonTheme
         baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
@@ -274,7 +220,7 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
                       <input
                         type="checkbox"
                         name={checkboxKey}
-                        checked={settings[checkboxKey as keyof ChatWidgetSettings] as boolean}
+                        checked={greetingSettings[checkboxKey as keyof GreetingSettings] as boolean}
                         onChange={handleInputChange}
                         disabled={isSaving}
                         className="mr-1"
@@ -292,7 +238,7 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
                       placeholder={type === 'color' ? '#hex' : placeholder}
                       maxLength={maxLength}
                       className="w-full px-2 py-2 text-sm focus:outline-none"
-                      value={settings[key as keyof ChatWidgetSettings] as string}
+                      value={greetingSettings[key as keyof GreetingSettings] as string}
                       onChange={handleInputChange}
                       disabled={isSaving}
                     />
@@ -301,7 +247,7 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
                         type="color"
                         name={key}
                         className="w-12 h-12 cursor-pointer border-l"
-                        value={settings[key as keyof ChatWidgetSettings] as string}
+                        value={greetingSettings[key as keyof GreetingSettings] as string}
                         onChange={handleInputChange}
                         disabled={isSaving}
                       />
@@ -322,14 +268,14 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
                   isHovered ? 'opacity-100' : 'opacity-0'
                 }`}
               >
-                <button aria-label="Hide greeting" style={{ color: settings.headingColor }}>
+                <button aria-label="Hide greeting" style={{ color: greetingSettings.headingColor }}>
                   <CloseIcon />
                 </button>
               </div>
 
               <div className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden min-h-[300px]">
                 <GreetingImage
-                  src={settings.imageUrl}
+                  src={greetingSettings.imageUrl}
                   alt="Greeting image"
                   fallbackSrc="/landingpage/hello01.png"
                 />
@@ -337,29 +283,29 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
                 <div className="p-3.5">
                   <h2
                     className="mb-2 break-words max-w-full box-border"
-                    style={{ color: settings.headingColor }}
+                    style={{ color: greetingSettings.headingColor }}
                   >
-                    {settings.headingText}
+                    {greetingSettings.headingText}
                   </h2>
                   <p
                     className="break-words max-w-full box-border"
-                    style={{ color: settings.paraColor }}
+                    style={{ color: greetingSettings.paraColor }}
                   >
-                    {settings.paraText}
+                    {greetingSettings.paraText}
                   </p>
                 </div>
 
                 <ul className="flex flex-col gap-2 px-2 pb-2 pt-[7px] mt-auto">
                   <CustomButton
-                    text={settings.primaryBtnText}
-                    bgColor={settings.primaryBtnColor}
-                    isVisible={settings.showPrimaryBtn}
+                    text={greetingSettings.primaryBtnText}
+                    bgColor={greetingSettings.primaryBtnColor}
+                    isVisible={greetingSettings.showPrimaryBtn}
                   />
                   <CustomButton
-                    text={settings.secondaryBtnText}
-                    bgColor={settings.secondaryBtnColor}
+                    text={greetingSettings.secondaryBtnText}
+                    bgColor={greetingSettings.secondaryBtnColor}
                     icon={<span>💬</span>}
-                    isVisible={settings.showSecondaryBtn}
+                    isVisible={greetingSettings.showSecondaryBtn}
                   />
                 </ul>
               </div>

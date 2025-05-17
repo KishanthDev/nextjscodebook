@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -7,38 +6,39 @@ import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import Loader from '../loader/Loader';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { AppSettings } from '@/types/Modifier';
-
-type EyecatcherSettings = AppSettings['eyeCatcher'];
+import { EyecatcherSettings } from '@/types/Modifier';
 
 export default function EyecatcherComponent({ defaultSettings }: { defaultSettings?: EyecatcherSettings }) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-
   const { settings, fetchSettings, updateSettings, loading } = useSettingsStore();
+
+  const eyeCatcherSettings: EyecatcherSettings = {
+    ...settings.eyeCatcher,
+    title: settings.eyeCatcher?.title ?? defaultSettings?.title ?? 'Hello',
+    text: settings.eyeCatcher?.text ?? defaultSettings?.text ?? 'Click to chat with us',
+    bgColor: settings.eyeCatcher?.bgColor ?? defaultSettings?.bgColor ?? '#007bff',
+    textColor: settings.eyeCatcher?.textColor ?? defaultSettings?.textColor ?? '#ffffff',
+  };
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('Fetching eyecatcher settings...');
+    fetchSettings('eyeCatcher', defaultSettings ?? {
+      title: 'Hello',
+      text: 'Click to chat with us',
+      bgColor: '#007bff',
+      textColor: '#ffffff',
+    });
+  }, [defaultSettings, fetchSettings]);
 
   useEffect(() => {
     if (mounted) {
       setIsDarkMode(resolvedTheme === 'dark');
     }
   }, [mounted, resolvedTheme]);
-
-  useEffect(() => {
-    fetchSettings('eyeCatcher', defaultSettings ?? {
-      title: '',
-      text: '',
-      bgColor: '#007bff',
-      textColor: '#ffffff',
-    });
-  }, [defaultSettings, fetchSettings]);
-
-  const eyeCatcher = settings.eyeCatcher;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,18 +48,8 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const res = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: 'eyeCatcher', data: eyeCatcher }),
-      });
-      const result = await res.json();
-
-      if (res.ok) {
-        toast.success('Settings saved!');
-      } else {
-        toast.error('Failed to save settings: ' + (result.message || 'Unknown error'));
-      }
+      await updateSettings('eyeCatcher', eyeCatcherSettings);
+      toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
       console.error(err);
@@ -70,7 +60,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
 
   if (!mounted) return null;
 
-  if (loading) {
+  if (loading || !settings.eyeCatcher) {
     return (
       <SkeletonTheme
         baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
@@ -106,8 +96,6 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
     );
   }
 
-  if (!eyeCatcher) return <p className="p-4 text-gray-500">No settings found.</p>;
-
   return (
     <div className="relative p-6 max-w-4xl mx-auto">
       {isSaving && (
@@ -137,7 +125,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                 placeholder="Hello"
                 maxLength={20}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={eyeCatcher.title}
+                value={eyeCatcherSettings.title}
                 onChange={handleInputChange}
                 disabled={isSaving}
               />
@@ -150,7 +138,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                 placeholder="Click to chat with us"
                 maxLength={36}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={eyeCatcher.text}
+                value={eyeCatcherSettings.text}
                 onChange={handleInputChange}
                 disabled={isSaving}
               />
@@ -163,7 +151,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                   name="bgColor"
                   placeholder="#007bff"
                   className="w-full px-3 py-3 text-sm focus:outline-none"
-                  value={eyeCatcher.bgColor}
+                  value={eyeCatcherSettings.bgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -171,7 +159,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                   type="color"
                   name="bgColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={eyeCatcher.bgColor}
+                  value={eyeCatcherSettings.bgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -185,7 +173,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                   name="textColor"
                   placeholder="#ffffff"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={eyeCatcher.textColor}
+                  value={eyeCatcherSettings.textColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -193,7 +181,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                   type="color"
                   name="textColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={eyeCatcher.textColor}
+                  value={eyeCatcherSettings.textColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -204,16 +192,16 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
             <div
               className="flex w-[13rem] p-4 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md"
               style={{
-                backgroundColor: eyeCatcher.bgColor,
-                color: eyeCatcher.textColor,
+                backgroundColor: eyeCatcherSettings.bgColor,
+                color: eyeCatcherSettings.textColor,
               }}
             >
               <span className="text-3xl animate-wave flex-shrink-0 mr-3" style={{ animationDuration: '1.5s' }}>
                 👋
               </span>
               <div className="flex flex-col min-w-0">
-                <h3 className="font-bold text-sm leading-tight break-words">{eyeCatcher.title}</h3>
-                <p className="text-xs break-words whitespace-normal">{eyeCatcher.text}</p>
+                <h3 className="font-bold text-sm leading-tight break-words">{eyeCatcherSettings.title}</h3>
+                <p className="text-xs break-words whitespace-normal">{eyeCatcherSettings.text}</p>
               </div>
             </div>
           </div>

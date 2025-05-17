@@ -8,7 +8,7 @@ type SettingsStore = {
   settings: AppSettings;
   loading: boolean;
   fetchSettings: <T>(section: keyof AppSettings, defaultSettings: T) => Promise<void>;
-  updateSettings: <T>(section: keyof AppSettings, newSettings: Partial<T>) => void;
+  updateSettings: <T>(section: keyof AppSettings, newSettings: Partial<T>) => Promise<void>;
 };
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -48,7 +48,7 @@ export const useSettingsStore = create<SettingsStore>()(
         }));
       }
     },
-    updateSettings: <T,>(section: keyof AppSettings, newSettings: Partial<T>) => {
+    updateSettings: async <T,>(section: keyof AppSettings, newSettings: Partial<T>) => {
       set((state) => {
         const updatedSettings = {
           ...state.settings,
@@ -61,11 +61,20 @@ export const useSettingsStore = create<SettingsStore>()(
         return { settings: updatedSettings };
       });
 
-      fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section, settings: newSettings }),
-      }).catch((err) => console.error(`Error syncing settings for ${section}:`, err));
+      try {
+        const response = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ section, data: newSettings }),
+        });
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.message || 'Failed to save settings');
+        }
+      } catch (err) {
+        console.error(`Error syncing settings for ${section}:`, err);
+        throw err; // Re-throw to be handled by the component
+      }
     },
   }))
 );

@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import localFont from 'next/font/local';
 import { ThemeProvider } from 'next-themes';
 import { SidebarProvider } from "@/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { Toaster } from '@/ui/sonner';
 import { NavbarWrapper } from '@/components/navbar/navbar';
 import { UserStatusProvider } from '@/context/UserStatusContext';

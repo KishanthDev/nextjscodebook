@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUserStatus } from '@/context/UserStatusContext';
 
-import { NavUser } from './sidebar/nav-user';
-import { TeamSwitcher } from './sidebar/team-switcher';
+import { NavUser } from './nav-user';
+import { TeamSwitcher } from './team-switcher';
 
 import {
   Sidebar,

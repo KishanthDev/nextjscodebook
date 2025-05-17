@@ -1,38 +1,39 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useSettings } from '@/hooks/useSettings';
-import data from "../../../../data/modifier.json";
+import { useTheme } from 'next-themes';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useTheme } from 'next-themes';
+import { useSettingsStore } from '@/stores/settingsStore';
+import defaultConfig from '../../../../data/modifier.json';
+import { BubbleSettings } from '@/types/Modifier';
 
-type BubbleSettings = {
-  bgColor: string;
-  iconColor: string;
-  dotsColor: string;
-};
-
-export default function Page() {
+export default function Bubble() {
   const [isHovered, setIsHovered] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const { settings, loading, fetchSettings } = useSettingsStore();
 
-  const defaultSettings: BubbleSettings = data.bubble;
-  const { settings, loading } = useSettings<BubbleSettings>({
-    section: 'bubble',
-    defaultSettings,
-  });
+  const defaultSettings: BubbleSettings = defaultConfig.bubble;
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('Fetching bubble settings...');
+    fetchSettings('bubble', defaultSettings);
+  }, [fetchSettings]);
 
   useEffect(() => {
     if (mounted) {
       setIsDarkMode(resolvedTheme === 'dark');
     }
   }, [mounted, resolvedTheme]);
+
+  const bubbleSettings: BubbleSettings = {
+    ...defaultSettings,
+    ...settings.bubble,
+  };
+
+  console.log('Bubble settings:', bubbleSettings);
 
   if (!mounted) return null;
 
@@ -57,7 +58,7 @@ export default function Page() {
         <div
           data-testid="bubble-container"
           className="relative flex items-center justify-center rounded-full w-16 h-16 transition-colors duration-300 cursor-pointer"
-          style={{ backgroundColor: settings.bgColor }}
+          style={{ backgroundColor: bubbleSettings.bgColor || '#ff5101' }}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -70,11 +71,11 @@ export default function Page() {
               aria-hidden="true"
             >
               <path
-                fill={settings.iconColor}
+                fill={bubbleSettings.iconColor || '#ffffff'}
                 d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z"
               />
               <path
-                fill={settings.bgColor}
+                fill={bubbleSettings.bgColor || '#ff5101'}
                 d="M19.57,21.68h3.67a2.08,2.08,0,0,0,2.11-1.81,89.86,89.86,0,0,0,0-10.38,1.9,1.9,0,0,0-1.84-1.74,113.15,113.15,0,0,0-15,0A1.9,1.9,0,0,0,6.71,9.49a74.92,74.92,0,0,0-.06,10.38,2,2,0,0,0,2.1,1.81h3.81V26.5Z"
               />
             </svg>
@@ -86,7 +87,7 @@ export default function Page() {
                   key={i}
                   className="w-2 h-2 rounded-full"
                   style={{
-                    backgroundColor: settings.dotsColor,
+                    backgroundColor: bubbleSettings.dotsColor || '#ff5101',
                     animation: `jump 1.2s infinite ease-in-out ${i * 0.2}s`,
                   }}
                 />

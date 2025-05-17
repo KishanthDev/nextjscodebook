@@ -1,36 +1,38 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useSettings } from '@/hooks/useSettings';
-import data from '../../../../data/modifier.json';
+import { useTheme } from 'next-themes';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useTheme } from 'next-themes';
+import { useSettingsStore } from '@/stores/settingsStore';
+import defaultConfig from '../../../../data/modifier.json';
+import { ChatbarSettings } from '@/types/Modifier';
 
-type ChatBarSettings = {
-  text: string;
-  bgColor: string;
-  textColor: string;
-};
-
-export default function ChatBarComponent() {
-  const defaultSettings: ChatBarSettings = data.chatbar;
-  const { settings, loading } = useSettings<ChatBarSettings>({
-    section: 'chatBar',
-    defaultSettings,
-  });
+export default function ChatBar() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const { settings, loading, fetchSettings } = useSettingsStore();
+
+  const defaultSettings: ChatbarSettings = defaultConfig.chatBar;
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('Fetching chatbar settings...');
+    fetchSettings('chatBar', defaultSettings);
+  }, [fetchSettings]);
 
   useEffect(() => {
     if (mounted) {
       setIsDarkMode(resolvedTheme === 'dark');
     }
   }, [mounted, resolvedTheme]);
+
+  const chatbarSettings: ChatbarSettings = {
+    ...defaultSettings,
+    ...settings.chatBar,
+  };
+
+  console.log('ChatBar settings:', chatbarSettings);
 
   if (!mounted) return null;
 
@@ -56,11 +58,13 @@ export default function ChatBarComponent() {
           data-testid="chatbar-container"
           className="w-full max-w-md p-3 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
           style={{
-            backgroundColor: settings.bgColor,
-            color: settings.textColor
+            backgroundColor: chatbarSettings.bgColor || '#007bff',
+            color: chatbarSettings.textColor || '#ffffff',
           }}
         >
-          <span data-testid="chatbar-text" className="font-medium">{settings.text}</span>
+          <span data-testid="chatbar-text" className="font-medium">
+            {chatbarSettings.text || 'Chat with us'}
+          </span>
         </div>
       </div>
     </div>

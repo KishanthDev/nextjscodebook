@@ -10,7 +10,7 @@
     "iconColor": "#ffffff",
     "dotsColor": "#ff5101"
   },
-  "chatbar": {
+  "chatBar": {
     "text": "Chat with us",
     "bgColor": "#007bff",
     "textColor": "#ffffff"

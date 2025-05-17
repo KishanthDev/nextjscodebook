@@ -13,7 +13,7 @@ export default function SettingsPage() {
   const [selectedOption, setSelectedOption] = useState('eyecatcher');
   const eyecatcherdata = data.eyeCatcher;
   const bubbledata = data.bubble;
-  const chatbardata = data.chatbar;
+  const chatbardata = data.chatBar;
   const chatwidgetdata = data.chatWidget;
   const chatwidgetmessage = data.chatWidget.messages;
   const greeting = data.greeting

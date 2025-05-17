@@ -13,7 +13,7 @@ type SettingsStore = {
 
 export const useSettingsStore = create<SettingsStore>()(
   devtools((set) => ({
-    settings: defaultConfig as AppSettings, // Initialize with default JSON
+    settings: defaultConfig as AppSettings,
     loading: false,
     fetchSettings: async <T,>(section: keyof AppSettings, defaultSettings: T) => {
       set({ loading: true });

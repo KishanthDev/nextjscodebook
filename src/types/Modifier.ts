@@ -53,7 +53,7 @@ export type GreetingSettings = {
 export type AppSettings = {
   eyeCatcher: EyecatcherSettings;
   bubble: BubbleSettings;
-  chatbar: ChatbarSettings;
+  chatBar: ChatbarSettings;
   chatWidget: ChatWidgetSettings;
   greeting: GreetingSettings;
 };

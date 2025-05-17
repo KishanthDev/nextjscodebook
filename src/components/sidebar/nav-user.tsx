@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUserStatus } from '@/context/UserStatusContext';
+import { useUserStatus } from "@/stores/useUserStatus";
 import { useTheme } from 'next-themes';
 import {
   DropdownMenu,
@@ -55,7 +55,7 @@ const StatusIndicator = ({
     className={cn(
       'absolute bottom-0 right-0 h-3 w-3 rounded-full border-2',
       borderClass,
-      isOnline ? 'bg-green-500' : 'bg-gray-400',
+      isOnline ? 'bg-green-500' : 'bg-red-500',
     )}
   />
 );
@@ -98,7 +98,7 @@ export function NavUser({ user, isOnline }: NavUserProps) {
               <span
                 className={cn(
                   'absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white',
-                  isOnline ? 'bg-green-500' : 'bg-gray-400',
+                  isOnline ? 'bg-green-500' : 'bg-red-500',
                 )}
               />
             </div>

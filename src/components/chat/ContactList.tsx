@@ -2,29 +2,23 @@ import { CircleUser, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/dropdown-menu";
 import { Button } from "@/ui/button";
 import clsx from "clsx";
-import { useState } from "react";
 import Contact from "@/types/Contact";
+import { useUserStatus } from "@/stores/useUserStatus";
 
 type Props = {
   contacts: Contact[];
   selectedContact: Contact | null;
   onSelect: (contact: Contact) => void;
+  userStatus: "online" | "offline";
 };
 
-const statusOptions = [
-  { label: "Online", color: "bg-green-500" },
-  { label: "Busy", color: "bg-red-500" },
-  { label: "Offline", color: "bg-gray-400" },
-];
-
-const statusColor: Record<string, string> = {
+const statusColor: Record<"online" | "offline", string> = {
   online: "bg-green-500",
-  offline: "bg-gray-400",
-  busy: "bg-red-500",
+  offline: "bg-red-500",
 };
 
-export default function ContactList({ contacts, selectedContact, onSelect }: Props) {
-  const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
+export default function ContactList({ contacts, selectedContact, onSelect, userStatus }: Props) {
+  const { toggleAcceptChats } = useUserStatus();
 
   return (
     <div className="w-1/3 border-r border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 flex flex-col h-full">
@@ -36,34 +30,35 @@ export default function ContactList({ contacts, selectedContact, onSelect }: Pro
             <span
               className={clsx(
                 "absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-black",
-                selectedStatus.color
+                statusColor[userStatus]
               )}
             />
           </div>
           <div>
             <div className="text-sm font-medium text-black dark:text-white">Zoey</div>
-            <div className="text-xs text-gray-500 dark:text-white">{selectedStatus.label}</div>
+            <div className="text-xs text-gray-500 dark:text-white">{userStatus.charAt(0).toUpperCase() + userStatus.slice(1)}</div>
           </div>
         </div>
 
         {/* Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white"
+            >
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40">
-            {statusOptions.map((status) => (
-              <DropdownMenuItem
-                key={status.label}
-                onClick={() => setSelectedStatus(status)}
-                className="flex items-center gap-2 text-sm cursor-pointer"
-              >
-                <span className={clsx("h-2.5 w-2.5 rounded-full", status.color)} />
-                {status.label}
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuItem
+              onClick={toggleAcceptChats}
+              className="flex items-center gap-2 text-sm cursor-pointer"
+            >
+              <span className={clsx("h-2.5 w-2.5 rounded-full", statusColor[userStatus === "online" ? "offline" : "online"])} />
+              Set {userStatus === "online" ? "Offline" : "Online"}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

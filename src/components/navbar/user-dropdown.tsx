@@ -14,7 +14,7 @@ import { User2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useUserStatus } from "@/context/UserStatusContext";
+import { useUserStatus } from "@/stores/useUserStatus";
 
 const Divider = () => (
     <div className="my-2 h-px bg-gray-200 dark:bg-zinc-700" />
@@ -23,7 +23,7 @@ const Divider = () => (
 // Only Online and Offline now
 const statusOptions = [
     { label: "Online", color: "bg-green-500", value: true },
-    { label: "Offline", color: "bg-gray-400", value: false },
+    { label: "Offline", color: "bg-red-500", value: false },
 ];
 
 export const UserDropdown = () => {
@@ -57,7 +57,7 @@ export const UserDropdown = () => {
                         className={cn(
                             "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2",
                             isDark ? "border-zinc-900" : "border-white",
-                            acceptChats ? "bg-green-500" : "bg-gray-400"
+                            acceptChats ? "bg-green-500" : "bg-red-500"
                         )}
                     />
                 </button>

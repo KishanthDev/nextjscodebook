@@ -8,8 +8,6 @@ import { SidebarProvider } from "@/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { Toaster } from '@/ui/sonner';
 import { NavbarWrapper } from '@/components/navbar/navbar';
-import { UserStatusProvider } from '@/context/UserStatusContext';
-
 const geistSans = localFont({
   src: '../fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -25,7 +23,6 @@ const geistMono = localFont({
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class">
-      <UserStatusProvider>
         <SidebarProvider>
           <AppSidebar />
           <main className={`${geistSans.variable} ${geistMono.variable} w-full bg-background text-foreground antialiased`}>
@@ -34,7 +31,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           </main>
           <Toaster />
         </SidebarProvider>
-      </UserStatusProvider>
     </ThemeProvider>
   );
 }

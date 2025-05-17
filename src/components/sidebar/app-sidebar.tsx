@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useUserStatus } from '@/context/UserStatusContext';
+import { useUserStatus } from "@/stores/useUserStatus";
 
 import { NavUser } from './nav-user';
 import { TeamSwitcher } from './team-switcher';

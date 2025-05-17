@@ -4,8 +4,7 @@ import Contact from "@/types/Contact";
 
 const statusColor = {
   online: "bg-green-500",
-  offline: "bg-gray-400",
-  busy: "bg-red-500",
+  offline: "bg-red-500",
 };
 
 export default function ChatHeader({ contact }: { contact: Contact | null }) {

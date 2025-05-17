@@ -1,4 +1,4 @@
-/* 'use client';
+'use client';
 
 import Link from 'next/link';
 import { useEffect } from 'react';
@@ -55,7 +55,7 @@ export default function EngageSection() {
             INCREASE ONLINE SALES
           </p>
         </div>
-        <div className="flex flex-col md:flex-row mb-2 text-center md:text-left gap-x-4">
+        <div className="flex justify-between">
           <h2
             className="text-[clamp(2.625rem,2rem+(1.5*(100vw-36rem)/49),3.5rem)] mb-2 font-medium"
             style={{ textWrap: 'balance' }}
@@ -109,4 +109,4 @@ export default function EngageSection() {
       </div>
     </section>
   );
-} */
+}

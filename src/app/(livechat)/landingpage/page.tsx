@@ -3,6 +3,8 @@ import React from 'react'
 import Footer from '@/components/landingpage/Footer'
 import Hero1 from '@/components/landingpage/Hero1'
 import Preview from '@/components/landingpage/Preview'
+import Hero2 from '@/components/landingpage/Hero2'
+import EngageSection from '@/components/landingpage/EngageSection'
 
 function Page() {
   return (
@@ -14,6 +16,8 @@ function Page() {
       <div className='my-10'>
         <Preview />
       </div>
+      <EngageSection/>
+      <Hero2/>
       <Footer />
     </div>
   )

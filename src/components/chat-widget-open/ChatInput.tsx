@@ -24,7 +24,7 @@ export default function ChatInput({ newMessage, setNewMessage, handleSendMessage
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder={settings.inputPlaceholder}
+          placeholder={settings.inputPlaceholder || 'Type a message...'}
           className="flex-1 max-w-full border rounded-lg px-3 py-2 pr-24 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
         />
@@ -65,10 +65,10 @@ export default function ChatInput({ newMessage, setNewMessage, handleSendMessage
             </svg>
           </button>
           <button
-            className={`p-1 rounded-lg ${newMessage.trim() ? 'bg-black text-white' : 'text-gray-400'}`}
+            className={`p-1 rounded-lg ${newMessage.trim() ? 'text-white' : 'text-gray-400'}`}
             style={{
-              backgroundColor: settings.sendBtnBgColor,
-              color: settings.sendBtnIconColor,
+              backgroundColor: newMessage.trim() ? settings.sendBtnBgColor || '#000000' : '#d1d5db',
+              color: settings.sendBtnIconColor || '#ffffff',
             }}
             onClick={handleSendMessage}
             disabled={!newMessage.trim()}

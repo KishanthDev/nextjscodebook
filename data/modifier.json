@@ -1,5 +1,5 @@
 {
-  "eyecatcher": {
+  "eyeCatcher": {
     "title": "Hello",
     "text": "Click to chat with us",
     "bgColor": "#007bff",
@@ -15,7 +15,7 @@
     "bgColor": "#007bff",
     "textColor": "#ffffff"
   },
-  "chatwidgetopen": {
+  "chatWidget": {
     "botMsgBgColor": "#f3f4f6",
     "userMsgBgColor": "#fef08a",
     "sendBtnBgColor": "#000000",

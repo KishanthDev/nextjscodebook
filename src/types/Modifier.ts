@@ -1,0 +1,59 @@
+export type Message = {
+  text: string;
+  isUser: boolean;
+};
+
+export type ChatWidgetSettings = {
+  botMsgBgColor: string;
+  userMsgBgColor: string;
+  sendBtnBgColor: string;
+  sendBtnIconColor: string;
+  footerBgColor: string;
+  footerTextColor: string;
+  footerText: string;
+  inputPlaceholder: string;
+  logoUrl: string;
+  chatTitle: string;
+  messages: Message[];
+};
+
+export type EyecatcherSettings = {
+  title: string;
+  text: string;
+  bgColor: string;
+  textColor: string;
+};
+
+export type BubbleSettings = {
+  bgColor: string;
+  iconColor: string;
+  dotsColor: string;
+};
+
+export type ChatbarSettings = {
+  text: string;
+  bgColor: string;
+  textColor: string;
+};
+
+export type GreetingSettings = {
+  headingColor: string;
+  paraColor: string;
+  primaryBtnColor: string;
+  secondaryBtnColor: string;
+  headingText: string;
+  paraText: string;
+  imageUrl: string;
+  primaryBtnText: string;
+  secondaryBtnText: string;
+  showPrimaryBtn: boolean;
+  showSecondaryBtn: boolean;
+};
+
+export type AppSettings = {
+  eyeCatcher: EyecatcherSettings;
+  bubble: BubbleSettings;
+  chatbar: ChatbarSettings;
+  chatWidget: ChatWidgetSettings;
+  greeting: GreetingSettings;
+};

@@ -7,6 +7,7 @@ type ChatMessagesProps = {
 };
 
 export default function ChatMessages({ messages, settings }: ChatMessagesProps) {
+    
   return (
     <div
       id="messagesContainer"
@@ -22,7 +23,9 @@ export default function ChatMessages({ messages, settings }: ChatMessagesProps) 
             <div
               className={`px-3 py-2 rounded-lg max-w-xs break-all whitespace-normal ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
               style={{
-                backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor,
+                backgroundColor: message.isUser
+                  ? settings.userMsgBgColor || '#fef08a'
+                  : settings.botMsgBgColor || '#f3f4f6',
               }}
             >
               {message.text}

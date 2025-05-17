@@ -8,21 +8,21 @@ import { Message, ChatWidgetSettings } from '@/types/WidgetOpen';
 import ChatHeader from './ChatHeader';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
-import data from '../../../data/modifier.json';
+import defaultConfig from '../../../data/modifier.json';
 
 export default function ChatWidgetPreview() {
-  const defaultSettings: ChatWidgetSettings = data.chatwidgetopen
-
-  const { settings, loading, fetchSettings } = useSettingsStore();
-  const [messages, setMessages] = useState<Message[]>(data.chatwidgetopen.messages);
+  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
   const [newMessage, setNewMessage] = useState('');
   const [soundsEnabled, setSoundsEnabled] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
 
+  const defaultSettings: ChatWidgetSettings = defaultConfig.chatWidget;
+
   useEffect(() => {
     setMounted(true);
+    console.log('Fetching chatWidget settings...');
     fetchSettings('chatWidget', defaultSettings);
   }, [fetchSettings]);
 
@@ -34,7 +34,10 @@ export default function ChatWidgetPreview() {
 
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
-    setMessages((prev) => [...prev, { text: newMessage, isUser: true }]);
+    const newMsg: Message = { text: newMessage, isUser: true };
+    updateSettings<ChatWidgetSettings>('chatWidget', {
+      messages: [...settings.chatWidget.messages, newMsg],
+    });
     setNewMessage('');
     setTimeout(() => {
       const messagesContainer = document.getElementById('messagesContainer');
@@ -92,13 +95,19 @@ export default function ChatWidgetPreview() {
     );
   }
 
-  const chatSettings = settings.chatWidget ?? defaultSettings;
+  const chatSettings: ChatWidgetSettings = {
+    ...defaultSettings,
+    ...settings.chatWidget,
+    messages: settings.chatWidget?.messages ?? defaultSettings.messages,
+  };
+
+  console.log('ChatWidgetPreview settings:', chatSettings);
 
   return (
     <div className="flex justify-center items-start p-6">
       <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden shadow-lg flex flex-col">
         <ChatHeader settings={chatSettings} soundsEnabled={soundsEnabled} toggleSounds={toggleSounds} />
-        <ChatMessages messages={messages} settings={chatSettings} />
+        <ChatMessages messages={chatSettings.messages} settings={chatSettings} />
         <ChatInput
           newMessage={newMessage}
           setNewMessage={setNewMessage}
@@ -108,11 +117,11 @@ export default function ChatWidgetPreview() {
         <div
           className="p-1 text-center text-xs border-t"
           style={{
-            backgroundColor: chatSettings.footerBgColor,
-            color: chatSettings.footerTextColor,
+            backgroundColor: chatSettings.footerBgColor || '#ffffff',
+            color: chatSettings.footerTextColor || '#374151',
           }}
         >
-          {chatSettings.footerText}
+          {chatSettings.footerText || 'Powered by LiveChat'}
         </div>
       </div>
     </div>

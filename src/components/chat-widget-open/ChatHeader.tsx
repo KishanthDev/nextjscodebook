@@ -15,12 +15,14 @@ export default function ChatHeader({ settings, soundsEnabled, toggleSounds }: Ch
     <div className="p-3 border-b flex justify-between items-center bg-white dark:bg-gray-800">
       <div className="flex items-center gap-2">
         <img
-          src={settings.logoUrl}
+          src={settings.logoUrl || 'https://via.placeholder.com/32'}
           alt={`${settings.chatTitle} Logo`}
           className="w-8 h-8 rounded-full border"
           onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/32')}
         />
-        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{settings.chatTitle}</span>
+        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          {settings.chatTitle || 'LiveChat'}
+        </span>
       </div>
 
       <div className="flex gap-2">

@@ -1,35 +1,31 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useTheme } from 'next-themes';
 import { useSettingsStore } from '@/stores/settingsStore';
+import defaultConfig from '../../../../data/modifier.json';
 
-type EyecatcherSettings = {
+export type EyecatcherSettings = {
   title: string;
   text: string;
   bgColor: string;
   textColor: string;
 };
 
-const defaultSettings: EyecatcherSettings = {
-  title: 'Hello',
-  text: 'Click to chat with us',
-  bgColor: '#007bff',
-  textColor: '#ffffff',
-};
+const defaultSettings: EyecatcherSettings = defaultConfig.eyeCatcher;
 
 export default function EyecatcherPreview() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
-
   const { settings, loading, fetchSettings } = useSettingsStore();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('Fetching eyecatcher settings...');
+    fetchSettings('eyeCatcher', defaultSettings);
+  }, [fetchSettings]);
 
   useEffect(() => {
     if (mounted) {
@@ -37,15 +33,16 @@ export default function EyecatcherPreview() {
     }
   }, [mounted, resolvedTheme]);
 
-  useEffect(() => {
-    fetchSettings('eyeCatcher', defaultSettings);
-  }, [fetchSettings]);
+  const eyeCatcherSettings: EyecatcherSettings = {
+    ...defaultSettings,
+    ...settings.eyeCatcher,
+  };
 
-  const eyeCatcherSettings = settings['eyeCatcher'] as EyecatcherSettings;
+  console.log('EyecatcherPreview settings:', eyeCatcherSettings);
 
   if (!mounted) return null;
 
-  if (loading || !eyeCatcherSettings) {
+  if (loading) {
     return (
       <SkeletonTheme
         baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
@@ -63,28 +60,47 @@ export default function EyecatcherPreview() {
       <div
         className="flex w-[13rem] p-4 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md"
         style={{
-          backgroundColor: eyeCatcherSettings.bgColor,
-          color: eyeCatcherSettings.textColor,
+          backgroundColor: eyeCatcherSettings.bgColor || '#007bff',
+          color: eyeCatcherSettings.textColor || '#ffffff',
         }}
       >
         <span className="text-3xl animate-wave flex-shrink-0 mr-3" style={{ animationDuration: '1.5s' }}>
           👋
         </span>
         <div className="flex flex-col min-w-0">
-          <h3 className="font-bold text-sm leading-tight break-words">{eyeCatcherSettings.title}</h3>
-          <p className="text-xs break-words whitespace-normal">{eyeCatcherSettings.text}</p>
+          <h3 className="font-bold text-sm leading-tight break-words">
+            {eyeCatcherSettings.title || 'Hello'}
+          </h3>
+          <p className="text-xs break-words whitespace-normal">
+            {eyeCatcherSettings.text || 'Click to chat with us'}
+          </p>
         </div>
       </div>
 
       <style jsx>{`
         @keyframes wave {
-          0%, 100% { transform: rotate(0deg); }
-          10% { transform: rotate(14deg); }
-          20% { transform: rotate(-8deg); }
-          30% { transform: rotate(14deg); }
-          40% { transform: rotate(-4deg); }
-          50% { transform: rotate(10deg); }
-          60% { transform: rotate(0deg); }
+          0%,
+          100% {
+            transform: rotate(0deg);
+          }
+          10% {
+            transform: rotate(14deg);
+          }
+          20% {
+            transform: rotate(-8deg);
+          }
+          30% {
+            transform: rotate(14deg);
+          }
+          40% {
+            transform: rotate(-4deg);
+          }
+          50% {
+            transform: rotate(10deg);
+          }
+          60% {
+            transform: rotate(0deg);
+          }
         }
         .animate-wave {
           display: inline-block;

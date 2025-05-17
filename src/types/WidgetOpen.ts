@@ -4,6 +4,7 @@ export type Message = {
 };
 
 export type ChatWidgetSettings = {
+  messages: import("c:/Mern/Intern/nextjscodebook/src/types/Modifier").Message[];
   botMsgBgColor: string;
   userMsgBgColor: string;
   sendBtnBgColor: string;

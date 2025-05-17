@@ -1,6 +1,6 @@
 import { CircleUser, MoreHorizontal } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../registry/new-york-v4/ui/dropdown-menu";
-import { Button } from "../../registry/new-york-v4/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 import clsx from "clsx";
 import { useState } from "react";
 import Contact from "../../../types/Contact";

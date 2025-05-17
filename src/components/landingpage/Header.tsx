@@ -9,8 +9,8 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from '../../registry/new-york-v4/ui/navigation-menu';
-import { Button } from '@/registry/new-york-v4/ui/button';
+} from '../ui/navigation-menu';
+import { Button } from '../ui/button';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

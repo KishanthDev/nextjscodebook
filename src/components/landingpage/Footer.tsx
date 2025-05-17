@@ -5,7 +5,7 @@ import {
     NavigationMenu,
     NavigationMenuItem,
     NavigationMenuList,
-} from '../../registry/new-york-v4/ui/navigation-menu';
+} from '../ui/navigation-menu';
 
 export default function Footer() {
     return (

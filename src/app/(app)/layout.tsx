@@ -4,9 +4,9 @@
 import type { ReactNode } from 'react';
 import localFont from 'next/font/local';
 import { ThemeProvider } from 'next-themes';
-import { SidebarProvider } from "@/registry/new-york-v4/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Toaster } from '@/registry/new-york-v4/ui/sonner';
+import { Toaster } from '@/components/ui/sonner';
 import { NavbarWrapper } from '@/components/navbar/navbar';
 import { UserStatusProvider } from '@/context/UserStatusContext';
 

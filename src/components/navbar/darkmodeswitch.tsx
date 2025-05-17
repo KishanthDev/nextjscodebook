@@ -4,7 +4,7 @@ import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
-import { Button } from "../../registry/new-york-v4/ui/button";
+import { Button } from "../ui/button";
 
 export function DarkModeSwitch() {
   const { theme, setTheme } = useTheme();

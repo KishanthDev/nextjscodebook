@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/registry/new-york-v4/ui/button";
+import { Button } from "../../../components/ui/button";
 import clsx from "clsx";
 
 const AuthPage: React.FC = () => {

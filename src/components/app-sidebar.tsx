@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUserStatus } from '@/context/UserStatusContext';
 
-import { NavUser } from '@/registry/new-york-v4/blocks/sidebar-07/components/nav-user';
-import { TeamSwitcher } from '@/registry/new-york-v4/blocks/sidebar-07/components/team-switcher';
+import { NavUser } from './sidebar/nav-user';
+import { TeamSwitcher } from './sidebar/team-switcher';
 
 import {
   Sidebar,
@@ -18,7 +18,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from '@/registry/new-york-v4/ui/sidebar';
+} from './ui/sidebar';
 
 import {
   LayoutDashboard,

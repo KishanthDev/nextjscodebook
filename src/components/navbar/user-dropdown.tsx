@@ -9,7 +9,7 @@ import {
     DropdownMenuSub,
     DropdownMenuSubTrigger,
     DropdownMenuSubContent,
-} from "../ui/dropdown-menu";
+} from "@/ui/dropdown-menu";
 import { User2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";

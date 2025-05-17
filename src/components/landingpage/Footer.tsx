@@ -5,7 +5,7 @@ import {
     NavigationMenu,
     NavigationMenuItem,
     NavigationMenuList,
-} from '../ui/navigation-menu';
+} from '@/ui/navigation-menu';
 
 export default function Footer() {
     return (

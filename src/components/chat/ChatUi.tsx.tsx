@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Contact from "../../../types/Contact";
+import Contact from "@/types/Contact";
 import ContactData from "../../../data/Contact.json";
 import ContactList from "./ContactList";
 import ChatHeader from "./ChatHeader";

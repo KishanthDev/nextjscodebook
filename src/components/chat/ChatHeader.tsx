@@ -1,6 +1,6 @@
 import { CircleUser } from "lucide-react";
 import clsx from "clsx";
-import Contact from "../../../types/Contact";
+import Contact from "@/types/Contact";
 
 const statusColor = {
   online: "bg-green-500",

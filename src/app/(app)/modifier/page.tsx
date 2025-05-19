@@ -42,7 +42,6 @@ export default function SettingsPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Radio Buttons Group - horizontal layout */}
       <div>
         <label className="block font-semibold text-lg mb-2">Choose Setting Type:</label>
         <div className="flex gap-6">
@@ -109,7 +108,7 @@ export default function SettingsPage() {
               checked={selectedOption === 'chat-widget-contact'}
               onChange={(e) => setSelectedOption(e.target.value)}
             />
-            <span>Chat Widget Greeting</span>
+            <span>Chat Widget Contact</span>
           </label>
         </div>
       </div>

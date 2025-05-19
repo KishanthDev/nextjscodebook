@@ -1,4 +1,3 @@
-// src/components/BubbleComponent.tsx
 'use client';
 import { useState, useEffect } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
@@ -18,17 +17,12 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [localSettings, setLocalSettings] = useState<BubbleSettings>(defaultSettings);
   const { resolvedTheme } = useTheme();
   const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
 
-  const bubbleSettings: BubbleSettings = {
-    ...defaultSettings,
-    ...settings.bubble,
-  };
-
   useEffect(() => {
     setMounted(true);
-    console.log('Fetching bubble settings...');
     fetchSettings('bubble', defaultSettings);
   }, [fetchSettings, defaultSettings]);
 
@@ -38,15 +32,25 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
     }
   }, [mounted, resolvedTheme]);
 
+  useEffect(() => {
+    setLocalSettings((prev) => ({
+      ...prev,
+      ...settings.bubble,
+    }));
+  }, [settings.bubble]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    updateSettings('bubble', { [name]: value });
+    setLocalSettings((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateSettings('bubble', bubbleSettings);
+      await updateSettings('bubble', localSettings);
       toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
@@ -108,7 +112,6 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
             Save
           </button>
         </div>
-
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 space-y-4 border-r pr-4">
             {['bgColor', 'iconColor', 'dotsColor'].map((key) => (
@@ -127,7 +130,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                     name={key}
                     placeholder="#hex"
                     className="w-full px-2 py-2 text-sm focus:outline-none"
-                    value={bubbleSettings[key as keyof BubbleSettings]}
+                    value={localSettings[key as keyof BubbleSettings]}
                     onChange={handleInputChange}
                     disabled={isSaving}
                   />
@@ -135,7 +138,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                     type="color"
                     name={key}
                     className="w-12 h-12 cursor-pointer border-l"
-                    value={bubbleSettings[key as keyof BubbleSettings]}
+                    value={localSettings[key as keyof BubbleSettings]}
                     onChange={handleInputChange}
                     disabled={isSaving}
                   />
@@ -146,18 +149,18 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
           <div className="flex-1 flex justify-center items-center">
             <div
               className="relative flex items-center justify-center rounded-full w-16 h-16 transition-colors duration-300 cursor-pointer"
-              style={{ backgroundColor: bubbleSettings.bgColor }}
+              style={{ backgroundColor: localSettings.bgColor }}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               {!isHovered ? (
                 <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
                   <path
-                    fill={bubbleSettings.iconColor}
+                    fill={localSettings.iconColor}
                     d="M12.63,26.46H8.83a6.61,6.61,0,0,1-6.65-6.07,89.05,89.05,0,0,1,0-11.2A6.5,6.5,0,0,1,8.23,3.25a121.62,121.62,0,0,1,15.51,0A6.51,6.51,0,0,1,29.8,9.19a77.53,77.53,0,0,1,0,11.2,6.61,6.61,0,0,1-6.66,6.07H19.48L12.63,31V26.46Z"
                   />
                   <path
-                    fill={bubbleSettings.bgColor}
+                    fill={localSettings.bgColor}
                     d="M19.57,21.68h3.67a2.08,2.08,0,0,0,2.11-1.81,89.86,89.86,0,0,0,0-10.38,1.9,1.9,0,0,0-1.84-1.74,113.15,113.15,0,0,0-15,0A1.9,1.9,0,0,0,6.71,9.49a74.92,74.92,0,0,0-.06,10.38,2,2,0,0,0,2.1,1.81h3.81V26.5Z"
                   />
                 </svg>
@@ -168,7 +171,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                       key={i}
                       className="w-2 h-2 rounded-full"
                       style={{
-                        backgroundColor: bubbleSettings.dotsColor,
+                        backgroundColor: localSettings.dotsColor,
                         animation: `jump 1.2s infinite ease-in-out ${i * 0.2}s`,
                       }}
                     />

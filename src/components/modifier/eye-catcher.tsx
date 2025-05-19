@@ -13,19 +13,18 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
   const [mounted, setMounted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [localSettings, setLocalSettings] = useState<EyecatcherSettings>(
+    defaultSettings ?? {
+      title: 'Hello',
+      text: 'Click to chat with us',
+      bgColor: '#007bff',
+      textColor: '#ffffff',
+    }
+  );
   const { settings, fetchSettings, updateSettings, loading } = useSettingsStore();
-
-  const eyeCatcherSettings: EyecatcherSettings = {
-    ...settings.eyeCatcher,
-    title: settings.eyeCatcher?.title ?? defaultSettings?.title ?? 'Hello',
-    text: settings.eyeCatcher?.text ?? defaultSettings?.text ?? 'Click to chat with us',
-    bgColor: settings.eyeCatcher?.bgColor ?? defaultSettings?.bgColor ?? '#007bff',
-    textColor: settings.eyeCatcher?.textColor ?? defaultSettings?.textColor ?? '#ffffff',
-  };
 
   useEffect(() => {
     setMounted(true);
-    console.log('Fetching eyecatcher settings...');
     fetchSettings('eyeCatcher', defaultSettings ?? {
       title: 'Hello',
       text: 'Click to chat with us',
@@ -40,15 +39,27 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
     }
   }, [mounted, resolvedTheme]);
 
+  useEffect(() => {
+    if (settings.eyeCatcher) {
+      setLocalSettings((prev) => ({
+        ...prev,
+        ...settings.eyeCatcher,
+      }));
+    }
+  }, [settings.eyeCatcher]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    updateSettings('eyeCatcher', { [name]: value });
+    setLocalSettings((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateSettings('eyeCatcher', eyeCatcherSettings);
+      await updateSettings('eyeCatcher', localSettings);
       toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
@@ -60,7 +71,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
 
   if (!mounted) return null;
 
-  if (loading || !settings.eyeCatcher) {
+  if (loading) {
     return (
       <SkeletonTheme
         baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
@@ -125,7 +136,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                 placeholder="Hello"
                 maxLength={20}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={eyeCatcherSettings.title}
+                value={localSettings.title}
                 onChange={handleInputChange}
                 disabled={isSaving}
               />
@@ -138,7 +149,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                 placeholder="Click to chat with us"
                 maxLength={36}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={eyeCatcherSettings.text}
+                value={localSettings.text}
                 onChange={handleInputChange}
                 disabled={isSaving}
               />
@@ -151,7 +162,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                   name="bgColor"
                   placeholder="#007bff"
                   className="w-full px-3 py-3 text-sm focus:outline-none"
-                  value={eyeCatcherSettings.bgColor}
+                  value={localSettings.bgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -159,7 +170,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                   type="color"
                   name="bgColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={eyeCatcherSettings.bgColor}
+                  value={localSettings.bgColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -173,7 +184,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                   name="textColor"
                   placeholder="#ffffff"
                   className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={eyeCatcherSettings.textColor}
+                  value={localSettings.textColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -181,7 +192,7 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
                   type="color"
                   name="textColor"
                   className="w-12 h-12 cursor-pointer border-l"
-                  value={eyeCatcherSettings.textColor}
+                  value={localSettings.textColor}
                   onChange={handleInputChange}
                   disabled={isSaving}
                 />
@@ -192,16 +203,16 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
             <div
               className="flex w-[13rem] p-4 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md"
               style={{
-                backgroundColor: eyeCatcherSettings.bgColor,
-                color: eyeCatcherSettings.textColor,
+                backgroundColor: localSettings.bgColor,
+                color: localSettings.textColor,
               }}
             >
               <span className="text-3xl animate-wave flex-shrink-0 mr-3" style={{ animationDuration: '1.5s' }}>
                 👋
               </span>
               <div className="flex flex-col min-w-0">
-                <h3 className="font-bold text-sm leading-tight break-words">{eyeCatcherSettings.title}</h3>
-                <p className="text-xs break-words whitespace-normal">{eyeCatcherSettings.text}</p>
+                <h3 className="font-bold text-sm leading-tight break-words">{localSettings.title}</h3>
+                <p className="text-xs break-words whitespace-normal">{localSettings.text}</p>
               </div>
             </div>
           </div>

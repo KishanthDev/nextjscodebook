@@ -28,7 +28,7 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder={settings.inputPlaceholder || 'Type a message...'}
-          className="flex-1 max-w-full border rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          className="flex-1 max-w-full border rounded-lg px-3 py-2 pr-24 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           onKeyPress={(e) => e.key === 'Enter' && onSendMessage()}
           disabled={isSaving}
         />
@@ -40,7 +40,7 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -59,7 +59,7 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -83,7 +83,7 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
+              className="h-5 w-5"
               viewBox="0 0 20 20"
               fill="currentColor"
             >

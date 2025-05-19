@@ -4,9 +4,10 @@ import { useState } from 'react';
 import Bubble from '../../../components/modifier/bubble';
 import ChatBar from '../../../components/modifier/chatBar';
 import ChatWidgetOpen from '../../../components/modifier/chat-widget/ChatWidgetOpenComponent';
-import Eyecatcher from '../../../components/modifier/eye-catcher'; 
+import Eyecatcher from '../../../components/modifier/eye-catcher';
 import data from "../../../../data/modifier.json"
 import Greeting from '@/components/modifier/greeting';
+import ChatWidgetContactComponent from '@/components/modifier/chat-widget-contact/ChatWidgetOpenComponent';
 
 
 export default function SettingsPage() {
@@ -16,6 +17,7 @@ export default function SettingsPage() {
   const chatbardata = data.chatBar;
   const chatwidgetdata = data.chatWidget;
   const chatwidgetmessage = data.chatWidget.messages;
+  const chatwidgetcontactmessage = data.chatWidgetContact.messages;
   const greeting = data.greeting
 
   const renderSelectedComponent = () => {
@@ -28,8 +30,10 @@ export default function SettingsPage() {
         return <ChatBar defaultSettings={chatbardata} />;
       case 'chat-widget-open':
         return <ChatWidgetOpen defaultSettings={chatwidgetdata} initialMessages={chatwidgetmessage} />;
+      case 'chat-widget-contact':
+        return <ChatWidgetContactComponent defaultSettings={chatwidgetdata} initialMessages={chatwidgetcontactmessage} />;
       case 'chat-widget-greeting':
-        return <Greeting defaultSettings={greeting}/>
+        return <Greeting defaultSettings={greeting} />
       default:
         return null;
     }
@@ -91,6 +95,17 @@ export default function SettingsPage() {
               name="settingOption"
               value="chat-widget-greeting"
               checked={selectedOption === 'chat-widget-greeting'}
+              onChange={(e) => setSelectedOption(e.target.value)}
+            />
+            <span>Chat Widget Greeting</span>
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="settingOption"
+              value="chat-widget-contact"
+              checked={selectedOption === 'chat-widget-contact'}
               onChange={(e) => setSelectedOption(e.target.value)}
             />
             <span>Chat Widget Greeting</span>

@@ -18,6 +18,8 @@ type Props = {
 const INPUT_FIELDS = [
   { label: 'Chat Title', name: 'chatTitle', placeholder: 'LiveChat', maxLength: 20 },
   { label: 'Form Title', name: 'formTitle', placeholder: 'Contact Us', maxLength: 30 },
+  { label: 'Form Message 1', name: 'formMessage1', placeholder: 'Please fill in the form we will reach out', maxLength: 100 },
+  { label: 'Form Message 2', name: 'formMessage2', placeholder: 'We are sorry our chat experts are busy right now', maxLength: 100 },
   { label: 'Logo URL', name: 'logoUrl', placeholder: 'https://example.com/logo.png' },
   { label: 'Bot Message Background Color', name: 'botMsgBgColor', placeholder: '#f3f4f6', isColor: true },
   { label: 'User Message Background Color', name: 'userMsgBgColor', placeholder: '#fef08a', isColor: true },
@@ -41,14 +43,10 @@ export default function ChatWidgetContactComponent({ defaultSettings, initialMes
   const { resolvedTheme } = useTheme();
   const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
 
-  const chatWidgetContactSettings: ChatWidgetContactSettings = {
-    ...defaultSettings,
-    ...settings.chatWidgetContact,
-  };
+  const [localSettings, setLocalSettings] = useState<ChatWidgetContactSettings>(defaultSettings);
 
   useEffect(() => {
     setMounted(true);
-    console.log('Fetching chat widget contact settings...');
     fetchSettings('chatWidgetContact', defaultSettings);
   }, []);
 
@@ -57,6 +55,20 @@ export default function ChatWidgetContactComponent({ defaultSettings, initialMes
       setIsDarkMode(resolvedTheme === 'dark');
     }
   }, [mounted, resolvedTheme]);
+
+  useEffect(() => {
+    setLocalSettings(prev => ({
+      ...prev,
+      ...settings.chatWidgetContact
+    }));
+  }, [settings.chatWidgetContact]);
+
+  const handleInputChange = (fieldName: keyof ChatWidgetContactSettings, value: string) => {
+    setLocalSettings((prev) => ({
+      ...prev,
+      [fieldName]: value,
+    }));
+  };
 
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
@@ -73,7 +85,7 @@ export default function ChatWidgetContactComponent({ defaultSettings, initialMes
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateSettings('chatWidgetContact', chatWidgetContactSettings);
+      await updateSettings('chatWidgetContact', localSettings);
       toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
@@ -172,16 +184,14 @@ export default function ChatWidgetContactComponent({ defaultSettings, initialMes
                 placeholder={field.placeholder}
                 maxLength={field.maxLength}
                 isColor={field.isColor}
-                value={typeof chatWidgetContactSettings[field.name as keyof ChatWidgetContactSettings] === 'string'
-                  ? chatWidgetContactSettings[field.name as keyof ChatWidgetContactSettings] as string
-                  : ''}
-                onChange={(value) => updateSettings('chatWidgetContact', { [field.name]: value })}
+                value={(localSettings[field.name as keyof ChatWidgetContactSettings] as string) ?? ''}
+                onChange={(value) => handleInputChange(field.name as keyof ChatWidgetContactSettings, value)}
                 disabled={isSaving}
               />
             ))}
           </div>
           <ChatPreview
-            settings={chatWidgetContactSettings}
+            settings={localSettings}
             messages={messages}
             newMessage={newMessage}
             setNewMessage={setNewMessage}

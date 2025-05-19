@@ -20,6 +20,8 @@ export type ChatWidgetSettings = {
 export type ChatWidgetContactSettings = {
   formTitle:string;
   botMsgBgColor: string;
+  formMessage1: string;
+  formMessage2: string;
   userMsgBgColor: string;
   sendBtnBgColor: string;
   sendBtnIconColor: string;

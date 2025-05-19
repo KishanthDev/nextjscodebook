@@ -39,7 +39,7 @@
         "text": "Sure, could you please provide your order number?",
         "isUser": false
       }
-  ]
+    ]
   },
   "greeting": {
     "headingColor": "#000000",
@@ -55,6 +55,9 @@
     "showSecondaryBtn": true
   },
   "chatWidgetContact": {
+    "formTitle": "",
+    "formMessage1": "Please fill in the form we will reach out",
+    "formMessage2": "We are sorry our chat experts are busy right now",
     "botMsgBgColor": "#f3f4f6",
     "userMsgBgColor": "#fef08a",
     "sendBtnBgColor": "#000000",
@@ -74,6 +77,6 @@
         "text": "I need help with my order.",
         "isUser": true
       }
-  ]
+    ]
   }
 }

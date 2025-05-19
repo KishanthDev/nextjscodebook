@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatWidgetSettings } from '@/types/Modifier';
 
 const EMOJIS = ['😊', '👍', '❤️', '😂', '😢', '😎', '🤔', '👋', '🎉', '💯', '🔥', '🚀'];
@@ -9,16 +9,33 @@ type Props = {
   newMessage: string;
   setNewMessage: React.Dispatch<React.SetStateAction<string>>;
   onSendMessage: () => void;
+  onTyping: (isTyping: boolean) => void; // New callback for typing
   isSaving: boolean;
 };
 
-export default function ChatInputArea({ settings, newMessage, setNewMessage, onSendMessage, isSaving }: Props) {
+export default function ChatInputArea({ settings, newMessage, setNewMessage, onSendMessage, onTyping, isSaving }: Props) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const addEmoji = (emoji: string) => {
     setNewMessage((prev: string) => prev + emoji);
     setShowEmojiPicker(false);
   };
+
+  // Detect typing and notify parent
+  useEffect(() => {
+    const typingTimeout = setTimeout(() => {
+      if (newMessage.trim() && !isSaving) {
+        setIsTyping(true);
+        onTyping(true);
+      } else {
+        setIsTyping(false);
+        onTyping(false);
+      }
+    }, 300); // Delay to debounce typing
+
+    return () => clearTimeout(typingTimeout);
+  }, [newMessage, isSaving, onTyping]);
 
   return (
     <div className="p-3 border-t bg-white dark:bg-gray-800">

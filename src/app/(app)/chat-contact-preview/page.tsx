@@ -100,8 +100,9 @@ export default function Page() {
         newMessage={newMessage}
         setNewMessage={setNewMessage}
         onSendMessage={handleSendMessage}
-        isSaving={isSaving}
-      />
+        isSaving={isSaving} onTyping={function (isTyping: boolean): void {
+          throw new Error('Function not implemented.');
+        } }      />
       <ChatFooter settings={settings.chatWidgetContact} />
     </div>
   );

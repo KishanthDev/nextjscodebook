@@ -86,7 +86,7 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
               ))}
             </div>
             <div className="flex-1 flex justify-center items-start">
-              <Skeleton width={448} height={48} borderRadius={8} />
+              <Skeleton width={254.983} height={39.992} borderRadius={12.8} />
             </div>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
           </div>
           <div className="flex-1 flex justify-center items-start">
             <div
-              className="w-full max-w-md p-3 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
+              className="w-[254.983px] h-[39.992px] rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
               style={{
                 backgroundColor: chatBarSettings.bgColor,
                 color: chatBarSettings.textColor,

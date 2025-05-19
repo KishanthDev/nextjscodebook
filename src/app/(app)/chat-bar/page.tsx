@@ -44,10 +44,11 @@ export default function ChatBar() {
       >
         <div className="p-6 max-w-4xl mx-auto">
           <div className="flex justify-center items-start">
-            <Skeleton width={448} height={48} borderRadius={8} />
+            <Skeleton width={254.983} height={39.992} borderRadius={12.8} />
           </div>
         </div>
       </SkeletonTheme>
+
     );
   }
 
@@ -56,7 +57,7 @@ export default function ChatBar() {
       <div className="flex justify-center items-start">
         <div
           data-testid="chatbar-container"
-          className="w-full max-w-md p-3 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
+          className="w-[254.983px] h-[39.992px]  rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
           style={{
             backgroundColor: chatbarSettings.bgColor || '#007bff',
             color: chatbarSettings.textColor || '#ffffff',

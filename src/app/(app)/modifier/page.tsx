@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Bubble from '../../../components/modifier/bubble';
 import ChatBar from '../../../components/modifier/chatBar';
-import ChatWidgetOpen from '../../../components/modifier/chat-widget-open';
+import ChatWidgetOpen from '../../../components/modifier/chat-widget/ChatWidgetOpenComponent';
 import Eyecatcher from '../../../components/modifier/eye-catcher'; 
 import data from "../../../../data/modifier.json"
 import Greeting from '@/components/modifier/greeting';

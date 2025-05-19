@@ -17,6 +17,7 @@ export default function SettingsPage() {
   const chatbardata = data.chatBar;
   const chatwidgetdata = data.chatWidget;
   const chatwidgetmessage = data.chatWidget.messages;
+  const chatwidgetcontact = data.chatWidgetContact;
   const chatwidgetcontactmessage = data.chatWidgetContact.messages;
   const greeting = data.greeting
 
@@ -31,7 +32,7 @@ export default function SettingsPage() {
       case 'chat-widget-open':
         return <ChatWidgetOpen defaultSettings={chatwidgetdata} initialMessages={chatwidgetmessage} />;
       case 'chat-widget-contact':
-        return <ChatWidgetContactComponent defaultSettings={chatwidgetdata} initialMessages={chatwidgetcontactmessage} />;
+        return <ChatWidgetContactComponent defaultSettings={chatwidgetcontact} initialMessages={chatwidgetcontactmessage} />;
       case 'chat-widget-greeting':
         return <Greeting defaultSettings={greeting} />
       default:

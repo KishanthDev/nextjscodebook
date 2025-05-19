@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { ChatWidgetSettings } from '@/types/Modifier';
+import { ChatWidgetContactSettings } from '@/types/Modifier';
 
 type Props = {
-  settings: ChatWidgetSettings;
+  settings: ChatWidgetContactSettings;
   isSaving: boolean;
 };
 

@@ -70,6 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/eye-catcher', icon: MessagesSquare, label: 'Eye Catcher' },
     { href: '/chat-bar', icon: MessagesSquare, label: 'Chat Bar' },
     { href: '/greeting', icon: MessagesSquare, label: 'Greeting' },
+    { href: '/chat-contact-preview', icon: MessagesSquare, label: 'Chat Contact' },
   ];
 
   return (

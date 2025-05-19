@@ -53,5 +53,27 @@
     "secondaryBtnText": "Chat Now",
     "showPrimaryBtn": true,
     "showSecondaryBtn": true
+  },
+  "chatWidgetContact": {
+    "botMsgBgColor": "#f3f4f6",
+    "userMsgBgColor": "#fef08a",
+    "sendBtnBgColor": "#000000",
+    "sendBtnIconColor": "#ffffff",
+    "footerBgColor": "#ffffff",
+    "footerTextColor": "#374151",
+    "footerText": "Powered by LiveChat",
+    "inputPlaceholder": "Type a message...",
+    "logoUrl": "https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png",
+    "chatTitle": "LiveChat",
+    "messages": [
+      {
+        "text": "Hello! How can I assist you today?",
+        "isUser": false
+      },
+      {
+        "text": "I need help with my order.",
+        "isUser": true
+      }
+  ]
   }
 }

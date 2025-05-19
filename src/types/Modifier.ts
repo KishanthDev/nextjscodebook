@@ -17,6 +17,21 @@ export type ChatWidgetSettings = {
   messages: Message[];
 };
 
+export type ChatWidgetContactSettings = {
+  formTitle:string;
+  botMsgBgColor: string;
+  userMsgBgColor: string;
+  sendBtnBgColor: string;
+  sendBtnIconColor: string;
+  footerBgColor: string;
+  footerTextColor: string;
+  footerText: string;
+  inputPlaceholder: string;
+  logoUrl: string;
+  chatTitle: string;
+  messages: Message[];
+};
+
 export type EyecatcherSettings = {
   title: string;
   text: string;
@@ -55,5 +70,6 @@ export type AppSettings = {
   bubble: BubbleSettings;
   chatBar: ChatbarSettings;
   chatWidget: ChatWidgetSettings;
+  chatWidgetContact: ChatWidgetContactSettings;
   greeting: GreetingSettings;
 };

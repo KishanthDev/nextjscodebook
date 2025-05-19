@@ -30,53 +30,5 @@
     "recentMsg": "See you tomorrow!",
     "time": "5 min ago",
     "unread": 1
-  },
-  {
-    "id": 5,
-    "name": "Ethan",
-    "status": "offline",
-    "recentMsg": "Sent the file.",
-    "time": "30 min ago",
-    "unread": 0
-  },
-  {
-    "id": 6,
-    "name": "Fiona",
-    "status": "busy",
-    "recentMsg": "Can't talk right now.",
-    "time": "15 min ago",
-    "unread": 3
-  },
-  {
-    "id": 7,
-    "name": "George",
-    "status": "online",
-    "recentMsg": "Meeting is confirmed.",
-    "time": "8 min ago",
-    "unread": 0
-  },
-  {
-    "id": 8,
-    "name": "Hannah",
-    "status": "offline",
-    "recentMsg": "Catch up later.",
-    "time": "1 day ago",
-    "unread": 0
-  },
-  {
-    "id": 9,
-    "name": "Ivan",
-    "status": "busy",
-    "recentMsg": "Review the document.",
-    "time": "45 min ago",
-    "unread": 4
-  },
-  {
-    "id": 10,
-    "name": "Julia",
-    "status": "online",
-    "recentMsg": "Let's grab lunch soon!",
-    "time": "Just now",
-    "unread": 6
   }
 ]

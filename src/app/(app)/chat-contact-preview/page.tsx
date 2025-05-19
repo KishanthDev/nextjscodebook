@@ -1,3 +1,4 @@
+// File: src/app/(app)/chat-contact-preview/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
@@ -11,17 +12,10 @@ import ContactForm from '@/components/modifier/chat-widget-contact/ContactForm';
 import ChatInputArea from '@/components/modifier/chat-widget-contact/ChatInputArea';
 import ChatFooter from '@/components/modifier/chat-widget-contact/ChatFooter';
 
-type Props = {
-  defaultSettings: ChatWidgetContactSettings;
-  initialMessages: Message[];
-};
-
-export default function ChatWidgetPreview({ defaultSettings, initialMessages }: Props) {
-  const [messages, setMessages] = useState<Message[]>(
-    initialMessages?.length > 0 ? initialMessages : [
-      { text: 'Hi, I have a question!', isUser: true },
-    ]
-  );
+export default function Page() {
+  const [messages, setMessages] = useState<Message[]>([
+    { text: 'Hi, I have a question!', isUser: true },
+  ]);
   const [newMessage, setNewMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -31,8 +25,8 @@ export default function ChatWidgetPreview({ defaultSettings, initialMessages }: 
 
   useEffect(() => {
     setMounted(true);
-    fetchSettings('chatWidgetContact', defaultSettings);
-  }, [fetchSettings, defaultSettings]);
+    fetchSettings('chatWidgetContact', {} as ChatWidgetContactSettings); // Provide default settings if needed
+  }, [fetchSettings]);
 
   useEffect(() => {
     if (mounted) {
@@ -95,7 +89,7 @@ export default function ChatWidgetPreview({ defaultSettings, initialMessages }: 
   }
 
   return (
-    <div className="w-[370px] mx-auto mt-5  h-[700px] border rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-900 flex flex-col">
+    <div className="w-[370px] mx-auto mt-5 h-[700px] border rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-900 flex flex-col">
       <ChatHeader settings={settings.chatWidgetContact} isSaving={false} />
       <div className="flex-1 overflow-y-auto flex flex-col">
         <MessagesContainer messages={messages} settings={settings.chatWidgetContact} />

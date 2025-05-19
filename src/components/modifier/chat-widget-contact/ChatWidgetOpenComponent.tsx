@@ -29,6 +29,11 @@ const INPUT_FIELDS = [
   { label: 'Footer Text', name: 'footerText', placeholder: 'Powered by LiveChat' },
   { label: 'Footer Background Color', name: 'footerBgColor', placeholder: '#ffffff', isColor: true },
   { label: 'Footer Text Color', name: 'footerTextColor', placeholder: '#374151', isColor: true },
+  { label: 'Submit Button Background Color', name: 'submitBtnBgColor', placeholder: '#3b82f6', isColor: true },
+  { label: 'Submit Button Font Color', name: 'submitBtnFontColor', placeholder: '#ffffff', isColor: true },
+  { label: 'Form Background Color', name: 'formBgColor', placeholder: '#ffffff', isColor: true },
+  { label: 'Submit Button Text', name: 'submitBtnText', placeholder: 'Submit', maxLength: 20 },
+  { label: 'Submit Button Submitted Text', name: 'submitBtnSubmittedText', placeholder: 'Submitted!', maxLength: 20 },
 ];
 
 export default function ChatWidgetContactComponent({ defaultSettings, initialMessages }: Props) {
@@ -107,13 +112,12 @@ export default function ChatWidgetContactComponent({ defaultSettings, initialMes
           </div>
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
-              {[...Array(11)].map((_, i) => (
+              {[...Array(18)].map((_, i) => (
                 <div key={i} className="space-y-2">
-                  <Skeleton width={180} height={16}
-/>
+                  <Skeleton width={180} height={16} />
                   <div className="flex items-center">
                     <Skeleton width="100%" height={40} borderRadius={6} containerClassName="flex-1" />
-                    {i < 6 && <Skeleton width={48} height={40} borderRadius={0} />}
+                    {i < 8 && <Skeleton width={48} height={40} borderRadius={0} />}
                   </div>
                 </div>
               ))}

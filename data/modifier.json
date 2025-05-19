@@ -55,19 +55,24 @@
     "showSecondaryBtn": true
   },
   "chatWidgetContact": {
+    "chatTitle": "LiveChat",
     "formTitle": "",
     "formMessage1": "Please fill in the form we will reach out",
     "formMessage2": "We are sorry our chat experts are busy right now",
+    "logoUrl": "https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png",
     "botMsgBgColor": "#f3f4f6",
     "userMsgBgColor": "#fef08a",
+    "inputPlaceholder": "Type a message...",
     "sendBtnBgColor": "#000000",
     "sendBtnIconColor": "#ffffff",
+    "footerText": "Powered by LiveChat",
     "footerBgColor": "#ffffff",
     "footerTextColor": "#374151",
-    "footerText": "Powered by LiveChat",
-    "inputPlaceholder": "Type a message...",
-    "logoUrl": "https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png",
-    "chatTitle": "LiveChat",
+    "submitBtnBgColor": "#3b82f6",
+    "formBgColor": "#ffffff",
+    "submitBtnFontColor": "#ffffff",
+    "submitBtnText": "Submit",
+    "submitBtnSubmittedText": "Submitted!",
     "messages": [
       {
         "text": "Hello! How can I assist you today?",

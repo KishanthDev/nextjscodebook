@@ -28,6 +28,11 @@ export type ChatWidgetContactSettings = {
   footerBgColor: string;
   footerTextColor: string;
   footerText: string;
+   submitBtnBgColor: string;
+  formBgColor: string;
+  submitBtnFontColor: string;
+  submitBtnText: string;
+  submitBtnSubmittedText: string;
   inputPlaceholder: string;
   logoUrl: string;
   chatTitle: string;

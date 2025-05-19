@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Contact from "@/types/Contact";
 import ContactData from "../../../data/Contact.json";
 import ContactList from "./ContactList";
@@ -8,17 +8,45 @@ import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import { useUserStatus } from "@/stores/useUserStatus";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { ChatWidgetSettings } from "@/types/Modifier";
 
 export default function ChatUI() {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const { acceptChats } = useUserStatus();
+  const { settings, fetchSettings } = useSettingsStore();
+
+  // Default settings in case store is empty
+  const defaultSettings: ChatWidgetSettings = {
+    chatTitle: "LiveChat",
+    logoUrl: "https://via.placeholder.com/32",
+    botMsgBgColor: "#f3f4f6",
+    userMsgBgColor: "#fef08a",
+    inputPlaceholder: "Type a message...",
+    sendBtnBgColor: "#000000",
+    sendBtnIconColor: "#ffffff",
+    footerText: "Powered by LiveChat",
+    footerBgColor: "#ffffff",
+    footerTextColor: "#374151",
+    messages: [{ text: "Hi, I have a question!", isUser: true }],
+  };
+
+  // Fetch settings on mount
+  useEffect(() => {
+    fetchSettings("chatWidget", defaultSettings);
+  }, [fetchSettings]);
+
+  const chatWidgetSettings: ChatWidgetSettings = {
+    ...defaultSettings,
+    ...settings.chatWidget,
+  };
 
   const sampleContacts: Contact[] = ContactData.map((contact) => ({
     ...contact,
     status: contact.status as "online" | "offline",
   }));
 
-  const sampleMessages: { fromUser: boolean; text: string }[] = [
+  const [messages, setMessages] = useState<{ fromUser: boolean; text: string }[]>([
     { fromUser: false, text: "Hi!" },
     { fromUser: false, text: "Sure thing! I'm gonna call you in 5, is it okay?" },
     { fromUser: true, text: "Awesome! Call me in 5 minutes.." },
@@ -34,9 +62,20 @@ export default function ChatUI() {
     { fromUser: false, text: "Haha, that’s hilarious!" },
     { fromUser: false, text: "You always send the best ones." },
     { fromUser: true, text: "😎" },
-  ];
+  ]);
 
   const userStatus = acceptChats ? "online" : "offline";
+
+  const handleSendMessage = (text: string) => {
+    setMessages((prev) => [...prev, { fromUser: true, text }]);
+    // Simulate a bot reply after a short delay
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { fromUser: false, text: "Got it! I'll reply soon." },
+      ]);
+    }, 1000);
+  };
 
   return (
     <div className="flex h-[calc(100vh-3.3rem)] border border-gray-300 bg-white text-black transition-colors dark:border-gray-700 dark:bg-zinc-900 dark:text-white">
@@ -48,8 +87,19 @@ export default function ChatUI() {
       />
       <div className="flex flex-1 flex-col min-h-0">
         <ChatHeader contact={selectedContact} />
-        <ChatMessages selected={!!selectedContact} messages={sampleMessages} />
-        {selectedContact && <ChatInput />}
+        <ChatMessages
+          selected={!!selectedContact}
+          messages={messages}
+          settings={chatWidgetSettings}
+        />
+        {selectedContact && (
+          <ChatInput
+            settings={chatWidgetSettings}
+            onSend={handleSendMessage}
+            onEmojiClick={() => alert("Emoji picker not implemented yet")}
+            onAttachmentClick={() => alert("Attachment upload not implemented yet")}
+          />
+        )}
       </div>
     </div>
   );

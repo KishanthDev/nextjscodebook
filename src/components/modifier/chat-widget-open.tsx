@@ -39,7 +39,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
     setMounted(true);
     console.log('Fetching chat widget settings...');
     fetchSettings('chatWidget', defaultSettings);
-  }, [fetchSettings, defaultSettings]);
+  }, []);
 
   useEffect(() => {
     if (mounted) {

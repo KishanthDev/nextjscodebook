@@ -13,7 +13,10 @@
   "chatBar": {
     "text": "Chat with us",
     "bgColor": "#007bff",
-    "textColor": "#ffffff"
+    "textColor": "#ffffff",
+    "iconColor": "#ffffff",
+    "bubbleBgColor": "#007bff",
+    "dotsColor": "#ffffff"
   },
   "chatWidget": {
     "botMsgBgColor": "#f3f4f6",

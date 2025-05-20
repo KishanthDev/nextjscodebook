@@ -56,6 +56,9 @@ export type ChatbarSettings = {
   text: string;
   bgColor: string;
   textColor: string;
+  iconColor: string;
+  bubbleBgColor: string;
+  dotsColor: string;
 };
 
 export type GreetingSettings = {

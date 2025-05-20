@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Bubble from '../../../components/modifier/bubble';
-import ChatBar from '../../../components/modifier/chatBar';
+import ChatBar from '../../../components/modifier/chatBar/chatBarModifier';
 import ChatWidgetOpen from '../../../components/modifier/chat-widget/ChatWidgetOpenComponent';
 import Eyecatcher from '../../../components/modifier/eye-catcher';
 import data from "../../../../data/modifier.json"

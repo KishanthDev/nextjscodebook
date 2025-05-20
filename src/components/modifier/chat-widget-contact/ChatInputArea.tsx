@@ -42,6 +42,7 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
       <div className="flex items-center relative">
         <input
           type="text"
+          aria-label="Chat message input"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder={settings.inputPlaceholder || 'Type a message...'}
@@ -51,6 +52,8 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
         />
         <div className="absolute right-2 flex gap-1">
           <button
+            aria-label="Toggle emoji picker"
+            title="Emoji"
             className="p-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             disabled={isSaving}
@@ -71,6 +74,8 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
             </svg>
           </button>
           <button
+            aria-label="Attach file"
+            title="Attach file"
             className="p-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
             disabled={isSaving}
           >
@@ -90,6 +95,8 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
             </svg>
           </button>
           <button
+            aria-label="Send message"
+            title="Send"
             className={`p-1 rounded-lg ${newMessage.trim() ? 'text-white' : 'text-gray-400'}`}
             style={{
               backgroundColor: newMessage.trim() ? settings.sendBtnBgColor || '#000000' : '#d1d5db',
@@ -117,6 +124,8 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
         <div className="absolute bottom-12 right-0 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-1">
           {EMOJIS.map((emoji) => (
             <button
+              aria-label={`Insert emoji ${emoji}`}
+              title={emoji}
               key={emoji}
               className="text-xl hover:bg-gray-100 dark:hover:bg-gray-700 rounded p-1"
               onClick={() => addEmoji(emoji)}

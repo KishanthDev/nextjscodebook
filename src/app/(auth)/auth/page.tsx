@@ -5,6 +5,7 @@ import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/ui/button";
 import clsx from "clsx";
+import Image from "next/image";
 
 const AuthPage: React.FC = () => {
   const [isSignIn, setIsSignIn] = useState<boolean>(false);
@@ -59,14 +60,28 @@ const AuthPage: React.FC = () => {
         <div className="content-row absolute top-0 left-0 flex w-full h-full pointer-events-none z-20">
           <div className="col w-1/2 flex items-center justify-center text-center">
             <div className={`text sign-in text-white transform transition-transform duration-1000 ease-in-out ${isSignIn ? "translate-x-0" : "-translate-x-[250%]"}`}>
+              <Image
+                alt="Deer Icon"
+                height={100}
+                width={100}
+                src="/landingpage/silhouette_deer.svg"
+                className="mx-auto mb-4"
+              />
               <h2 className="text-4xl font-extrabold mb-4">Welcome Back</h2>
               <p className="text-lg font-semibold">Please sign in to continue</p>
             </div>
           </div>
           <div className="col w-1/2 flex items-center justify-center text-center">
             <div className={`text sign-up text-white transform transition-transform duration-1000 ease-in-out ${isSignIn ? "translate-x-[250%]" : "translate-x-0"}`}>
-              <h2 className="text-4xl font-extrabold mb-4">Join With Us</h2>
+              <h2 className="text-4xl mt-4 font-extrabold mb-4">Join With Us</h2>
               <p className="text-lg font-semibold">Sign up to get started</p>
+              <Image
+                alt="Deer Icon"
+                height={100}
+                width={100}
+                src="/landingpage/silhouette_deer.svg"
+                className="mx-auto mt-4"
+              />
             </div>
           </div>
         </div>

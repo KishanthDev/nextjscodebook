@@ -5,10 +5,8 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { Message, ChatWidgetSettings } from '@/types/Modifier';
-import ChatHeader from './ChatHeader';
-import ChatMessages from './ChatMessages';
-import ChatInput from './ChatInput';
 import defaultConfig from '../../../data/modifier.json';
+import ChatPreview from '../modifier/chat-widget/ChatPreview';
 
 export default function ChatWidgetPreview() {
   const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
@@ -17,6 +15,8 @@ export default function ChatWidgetPreview() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+      const [isSaving, setIsSaving] = useState(false);
+
 
   const defaultSettings: ChatWidgetSettings = defaultConfig.chatWidget;
 
@@ -106,23 +106,14 @@ export default function ChatWidgetPreview() {
   return (
     <div className="flex justify-center items-start p-6">
       <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden shadow-lg flex flex-col">
-        <ChatHeader settings={chatSettings} soundsEnabled={soundsEnabled} toggleSounds={toggleSounds} />
-        <ChatMessages messages={chatSettings.messages} settings={chatSettings} />
-        <ChatInput
-          newMessage={newMessage}
-          setNewMessage={setNewMessage}
-          handleSendMessage={handleSendMessage}
-          settings={chatSettings}
-        />
-        <div
-          className="p-1 text-center text-xs border-t"
-          style={{
-            backgroundColor: chatSettings.footerBgColor || '#ffffff',
-            color: chatSettings.footerTextColor || '#374151',
-          }}
-        >
-          {chatSettings.footerText || 'Powered by LiveChat'}
-        </div>
+        <ChatPreview
+                    settings={chatSettings}
+                    messages={chatSettings.messages}
+                    newMessage={newMessage}
+                    setNewMessage={setNewMessage}
+                    onSendMessage={handleSendMessage}
+                    isSaving={isSaving}
+                  />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import ChatWidgetOpen from '../../../components/modifier/chat-widget/ChatWidgetO
 import Eyecatcher from '../../../components/modifier/eye-catcher';
 import data from "../../../../data/modifier.json"
 import Greeting from '@/components/modifier/greeting';
-import ChatWidgetContactComponent from '@/components/modifier/chat-widget-contact/ChatWidgetOpenComponent';
+import ChatWidgetContactComponent from '@/components/modifier/chat-widget-contact/ChatWidgetContactComponent';
 
 
 export default function SettingsPage() {

@@ -220,7 +220,7 @@ export default function ChatBarModifier({ defaultSettings }: ChatBarModifierProp
               disabled={isSaving}
             />
             <ColorInputField
-              label="Bubble Icon Color"
+              label="Icon Color"
               name="iconColor"
               value={localSettings.iconColor}
               onChange={handleInputChange}
@@ -228,7 +228,7 @@ export default function ChatBarModifier({ defaultSettings }: ChatBarModifierProp
               disabled={isSaving}
             />
             <ColorInputField
-              label="Bubble Background Color"
+              label="Background Color"
               name="bubbleBgColor"
               value={localSettings.bubbleBgColor}
               onChange={handleInputChange}
@@ -236,7 +236,7 @@ export default function ChatBarModifier({ defaultSettings }: ChatBarModifierProp
               disabled={isSaving}
             />
             <ColorInputField
-              label="Bubble Dots Color"
+              label="Dots Color"
               name="dotsColor"
               value={localSettings.dotsColor}
               onChange={handleInputChange}

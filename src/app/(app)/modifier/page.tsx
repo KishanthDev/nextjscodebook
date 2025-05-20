@@ -53,7 +53,7 @@ export default function SettingsPage() {
               checked={selectedOption === 'eyecatcher'}
               onChange={(e) => setSelectedOption(e.target.value)}
             />
-            <span>Eyecatcher</span>
+            <span className='text-sm font-semibold'>Eyecatcher</span>
           </label>
 
           <label className="flex items-center gap-2">
@@ -64,7 +64,7 @@ export default function SettingsPage() {
               checked={selectedOption === 'bubble'}
               onChange={(e) => setSelectedOption(e.target.value)}
             />
-            <span>Bubble</span>
+            <span className='text-sm font-semibold'>Bubble</span>
           </label>
 
           <label className="flex items-center gap-2">
@@ -75,7 +75,7 @@ export default function SettingsPage() {
               checked={selectedOption === 'chat-bar'}
               onChange={(e) => setSelectedOption(e.target.value)}
             />
-            <span>Chat Bar</span>
+            <span className='text-sm font-semibold'>Chat Bar</span>
           </label>
 
           <label className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function SettingsPage() {
               checked={selectedOption === 'chat-widget-open'}
               onChange={(e) => setSelectedOption(e.target.value)}
             />
-            <span>Chat Widget Open</span>
+            <span className='text-sm font-semibold'>Chat Widget Open</span>
           </label>
 
           <label className="flex items-center gap-2">
@@ -97,7 +97,7 @@ export default function SettingsPage() {
               checked={selectedOption === 'chat-widget-greeting'}
               onChange={(e) => setSelectedOption(e.target.value)}
             />
-            <span>Chat Widget Greeting</span>
+            <span className='text-sm font-semibold'>Chat Widget Greeting</span>
           </label>
 
           <label className="flex items-center gap-2">
@@ -108,7 +108,7 @@ export default function SettingsPage() {
               checked={selectedOption === 'chat-widget-contact'}
               onChange={(e) => setSelectedOption(e.target.value)}
             />
-            <span>Chat Widget Contact</span>
+            <span className='text-sm font-semibold'>Chat Widget Contact</span>
           </label>
         </div>
       </div>

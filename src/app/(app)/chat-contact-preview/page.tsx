@@ -22,10 +22,11 @@ export default function Page() {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
   const { settings, loading, fetchSettings } = useSettingsStore();
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
-    fetchSettings('chatWidgetContact', {} as ChatWidgetContactSettings); // Provide default settings if needed
+    fetchSettings('chatWidgetContact', {} as ChatWidgetContactSettings);
   }, [fetchSettings]);
 
   useEffect(() => {
@@ -92,17 +93,20 @@ export default function Page() {
     <div className="w-[370px] mx-auto mt-5 h-[700px] border rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-900 flex flex-col">
       <ChatHeader settings={settings.chatWidgetContact} isSaving={false} />
       <div className="flex-1 overflow-y-auto flex flex-col">
+        <div>
         <MessagesContainer messages={messages} settings={settings.chatWidgetContact} />
-        <ContactForm settings={settings.chatWidgetContact} isSaving={isSaving} />
+        </div>
+        <div className='p-4'>
+          <ContactForm settings={settings.chatWidgetContact} isSaving={isSaving} />
+        </div>
       </div>
       <ChatInputArea
         settings={settings.chatWidgetContact}
         newMessage={newMessage}
         setNewMessage={setNewMessage}
         onSendMessage={handleSendMessage}
-        isSaving={isSaving} onTyping={function (isTyping: boolean): void {
-          throw new Error('Function not implemented.');
-        } }      />
+        onTyping={setIsTyping} // Pass typing callback
+        isSaving={isSaving} />
       <ChatFooter settings={settings.chatWidgetContact} />
     </div>
   );

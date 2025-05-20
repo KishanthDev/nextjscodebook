@@ -68,14 +68,14 @@ export default function ContactForm({ settings, isSaving }: Props) {
     };
 
     return (
-        <div className="p-4" style={{ backgroundColor: settings.formBgColor || '#ffffff' }}>
+        <div className="p-4 border border-black rounded-xl" style={{ backgroundColor: settings.formBgColor || '#ffffff' }}>
             {!isSubmitted && (
                 <div className="mb-4 text-center">
-                    <p className="text-lg font-semibold pb-3 text-gray-700 dark:text-gray-300">{settings.formMessage1 || 'Please fill in the form we will reach out'}</p>
+                    <p className="text-xl font-bold pb-3 text-gray-700 dark:text-gray-300">{settings.formMessage1 || 'Please fill in the form we will reach out'}</p>
                     <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">{settings.formMessage2 || 'We are sorry our chat experts are busy right now'}</p>
                 </div>
             )}
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{settings.formTitle || 'Contact Us'}</h3>
+            <h3 className="text-lg font-normal text-gray-900 dark:text-gray-100 mb-3">{settings.formTitle || 'Contact Us'}</h3>
                 <form onSubmit={handleFormSubmit} className="space-y-3">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name:</label>

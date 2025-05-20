@@ -9,7 +9,7 @@ type Props = {
   newMessage: string;
   setNewMessage: React.Dispatch<React.SetStateAction<string>>;
   onSendMessage: () => void;
-  onTyping: (isTyping: boolean) => void; // New callback for typing
+  onTyping: (isTyping: boolean) => void;
   isSaving: boolean;
 };
 

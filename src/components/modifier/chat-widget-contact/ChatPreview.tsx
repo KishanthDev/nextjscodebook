@@ -34,7 +34,7 @@ export default function ChatPreview({
         <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
           <div className="flex-1 overflow-y-auto">
             <MessagesContainer messages={messages} settings={settings} isTyping={isTyping} />
-            <div className="border bg-gray-100">
+            <div className="p-4">
               <ContactForm settings={settings} isSaving={isSaving} />
             </div>
           </div>

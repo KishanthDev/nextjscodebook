@@ -121,7 +121,10 @@ export default function ChatInputArea({ settings, newMessage, setNewMessage, onS
         </div>
       </div>
       {showEmojiPicker && (
-        <div className="absolute bottom-12 right-0 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-1">
+        <div
+          role="listbox"
+          aria-label="Emoji picker"
+          className="absolute bottom-12 right-0 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-1">
           {EMOJIS.map((emoji) => (
             <button
               aria-label={`Insert emoji ${emoji}`}

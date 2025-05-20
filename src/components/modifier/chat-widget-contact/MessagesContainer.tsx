@@ -3,7 +3,7 @@ import { ChatWidgetSettings, Message } from '@/types/Modifier';
 type Props = {
   messages: Message[];
   settings: ChatWidgetSettings;
-  isTyping?: boolean; // New prop for typing state
+  isTyping?: boolean; 
 };
 
 export default function MessagesContainer({ messages, settings, isTyping }: Props) {

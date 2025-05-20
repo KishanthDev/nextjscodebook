@@ -81,8 +81,8 @@ export default function ChatBar() {
               height={20}
             />
           </span>
-          </div>
-          </div>
         </div>
+      </div>
+    </div>
   );
 }

@@ -7,11 +7,13 @@ import { toast } from 'sonner';
 import Loader from '../loader/Loader';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ChatbarSettings } from '@/types/Modifier';
+import BubbleIcon from '../icons/BubbleIcon';
 
 export default function ChatBarComponent({ defaultSettings }: { defaultSettings?: ChatbarSettings }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isHovered,setIsHovered] = useState(false)
   const [localSettings, setLocalSettings] = useState<ChatbarSettings>(
     defaultSettings ?? {
       text: 'Chat with us',
@@ -186,13 +188,23 @@ export default function ChatBarComponent({ defaultSettings }: { defaultSettings?
           </div>
           <div className="flex-1 flex justify-center items-start">
             <div
-              className="w-[254.983px] h-[39.992px] rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
+              className="justify-between pl-4 pr-4 w-[254.983px] h-[39.992px] rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex  items-center"
               style={{
                 backgroundColor: localSettings.bgColor,
                 color: localSettings.textColor,
               }}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
             >
               <span className="font-medium">{localSettings.text}</span>
+              <BubbleIcon
+                iconColor='#ffffff'
+                bgColor='#ffffff'
+                dotsColor='#ffffff'
+                hovered={isHovered}
+                width={20}
+                height={20}
+              />
             </div>
           </div>
         </div>

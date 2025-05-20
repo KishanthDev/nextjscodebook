@@ -6,6 +6,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { useSettingsStore } from '@/stores/settingsStore';
 import defaultConfig from '../../../../data/modifier.json';
 import { ChatbarSettings } from '@/types/Modifier';
+import BubbleIcon from '@/components/icons/BubbleIcon';
 
 export default function ChatBar() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -32,6 +33,8 @@ export default function ChatBar() {
     ...settings.chatBar,
   };
 
+  const [isHovered, setIsHovered] = useState(false);
+
   console.log('ChatBar settings:', chatbarSettings);
 
   if (!mounted) return null;
@@ -57,17 +60,29 @@ export default function ChatBar() {
       <div className="flex justify-center items-start">
         <div
           data-testid="chatbar-container"
-          className="w-[254.983px] h-[39.992px]  rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-center items-center"
+          className="w-[254.983px] h-[39.992px]  rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md flex justify-between pl-4 pr-4 items-center"
           style={{
             backgroundColor: chatbarSettings.bgColor || '#007bff',
             color: chatbarSettings.textColor || '#ffffff',
           }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           <span data-testid="chatbar-text" className="font-medium">
             {chatbarSettings.text || 'Chat with us'}
           </span>
+          <span>
+            <BubbleIcon
+              iconColor='#ffffff'
+              bgColor='#ffffff'
+              dotsColor='#ffffff'
+              hovered={isHovered}
+              width={20}
+              height={20}
+            />
+          </span>
+          </div>
+          </div>
         </div>
-      </div>
-    </div>
   );
 }

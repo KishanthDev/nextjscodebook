@@ -133,6 +133,7 @@ const AuthPage: React.FC = () => {
                     />
                     <button
                       type="button"
+                      aria-label="eye"
                       onClick={() => setIsVisible(!isVisible)}
                       className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none"
                     >

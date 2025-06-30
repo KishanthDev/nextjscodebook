@@ -1,6 +1,6 @@
 import React from "react";
 import Contact from "@/types/Contact";
-import { Mail, Phone, MapPin, Calendar, Info, X } from "lucide-react";
+import {  Phone, MapPin, Calendar, Info, X, User } from "lucide-react";
 
 
 interface ContactProfileProps {
@@ -22,7 +22,7 @@ export default function ContactProfile({ contact }: ContactProfileProps) {
                 <h3 className="flex items-center justify-between p-4 border-b h-14 font-semibold text-gray-800 dark:text-white">
                     {/* Left Icons + Label */}
                     <div className="flex items-center gap-3">
-                        <Mail className="w-4 h-4 text-gray-500" />
+                        <User className="w-4 h-4 text-gray-500" />
                         <Phone className="w-4 h-4 text-gray-500" />
                         <MapPin className="w-4 h-4 text-gray-500" />
                         <Calendar className="w-4 h-4 text-gray-500" />

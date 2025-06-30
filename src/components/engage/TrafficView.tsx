@@ -73,7 +73,7 @@ export default function TrafficView() {
                     Showing data for: <strong>{selectedFilter}</strong>
                 </p>
                 <table className="w-full mt-2 text-sm text-left text-gray-700 dark:text-gray-300">
-                    <thead className="border-b border-gray-300 dark:border-zinc-700 text-xs uppercase text-gray-500 dark:text-gray-400">
+                    <thead className="border-b border-t border-gray-300 dark:border-zinc-700 text-xs uppercase text-gray-500 dark:text-gray-400">
                         <tr>
                             <th className="py-2 pr-4">Name</th>
                             <th className="py-2 pr-4">Group</th>

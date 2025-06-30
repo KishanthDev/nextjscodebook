@@ -30,6 +30,7 @@ import {
   Command,
   Circle,
   MessagesSquare,
+  Send,
 } from 'lucide-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -63,6 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const links = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/chats', icon: MessageCircle, label: 'Chats' },
+    { href: '/engage', icon: Send, label: 'Engage' },
     { href: '/ai-agent', icon: Bot, label: 'AI Agent' },
     { href: '/modifier', icon: Settings2, label: 'Chat Customization' },
     { href: '/bubble', icon: Circle, label: 'Bubble' },

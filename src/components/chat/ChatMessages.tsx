@@ -28,7 +28,7 @@ export default function ChatMessages({ selected, messages, settings }: Props) {
             "max-w-sm px-4 py-2 rounded-lg inline-block mb-3",
             msg.fromUser
               ? "self-end rounded-br-none text-white"
-              : "self-start rounded-bl-none text-black dark:text-white",
+              : "self-start rounded-bl-none  text-black dark:text-white",
             styles.message
           )}
           style={{

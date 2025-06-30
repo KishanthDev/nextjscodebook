@@ -21,9 +21,9 @@ export default function ContactList({ contacts, selectedContact, onSelect, userS
   const { toggleAcceptChats } = useUserStatus();
 
   return (
-    <div className="w-1/3 border-r border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 flex flex-col h-full">
+    <div className="border-r border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-300 dark:border-zinc-800">
+      <div className="flex items-center justify-between px-4 h-14 border-b border-gray-300 dark:border-zinc-800">
         <div className="flex items-center gap-3">
           <div className="relative">
             <CircleUser className="h-9 w-9 text-gray-600 dark:text-gray-300" />

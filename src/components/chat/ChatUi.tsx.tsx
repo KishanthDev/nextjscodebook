@@ -7,6 +7,7 @@ import ContactList from "./ContactList";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
+import ContactProfile from "./ContactProfile";
 import { useUserStatus } from "@/stores/useUserStatus";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { ChatWidgetSettings } from "@/types/Modifier";
@@ -79,13 +80,18 @@ export default function ChatUI() {
 
   return (
     <div className="flex h-[calc(100vh-3.3rem)] border border-gray-300 bg-white text-black transition-colors dark:border-gray-700 dark:bg-zinc-900 dark:text-white">
-      <ContactList
-        contacts={sampleContacts}
-        selectedContact={selectedContact}
-        onSelect={setSelectedContact}
-        userStatus={userStatus}
-      />
-      <div className="flex flex-1 flex-col min-h-0">
+      {/* Left Sidebar - 30% */}
+      <div className="w-[30%] border-r border-gray-300 dark:border-gray-700">
+        <ContactList
+          contacts={sampleContacts}
+          selectedContact={selectedContact}
+          onSelect={setSelectedContact}
+          userStatus={userStatus}
+        />
+      </div>
+
+      {/* Chat Area - 40% */}
+      <div className="w-[40%] flex flex-col min-h-0">
         <ChatHeader contact={selectedContact} />
         <ChatMessages
           selected={!!selectedContact}
@@ -101,6 +107,14 @@ export default function ChatUI() {
           />
         )}
       </div>
+
+      {/* Right Sidebar - 30% */}
+      <div className="w-[30%] flex-shrink-0 border-l border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-zinc-800">
+        <ContactProfile contact={selectedContact} />
+      </div>
+
+
     </div>
+
   );
 }

@@ -28,8 +28,6 @@ import {
   GalleryVerticalEnd,
   AudioWaveform,
   Command,
-  Circle,
-  MessagesSquare,
   Send,
 } from 'lucide-react';
 
@@ -66,13 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/chats', icon: MessageCircle, label: 'Chats' },
     { href: '/engage', icon: Send, label: 'Engage' },
     { href: '/ai-agent', icon: Bot, label: 'AI Agent' },
-    { href: '/modifier', icon: Settings2, label: 'Chat Customization' },
-    { href: '/bubble', icon: Circle, label: 'Bubble' },
-    { href: '/chat-widget-open', icon: MessagesSquare, label: 'Chat Widget Open' },
-    { href: '/eye-catcher', icon: MessagesSquare, label: 'Eye Catcher' },
-    { href: '/chat-bar', icon: MessagesSquare, label: 'Chat Bar' },
-    { href: '/greeting', icon: MessagesSquare, label: 'Greeting' },
-    { href: '/chat-contact-preview', icon: MessagesSquare, label: 'Chat Contact' },
+    { href: '/modifier', icon: Settings2, label: 'Chat Customization' }
   ];
 
   return (

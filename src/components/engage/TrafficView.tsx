@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { customerData } from "./customerData"
+import { useCustomerStore } from '@/stores/useCustomerStore';
 import { Filter, Plus, SlidersHorizontal } from 'lucide-react';
 
-const filters = [
+export default function TrafficView() {
+    const { customerData } = useCustomerStore();
+    
+    const filters = [
     { label: 'All Customers', count: customerData.length },
     { label: 'Chatting', count: customerData.filter(c => c.activity === 'Chatting').length },
     { label: 'Supervised', count: customerData.filter(c => c.activity === 'Supervised').length },
@@ -14,9 +17,6 @@ const filters = [
     { label: 'Invited', count: customerData.filter(c => c.activity === 'Invited').length },
     { label: 'Browsing', count: customerData.filter(c => c.activity === 'Browsing').length },
 ];
-
-
-export default function TrafficView() {
     const [selectedFilter, setSelectedFilter] = useState<string>('All Customers');
 
     const filteredData =

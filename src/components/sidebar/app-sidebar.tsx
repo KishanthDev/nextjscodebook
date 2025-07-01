@@ -61,10 +61,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const links = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/chats', icon: MessageCircle, label: 'Chats' },
+    { href: '/chats', icon: MessageCircle, label: 'Active Chats' },
     { href: '/engage', icon: Send, label: 'Engage' },
     { href: '/ai-agent', icon: Bot, label: 'AI Agent' },
-    { href: '/modifier', icon: Settings2, label: 'Chat Widget' }
+    { href: '/modifier', icon: Settings2, label: 'Chat Widget' },
+    { href: '/archived-chats', icon: MessageCircle, label: 'Archived Chats' },
   ];
 
   return (

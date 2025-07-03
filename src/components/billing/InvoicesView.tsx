@@ -77,12 +77,12 @@ export default function InvoicesView() {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end relative z-10">
+            <div className="flex flex-col sm:flex-row gap-4 items-start justify-between sm:items-end relative z-10">
                 <div className="w-full sm:w-64 relative">
-                    <Command>
+                    <Command className='rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900'>
                         <CommandInput
                             placeholder="Search company..."
-                            className="h-10 rounded-md border border-gray-300 dark:border-gray-700 px-3 text-sm"
+                            className="h-10 px-3 text-sm"
                             value={companyQuery}
                             onValueChange={(val) => setCompanyQuery(val)}
                         />
@@ -124,7 +124,7 @@ export default function InvoicesView() {
                 </div>
 
                 {/* Date Filters */}
-                <div className="flex gap-2">
+                <div className="flex gap-6">
                     <Input
                         type="date"
                         value={fromDate}

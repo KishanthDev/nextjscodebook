@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import InvoicesView from '@/components/billing/InvoicesView';
+import PaymentsView from '@/components/billing/PaymentsTable';
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'price plans'>('invoices');
@@ -42,11 +43,6 @@ export default function Page() {
   );
 }
 
-
-
-function PaymentsView() {
-  return <div className="text-xl font-bold">💳 Payment Methods</div>;
-}
 
 function PricePlansView() {
   return <div className="text-xl font-bold">💰 Pricing Plans</div>;

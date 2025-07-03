@@ -1,0 +1,92 @@
+ [
+    {
+        "createdAt": "2025-07-01T10:15:00Z",
+        "updatedAt": "2025-07-01T12:00:00Z",
+        "price": 150,
+        "currency": "USD",
+        "status": "Completed",
+        "cancellationTime": "",
+        "cancellationReason": ""
+    },
+    {
+        "createdAt": "2025-06-30T09:00:00Z",
+        "updatedAt": "2025-06-30T09:30:00Z",
+        "price": 250,
+        "currency": "EUR",
+        "status": "Completed",
+        "cancellationTime": "",
+        "cancellationReason": ""
+    },
+    {
+        "createdAt": "2025-06-29T15:45:00Z",
+        "updatedAt": "2025-06-29T16:00:00Z",
+        "price": 300,
+        "currency": "USD",
+        "status": "Refunded",
+        "cancellationTime": "2025-06-29T16:10:00Z",
+        "cancellationReason": "Product defect"
+    },
+    {
+        "createdAt": "2025-06-28T11:20:00Z",
+        "updatedAt": "2025-06-28T11:50:00Z",
+        "price": 120,
+        "currency": "INR",
+        "status": "Completed",
+        "cancellationTime": "",
+        "cancellationReason": ""
+    },
+    {
+        "createdAt": "2025-06-27T13:10:00Z",
+        "updatedAt": "2025-06-27T13:40:00Z",
+        "price": 180,
+        "currency": "USD",
+        "status": "Cancelled",
+        "cancellationTime": "2025-06-27T13:45:00Z",
+        "cancellationReason": "Payment timeout"
+    },
+    {
+        "createdAt": "2025-06-26T08:00:00Z",
+        "updatedAt": "2025-06-26T08:30:00Z",
+        "price": 220,
+        "currency": "EUR",
+        "status": "Completed",
+        "cancellationTime": "",
+        "cancellationReason": ""
+    },
+    {
+        "createdAt": "2025-06-25T17:00:00Z",
+        "updatedAt": "2025-06-25T17:20:00Z",
+        "price": 90,
+        "currency": "INR",
+        "status": "Pending",
+        "cancellationTime": "",
+        "cancellationReason": ""
+    },
+    {
+        "createdAt": "2025-06-24T19:30:00Z",
+        "updatedAt": "2025-06-24T20:00:00Z",
+        "price": 160,
+        "currency": "USD",
+        "status": "Completed",
+        "cancellationTime": "",
+        "cancellationReason": ""
+    },
+    {
+        "createdAt": "2025-06-23T12:10:00Z",
+        "updatedAt": "2025-06-23T12:40:00Z",
+        "price": 210,
+        "currency": "EUR",
+        "status": "Cancelled",
+        "cancellationTime": "2025-06-23T12:50:00Z",
+        "cancellationReason": "Insufficient funds"
+    },
+    {
+        "createdAt": "2025-06-22T14:30:00Z",
+        "updatedAt": "2025-06-22T15:00:00Z",
+        "price": 130,
+        "currency": "INR",
+        "status": "Completed",
+        "cancellationTime": "",
+        "cancellationReason": ""
+    }
+]

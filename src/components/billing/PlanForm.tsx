@@ -22,6 +22,17 @@ export default function CreatePlanForm() {
     unlimitedHistory: false,
     historyDuration: '',
     historyExtraCost: '',
+    unlimitedUsers: false,
+    NumberOfUsers: '',
+    ExtraUsersAmount: '',
+    NumberOfWebsites: '',
+    ExtraWebsitesAmount: '',
+    ChatTakeover: false,
+    ChatTagging: false,
+    ChatTranscript: false,
+    ChatbotFromOpenAiIncluded: false,
+    managedAccount: false,
+    customPlan: false,
   });
 
   const handleChange = (field: string, value: any) => {
@@ -158,7 +169,106 @@ export default function CreatePlanForm() {
             </div>
           </>
         )}
+
+        <div className="flex items-center justify-between gap-x-4">
+          <Label>Unlimited Users</Label>
+          <Switch
+            checked={form.unlimitedUsers}
+            onCheckedChange={(val) => handleChange('unlimitedUsers', val)}
+          />
+        </div>
+
+        {!form.unlimitedUsers && (
+          <>
+            <div className="flex flex-col space-y-1">
+              <Label>Number of Users</Label>
+              <Input
+                type="number"
+                value={form.NumberOfUsers}
+                onChange={(e) => handleChange('NumberOfUsers', e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col space-y-1">
+              <Label>Extra User Cost ($)</Label>
+              <Input
+                type="number"
+                value={form.ExtraUsersAmount}
+                onChange={(e) => handleChange('ExtraUsersAmount', e.target.value)}
+              />
+            </div>
+          </>
+        )}
+
+        <div className="flex flex-col space-y-1">
+          <Label>Number of Websites</Label>
+          <Input
+            type="number"
+            value={form.NumberOfWebsites}
+            onChange={(e) => handleChange('NumberOfWebsites', e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col space-y-1">
+          <Label>Extra Website Cost ($)</Label>
+          <Input
+            type="number"
+            value={form.ExtraWebsitesAmount}
+            onChange={(e) => handleChange('ExtraWebsitesAmount', e.target.value)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between gap-x-4">
+          <Label>Chat Takeover</Label>
+          <Switch
+            checked={form.ChatTakeover}
+            onCheckedChange={(val) => handleChange('ChatTakeover', val)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between gap-x-4">
+          <Label>Chat Tagging</Label>
+          <Switch
+            checked={form.ChatTagging}
+            onCheckedChange={(val) => handleChange('ChatTagging', val)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between gap-x-4">
+          <Label>Chat Transcript</Label>
+          <Switch
+            checked={form.ChatTranscript}
+            onCheckedChange={(val) => handleChange('ChatTranscript', val)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between gap-x-4">
+          <Label>Chatbot (OpenAI Included)</Label>
+          <Switch
+            checked={form.ChatbotFromOpenAiIncluded}
+            onCheckedChange={(val) => handleChange('ChatbotFromOpenAiIncluded', val)}
+          />
+        </div>
       </div>
+      <div className="flex flex-col space-y-1">
+        <div className="flex items-center justify-between gap-x-4">
+          <Label>Managed Account</Label>
+          <Switch
+            checked={form.managedAccount}
+            onCheckedChange={(val) => handleChange('managedAccount', val)}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col space-y-1">
+        <div className="flex items-center justify-between gap-x-4">
+          <Label>Custom Plan</Label>
+          <Switch
+            checked={form.customPlan}
+            onCheckedChange={(val) => handleChange('customPlan', val)}
+          />
+        </div>
+      </div>
+
 
       <Button type="submit" className="w-full sm:w-auto">
         Save Plan

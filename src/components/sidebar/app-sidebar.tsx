@@ -29,6 +29,7 @@ import {
   AudioWaveform,
   Command,
   Send,
+  BadgeDollarSign,
 } from 'lucide-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -66,6 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/ai-agent', icon: Bot, label: 'AI Agent' },
     { href: '/modifier', icon: Settings2, label: 'Chat Widget' },
     { href: '/archived-chats', icon: MessageCircle, label: 'Archived Chats' },
+    { href: '/billing', icon: BadgeDollarSign, label: 'Billing' },
   ];
 
   return (

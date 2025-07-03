@@ -25,7 +25,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <ThemeProvider attribute="class">
         <SidebarProvider>
           <AppSidebar />
-          <main className={`${geistSans.variable} ${geistMono.variable} w-full bg-background text-foreground antialiased`}>
+          <main className={`${geistSans.variable} ${geistMono.variable} w-full bg-background text-foreground antialiased overflow-x-hidden`}>
             <NavbarWrapper />
             {children}
           </main>

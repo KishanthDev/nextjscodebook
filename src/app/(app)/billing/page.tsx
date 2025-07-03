@@ -35,7 +35,7 @@ export default function Page() {
       </div>
 
       {/* Right Content View */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 overflow-y-auto p-6">
         {activeTab === 'invoices' && <InvoicesView />}
         {activeTab === 'payments' && <PaymentsView />}
         {activeTab === 'price plans' && <PricePlansView />}

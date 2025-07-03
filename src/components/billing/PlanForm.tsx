@@ -37,7 +37,7 @@ export default function CreatePlanForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
       <div className="space-y-4">
-        <div>
+        <div className="flex flex-col space-y-1">
           <Label htmlFor="planName">Plan Name</Label>
           <Input
             id="planName"
@@ -47,7 +47,7 @@ export default function CreatePlanForm() {
           />
         </div>
 
-        <div>
+        <div className="flex flex-col space-y-1">
           <Label htmlFor="planDescription">Plan Description</Label>
           <Textarea
             id="planDescription"
@@ -56,7 +56,7 @@ export default function CreatePlanForm() {
           />
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-x-4">
           <Label>Free Plan</Label>
           <Switch
             checked={form.isFree}
@@ -66,7 +66,7 @@ export default function CreatePlanForm() {
 
         {!form.isFree && (
           <>
-            <div>
+            <div className="flex flex-col space-y-1">
               <Label>Price Monthly ($)</Label>
               <Input
                 type="number"
@@ -74,7 +74,7 @@ export default function CreatePlanForm() {
                 onChange={(e) => handleChange('priceMonthly', e.target.value)}
               />
             </div>
-            <div>
+            <div className="flex flex-col space-y-1">
               <Label>Price Annually ($)</Label>
               <Input
                 type="number"
@@ -85,7 +85,7 @@ export default function CreatePlanForm() {
           </>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-x-4">
           <Label>Active Plan</Label>
           <Switch
             checked={form.isActive}
@@ -93,7 +93,7 @@ export default function CreatePlanForm() {
           />
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-x-4">
           <Label>Default Plan</Label>
           <Switch
             checked={form.isDefault}
@@ -101,7 +101,7 @@ export default function CreatePlanForm() {
           />
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-x-4">
           <Label>Unlimited Chat</Label>
           <Switch
             checked={form.unlimitedChat}
@@ -111,7 +111,7 @@ export default function CreatePlanForm() {
 
         {!form.unlimitedChat && (
           <>
-            <div>
+            <div className="flex flex-col space-y-1">
               <Label>Number of Chats</Label>
               <Input
                 type="number"
@@ -119,7 +119,7 @@ export default function CreatePlanForm() {
                 onChange={(e) => handleChange('numChats', e.target.value)}
               />
             </div>
-            <div>
+            <div className="flex flex-col space-y-1">
               <Label>Extra Chat Amount ($)</Label>
               <Input
                 type="number"
@@ -130,7 +130,7 @@ export default function CreatePlanForm() {
           </>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-x-4">
           <Label>Unlimited Chat History Storage</Label>
           <Switch
             checked={form.unlimitedHistory}
@@ -140,7 +140,7 @@ export default function CreatePlanForm() {
 
         {!form.unlimitedHistory && (
           <>
-            <div>
+            <div className="flex flex-col space-y-1">
               <Label>Chat History Duration (in days)</Label>
               <Input
                 type="number"
@@ -148,7 +148,7 @@ export default function CreatePlanForm() {
                 onChange={(e) => handleChange('historyDuration', e.target.value)}
               />
             </div>
-            <div>
+            <div className="flex flex-col space-y-1">
               <Label>Cost per Extra Day of Storage ($)</Label>
               <Input
                 type="number"

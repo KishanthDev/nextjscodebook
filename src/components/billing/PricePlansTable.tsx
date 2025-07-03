@@ -65,8 +65,8 @@ export default function PricePlansTable() {
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-2xl">
                         <DialogHeader>
-                            <DialogTitle>Create a New Price Plan</DialogTitle>
-                            <DialogDescription>Fill out the fields to define a new subscription plan.</DialogDescription>
+                            <DialogTitle className='text-center'>Create a New Price Plan</DialogTitle>
+                            <DialogDescription className='text-center'>Fill out the fields to define a new subscription plan.</DialogDescription>
                         </DialogHeader>
 
                         <div className="overflow-y-auto max-h-[70vh] pr-2">

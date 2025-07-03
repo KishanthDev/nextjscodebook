@@ -1,0 +1,101 @@
+ [
+        {
+            "company": "Oxnia Corp",
+            "customerEmail": "maria@oxnia.com",
+            "createdAt": "2025-07-01",
+            "invoiceNo": "INV-1001",
+            "price": 1200,
+            "currency": "USD",
+            "status": "Paid"
+        },
+        {
+            "company": "NextTech",
+            "customerEmail": "john@nexttech.io",
+            "createdAt": "2025-06-25",
+            "invoiceNo": "INV-1002",
+            "price": 500,
+            "currency": "USD",
+            "status": "Pending"
+        },
+        {
+            "company": "BlueSky Solutions",
+            "customerEmail": "alice@bluesky.com",
+            "createdAt": "2025-06-20",
+            "invoiceNo": "INV-1003",
+            "price": 750,
+            "currency": "USD",
+            "status": "Paid"
+        },
+        {
+            "company": "GreenLeaf Inc",
+            "customerEmail": "bob@greenleaf.com",
+            "createdAt": "2025-06-18",
+            "invoiceNo": "INV-1004",
+            "price": 950,
+            "currency": "USD",
+            "status": "Overdue"
+        },
+        {
+            "company": "RedStone LLC",
+            "customerEmail": "carol@redstone.com",
+            "createdAt": "2025-06-15",
+            "invoiceNo": "INV-1005",
+            "price": 1100,
+            "currency": "USD",
+            "status": "Paid"
+        },
+        {
+            "company": "AquaTech",
+            "customerEmail": "dave@aquatech.com",
+            "createdAt": "2025-06-10",
+            "invoiceNo": "INV-1006",
+            "price": 600,
+            "currency": "USD",
+            "status": "Pending"
+        },
+        {
+            "company": "Sunrise Media",
+            "customerEmail": "eve@sunrisemedia.com",
+            "createdAt": "2025-06-05",
+            "invoiceNo": "INV-1007",
+            "price": 1300,
+            "currency": "USD",
+            "status": "Paid"
+        },
+        {
+            "company": "PeakSoft",
+            "customerEmail": "frank@peaksoft.com",
+            "createdAt": "2025-06-01",
+            "invoiceNo": "INV-1008",
+            "price": 800,
+            "currency": "USD",
+            "status": "Overdue"
+        },
+        {
+            "company": "NovaWorks",
+            "customerEmail": "grace@novaworks.com",
+            "createdAt": "2025-05-28",
+            "invoiceNo": "INV-1009",
+            "price": 1050,
+            "currency": "USD",
+            "status": "Paid"
+        },
+        {
+            "company": "BrightPath",
+            "customerEmail": "henry@brightpath.com",
+            "createdAt": "2025-05-25",
+            "invoiceNo": "INV-1010",
+            "price": 900,
+            "currency": "USD",
+            "status": "Pending"
+        },
+        {
+            "company": "CloudNine",
+            "customerEmail": "irene@cloudnine.com",
+            "createdAt": "2025-05-20",
+            "invoiceNo": "INV-1011",
+            "price": 1150,
+            "currency": "USD",
+            "status": "Paid"
+        }
+    ]

@@ -23,7 +23,7 @@ export default function PaymentsTable() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Payments</h1>
+      <h1 className="text-3xl text-center font-bold text-gray-800 dark:text-white">Payments</h1>
 
       <Card className="overflow-auto rounded-2xl shadow-sm">
         <Table>

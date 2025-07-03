@@ -47,38 +47,36 @@ export default function PricePlansTable() {
     return (
         <div className="max-w-7xl mx-auto p-6 space-y-6">
             {/* Header Row */}
+            <h1 className="text-3xl text-center font-bold text-gray-800 dark:text-white">Price Plans</h1>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Price Plans</h1>
+                <Input
+                    placeholder="Search price plans..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full sm:w-64"
+                />
 
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:items-center">
-                    <Input
-                        placeholder="Search price plans..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full sm:w-64"
-                    />
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button className="flex items-center gap-2 whitespace-nowrap">
+                            <Plus size={16} />
+                            Add Price Plan
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>Create a New Price Plan</DialogTitle>
+                            <DialogDescription>Fill out the fields to define a new subscription plan.</DialogDescription>
+                        </DialogHeader>
 
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button className="flex items-center gap-2 whitespace-nowrap">
-                                <Plus size={16} />
-                                Add Price Plan
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-2xl">
-                            <DialogHeader>
-                                <DialogTitle>Create a New Price Plan</DialogTitle>
-                                <DialogDescription>Fill out the fields to define a new subscription plan.</DialogDescription>
-                            </DialogHeader>
+                        <div className="overflow-y-auto max-h-[70vh] pr-2">
+                            <CreatePlanForm />
+                        </div>
+                    </DialogContent>
 
-                            <div className="overflow-y-auto max-h-[70vh] pr-2">
-                                <CreatePlanForm />
-                            </div>
-                        </DialogContent>
-
-                    </Dialog>
-                </div>
+                </Dialog>
             </div>
+
 
             {/* Table Section */}
             <Card className="overflow-auto rounded-2xl shadow-sm">
@@ -104,8 +102,8 @@ export default function PricePlansTable() {
                                     <TableCell>
                                         <span
                                             className={`px-2 py-1 text-xs rounded-full ${plan.status === 'Active'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-red-100 text-red-700'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'bg-red-100 text-red-700'
                                                 }`}
                                         >
                                             {plan.status}

@@ -1,0 +1,132 @@
+[
+    {
+        "planName": "Starter",
+        "status": "Active",
+        "isDefault": true,
+        "isFree": true,
+        "priceMonthly": 0,
+        "priceAnnually": 0,
+        "dateAdded": "2025-06-01",
+        "type": "Public"
+    },
+    {
+        "planName": "Pro",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 29,
+        "priceAnnually": 299,
+        "dateAdded": "2025-06-15",
+        "type": "Public"
+    },
+    {
+        "planName": "Enterprise",
+        "status": "Inactive",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 99,
+        "priceAnnually": 999,
+        "dateAdded": "2025-06-20",
+        "type": "Custom"
+    },
+    {
+        "planName": "Basic",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 9,
+        "priceAnnually": 90,
+        "dateAdded": "2025-07-01",
+        "type": "Public"
+    },
+    {
+        "planName": "Team",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 49,
+        "priceAnnually": 490,
+        "dateAdded": "2025-07-05",
+        "type": "Public"
+    },
+    {
+        "planName": "Business",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 79,
+        "priceAnnually": 790,
+        "dateAdded": "2025-07-10",
+        "type": "Public"
+    },
+    {
+        "planName": "Premium",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 59,
+        "priceAnnually": 590,
+        "dateAdded": "2025-07-15",
+        "type": "Public"
+    },
+    {
+        "planName": "Growth",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 39,
+        "priceAnnually": 390,
+        "dateAdded": "2025-07-20",
+        "type": "Public"
+    },
+    {
+        "planName": "Scale",
+        "status": "Inactive",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 119,
+        "priceAnnually": 1190,
+        "dateAdded": "2025-07-25",
+        "type": "Custom"
+    },
+    {
+        "planName": "Ultimate",
+        "status": "Inactive",
+        "isDefault": false,
+        "isFree": false,
+        "priceMonthly": 199,
+        "priceAnnually": 1990,
+        "dateAdded": "2025-08-01",
+        "type": "Custom"
+    },
+    {
+        "planName": "Developer",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": true,
+        "priceMonthly": 0,
+        "priceAnnually": 0,
+        "dateAdded": "2025-08-05",
+        "type": "Public"
+    },
+    {
+        "planName": "Nonprofit",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": true,
+        "priceMonthly": 0,
+        "priceAnnually": 0,
+        "dateAdded": "2025-08-10",
+        "type": "Custom"
+    },
+    {
+        "planName": "Education",
+        "status": "Active",
+        "isDefault": false,
+        "isFree": true,
+        "priceMonthly": 0,
+        "priceAnnually": 0,
+        "dateAdded": "2025-08-15",
+        "type": "Custom"
+    }
+]

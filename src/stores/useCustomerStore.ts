@@ -8,6 +8,7 @@ export interface Customer {
   country: string;
   state: string;
   activity: string;
+  status: string;
 }
 
 interface CustomerStore {
@@ -23,6 +24,7 @@ const defaultData: Customer[] = [
     country: 'India',
     state: 'Maharashtra',
     activity: 'Chatting',
+    status: 'online',
   },
   {
     name: 'Amit Shah',
@@ -31,6 +33,7 @@ const defaultData: Customer[] = [
     country: 'India',
     state: 'Delhi',
     activity: 'Browsing',
+    status: 'offline',
   },
   {
     name: 'Samantha',
@@ -39,6 +42,7 @@ const defaultData: Customer[] = [
     country: 'India',
     state: 'Karnataka',
     activity: 'Waiting for reply',
+    status: 'online',
   },
 ];
 

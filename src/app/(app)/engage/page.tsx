@@ -34,7 +34,7 @@ export default function EngagePage() {
       </div>
 
       {/* Right Content View */}
-      <div className="flex-1 p-6">
+      <div className="flex-1">
         {activeTab === 'traffic' && <TrafficView />}
         {activeTab === 'campaigns' && <CampaignsView />}
         {activeTab === 'goals' && <GoalsView />}

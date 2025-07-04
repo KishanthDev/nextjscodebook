@@ -47,103 +47,106 @@ export default function PricePlansTable() {
     return (
         <div className="max-w-7xl mx-auto p-6 space-y-6">
             {/* Header Row */}
-            <h1 className="text-3xl text-center font-bold text-gray-800 dark:text-white">Price Plans</h1>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <Input
-                    placeholder="Search price plans..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full sm:w-64"
-                />
+            <div className='border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-4 bg-white dark:bg-gray-800 shadow-sm'>
+                <h1 className="text-3xl text-center font-bold text-gray-800 dark:text-white">Price Plans</h1>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <Input
+                        placeholder="Search price plans..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full sm:w-64"
+                    />
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button className="flex items-center gap-2 whitespace-nowrap">
-                            <Plus size={16} />
-                            Add Price Plan
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-2xl">
-                        <DialogHeader>
-                            <DialogTitle className='text-center'>Create a New Price Plan</DialogTitle>
-                            <DialogDescription className='text-center'>Fill out the fields to define a new subscription plan.</DialogDescription>
-                        </DialogHeader>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button className="flex items-center gap-2 whitespace-nowrap">
+                                <Plus size={16} />
+                                Add Price Plan
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-2xl">
+                            <DialogHeader>
+                                <DialogTitle className='text-center'>Create a New Price Plan</DialogTitle>
+                                <DialogDescription className='text-center'>Fill out the fields to define a new subscription plan.</DialogDescription>
+                            </DialogHeader>
 
-                        <div className="overflow-y-auto max-h-[70vh] pr-2">
-                            <CreatePlanForm />
-                        </div>
-                    </DialogContent>
+                            <div className="overflow-y-auto max-h-[70vh] pr-2">
+                                <CreatePlanForm />
+                            </div>
+                        </DialogContent>
 
-                </Dialog>
+                    </Dialog>
+                </div>
+
             </div>
-
-
             {/* Table Section */}
-            <Card className="overflow-auto rounded-2xl shadow-sm">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Plan Name</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Default Plan</TableHead>
-                            <TableHead>Free Plan</TableHead>
-                            <TableHead>Price (Monthly)</TableHead>
-                            <TableHead>Price (Annually)</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {paginatedPlans.length > 0 ? (
-                            paginatedPlans.map((plan, idx) => (
-                                <TableRow key={idx}>
-                                    <TableCell>{plan.planName}</TableCell>
-                                    <TableCell>
-                                        <span
-                                            className={`px-2 py-1 text-xs rounded-full ${plan.status === 'Active'
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-red-100 text-red-700'
-                                                }`}
-                                        >
-                                            {plan.status}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>{plan.isDefault ? 'Yes' : 'No'}</TableCell>
-                                    <TableCell>{plan.isFree ? 'Yes' : 'No'}</TableCell>
-                                    <TableCell>${plan.priceMonthly}</TableCell>
-                                    <TableCell>${plan.priceAnnually}</TableCell>
-                                    <TableCell>{new Date(plan.dateAdded).toLocaleDateString()}</TableCell>
-                                    <TableCell>{plan.type}</TableCell>
-                                    <TableCell className="text-right space-x-2">
-                                        <Button size="icon" variant="ghost">
-                                            <Pencil size={16} />
-                                        </Button>
-                                        <Button size="icon" variant="ghost" className="text-red-500 hover:bg-red-100">
-                                            <Trash2 size={16} />
-                                        </Button>
+            <div className='border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-4 bg-white dark:bg-gray-800 shadow-sm'>
+                <Card className="overflow-auto rounded-2xl shadow-sm">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Plan Name</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Default Plan</TableHead>
+                                <TableHead>Free Plan</TableHead>
+                                <TableHead>Price (Monthly)</TableHead>
+                                <TableHead>Price (Annually)</TableHead>
+                                <TableHead>Date Added</TableHead>
+                                <TableHead>Type</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {paginatedPlans.length > 0 ? (
+                                paginatedPlans.map((plan, idx) => (
+                                    <TableRow key={idx}>
+                                        <TableCell>{plan.planName}</TableCell>
+                                        <TableCell>
+                                            <span
+                                                className={`px-2 py-1 text-xs rounded-full ${plan.status === 'Active'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-red-100 text-red-700'
+                                                    }`}
+                                            >
+                                                {plan.status}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>{plan.isDefault ? 'Yes' : 'No'}</TableCell>
+                                        <TableCell>{plan.isFree ? 'Yes' : 'No'}</TableCell>
+                                        <TableCell>${plan.priceMonthly}</TableCell>
+                                        <TableCell>${plan.priceAnnually}</TableCell>
+                                        <TableCell>{new Date(plan.dateAdded).toLocaleDateString()}</TableCell>
+                                        <TableCell>{plan.type}</TableCell>
+                                        <TableCell className="text-right space-x-2">
+                                            <Button size="icon" variant="ghost">
+                                                <Pencil size={16} />
+                                            </Button>
+                                            <Button size="icon" variant="ghost" className="text-red-500 hover:bg-red-100">
+                                                <Trash2 size={16} />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={9} className="text-center text-gray-500">
+                                        No plans found.
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={9} className="text-center text-gray-500">
-                                    No plans found.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </Card>
+                            )}
+                        </TableBody>
+                    </Table>
+                </Card>
 
-            {/* Pagination */}
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
-                onPageChange={setCurrentPage}
-                onItemsPerPageChange={setItemsPerPage}
-            />
+                {/* Pagination */}
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={setItemsPerPage}
+                />
+            </div>
         </div>
     );
 }

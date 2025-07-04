@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <div className="flex h-[calc(100vh-3.5rem)]">
       {/* Left Sidebar */}
-      <div className="w-[150px] border-r p-4 bg-gray-50 dark:bg-zinc-900">
+      <div className="w-[150px] border-r p-2 bg-gray-50 dark:bg-zinc-900">
         <nav className="flex flex-col gap-2">
           {['invoices', 'payments', 'price plans'].map((tab) => (
             <button
@@ -35,7 +35,7 @@ export default function Page() {
       </div>
 
       {/* Right Content View */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto">
         {activeTab === 'invoices' && <InvoicesView />}
         {activeTab === 'payments' && <PaymentsView />}
         {activeTab === 'price plans' && <PricePlansView />}

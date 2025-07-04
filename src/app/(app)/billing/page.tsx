@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <div className="flex h-[calc(100vh-3.5rem)]">
       {/* Left Sidebar */}
-      <div className="w-[220px] border-r p-4 bg-gray-50 dark:bg-zinc-900">
+      <div className="w-[150px] border-r p-4 bg-gray-50 dark:bg-zinc-900">
         <nav className="flex flex-col gap-2">
           {['invoices', 'payments', 'price plans'].map((tab) => (
             <button

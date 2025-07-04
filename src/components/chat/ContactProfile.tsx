@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+'use client';
 
+import React, { useState } from "react";
 import {
   Phone,
   MapPin,
   Calendar,
   Info,
   X,
-  User
 } from "lucide-react";
 
 interface Contact {
@@ -17,7 +17,6 @@ interface Contact {
   notes?: string;
   status: "online" | "offline";
 }
-
 
 interface ContactProfileProps {
   contact: Contact | null;
@@ -32,16 +31,10 @@ const tabs = [
 
 export default function ContactProfile({ contact }: ContactProfileProps) {
   const [activeTab, setActiveTab] = useState("phone");
-
-  if (!contact) {
-    return (
-      <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
-        Select a contact to view their profile
-      </div>
-    );
-  }
+  const [expanded, setExpanded] = useState(false);
 
   const renderTabContent = () => {
+    if (!contact) return null;
     switch (activeTab) {
       case "phone":
         return <p>{contact.phone ?? "No phone number available"}</p>;
@@ -57,64 +50,99 @@ export default function ContactProfile({ contact }: ContactProfileProps) {
   };
 
   return (
-    <div>
-      <div>
-        <h3 className="flex items-center justify-between p-4 border-b h-14 font-semibold text-gray-800 dark:text-white">
-          <div className="flex items-center gap-3">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 ${isActive ? "bg-gray-200 dark:bg-gray-700" : ""
-                    }`}
-                  title={tab.label}
-                >
-                  <Icon
-                    className={`w-5 h-5 ${isActive
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-500"
+    <>
+      {/* RIGHT ICON STACK (collapsed mode only) */}
+      {!expanded && (
+        <div className="fixed right-0 top-13 bottom-0 z-50 flex flex-col gap-3 p-1.5 bg-gray-100 dark:bg-gray-900 border-l border-gray-300 dark:border-gray-700 shadow-md">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setExpanded(true);
+                }}
+                className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-800"
+                title={tab.label}
+              >
+                <Icon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* EXPANDED PANEL */}
+      <div
+        className={`fixed right-0 top-13 bottom-0 border-t w-90 max-w-full bg-white dark:bg-gray-800 border-l border-gray-300 dark:border-gray-700 z-50 transform transition-transform duration-300 ${expanded ? "translate-x-0" : "translate-x-full"
+          } shadow-xl`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Top header with icons and close button */}
+          <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
+            <div className="flex gap-3">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 ${isActive ? "bg-gray-200 dark:bg-gray-700" : ""
                       }`}
-                  />
-                </button>
-              );
-            })}
+                    title={tab.label}
+                  >
+                    <Icon
+                      className={`w-5 h-5 ${isActive
+                          ? "text-blue-600 dark:text-blue-400"
+                          : "text-gray-500"
+                        }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+
+            <button onClick={() => setExpanded(false)} title="Close">
+              <X className="w-5 h-5 text-gray-500 hover:text-red-500" />
+            </button>
           </div>
 
-          <button>
-            <X className="w-5 h-5 text-gray-500 hover:text-red-500" />
-          </button>
-        </h3>
-      </div>
+          {/* Profile info */}
+          {contact ? (
+            <div className="flex flex-col items-center text-center p-6 overflow-y-auto">
+              <img
+                src={"https://via.placeholder.com/150"}
+                alt={contact.name}
+                className="w-20 h-20 rounded-full mb-2 border-2 border-gray-300 dark:border-gray-600"
+              />
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                {contact.name}
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {`${contact.name.toLowerCase().replace(/\s+/g, "")}@example.com`}
+              </p>
+              <span
+                className={`mt-2 inline-block rounded-full px-3 py-1 text-xs font-medium ${contact.status === "online"
+                    ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
+                    : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                  }`}
+              >
+                {contact.status}
+              </span>
 
-      <div className="flex flex-col mt-3 items-center text-center">
-        <img
-          src={"https://via.placeholder.com/150"}
-          alt={contact.name}
-          className="w-20 h-20 rounded-full mb-4 border-2 border-gray-300 dark:border-gray-600"
-        />
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-          {contact.name}
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {`${contact.name?.toLowerCase().replace(/\s+/g, "")}@example.com`}
-        </p>
-        <span
-          className={`mt-2 inline-block rounded-full px-3 py-1 text-xs font-medium ${contact.status === "online"
-              ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
-              : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-            }`}
-        >
-          {contact.status}
-        </span>
-
-        {/* Tab content */}
-        <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
-          {renderTabContent()}
+              <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
+                {renderTabContent()}
+              </div>
+            </div>
+          ) : (
+            <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+              Select a contact to view their profile
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -90,8 +90,7 @@ export default function ChatUI() {
         />
       </div>
 
-      {/* Chat Area - 40% */}
-      <div className="w-[40%] flex flex-col min-h-0">
+      <div className="w-[66%] flex flex-col min-h-0">
         <ChatHeader contact={selectedContact} />
         <ChatMessages
           selected={!!selectedContact}
@@ -108,13 +107,10 @@ export default function ChatUI() {
         )}
       </div>
 
-      {/* Right Sidebar - 30% */}
-      <div className="w-[30%] flex-shrink-0 border-l border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-zinc-800">
+      {/* Right Sidebar - Expandable */}
+      <div className="shrink-0 transition-all duration-300 ease-in-out overflow-hidden">
         <ContactProfile contact={selectedContact} />
       </div>
-
-
     </div>
-
   );
 }

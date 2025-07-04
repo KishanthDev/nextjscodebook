@@ -3,13 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/ui/input';
 import { Button } from '@/ui/button';
-import { CalendarIcon, Plus } from 'lucide-react';
-import { Calendar } from "@/ui/calendar"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/ui/popover"
+import { Plus } from 'lucide-react';
 import {
     Command,
     CommandInput,

@@ -3,7 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/ui/input';
 import { Button } from '@/ui/button';
-import { Plus } from 'lucide-react';
+import { CalendarIcon, Plus } from 'lucide-react';
+import { Calendar } from "@/ui/calendar"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/ui/popover"
 import {
     Command,
     CommandInput,
@@ -15,15 +21,17 @@ import { Card } from '@/ui/card';
 import Pagination from '../Pagination';
 import invoices from './invoices.json';
 import InvoicesTable from './InvoicesTable';
+import { DateRangePicker } from './DateRangePicker';
 
 export default function InvoicesView() {
     const [searchTerm, setSearchTerm] = useState('');
     const [companyQuery, setCompanyQuery] = useState('');
     const [companyFilter, setCompanyFilter] = useState('');
-    const [fromDate, setFromDate] = useState('');
-    const [toDate, setToDate] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [fromDate, setFromDate] = useState<Date | null>(null);
+    const [toDate, setToDate] = useState<Date | null>(null);
+
 
     // Extract unique company names
     const companyNames = Array.from(new Set(invoices.map((inv) => inv.company)));
@@ -61,13 +69,13 @@ export default function InvoicesView() {
     return (
         <div className="max-w-7xl mx-auto p-6 space-y-6">
             <div className='border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-4 bg-white dark:bg-gray-800 shadow-sm'>
-                <h1 className="text-3xl text-center font-bold text-gray-800 dark:text-white">Invoices</h1>
+                <h1 className="text-3xl text-center mb-3 font-bold text-gray-800 dark:text-white">Invoices</h1>
 
                 {/* Search + Generate Button */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <Input
                         placeholder="Search by email or invoice no..."
-                        className="w-full sm:w-80"
+                        className="w-full h-10 sm:w-80"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -79,7 +87,7 @@ export default function InvoicesView() {
 
                 {/* Filters */}
                 <div className="flex flex-col mt-4 sm:flex-row gap-4 items-start justify-between sm:items-end relative z-10">
-                    <div className="w-full sm:w-64 relative">
+                    <div className="w-full sm:w-80 relative">
                         <Command className='rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900'>
                             <CommandInput
                                 placeholder="Search company..."
@@ -125,20 +133,13 @@ export default function InvoicesView() {
                     </div>
 
                     {/* Date Filters */}
-                    <div className="flex gap-6">
-                        <Input
-                            type="date"
-                            value={fromDate}
-                            onChange={(e) => setFromDate(e.target.value)}
-                            className="w-36 rounded-md border border-gray-300 dark:border-gray-700 px-2 text-sm"
-                        />
-                        <Input
-                            type="date"
-                            value={toDate}
-                            onChange={(e) => setToDate(e.target.value)}
-                            className="w-36 rounded-md border border-gray-300 dark:border-gray-700 px-2 text-sm"
-                        />
-                    </div>
+                    <DateRangePicker
+                        fromDate={fromDate}
+                        toDate={toDate}
+                        setFromDate={setFromDate}
+                        setToDate={setToDate}
+                    />
+
                 </div>
             </div>
 

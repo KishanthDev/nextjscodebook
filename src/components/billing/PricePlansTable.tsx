@@ -48,7 +48,7 @@ export default function PricePlansTable() {
         <div className="max-w-7xl mx-auto p-6 space-y-6">
             {/* Header Row */}
             <div className='border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-4 bg-white dark:bg-gray-800 shadow-sm'>
-                <h1 className="text-3xl text-center font-bold text-gray-800 dark:text-white">Price Plans</h1>
+                <h1 className="text-3xl text-center mb-3 font-bold text-gray-800 dark:text-white">Price Plans</h1>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <Input
                         placeholder="Search price plans..."

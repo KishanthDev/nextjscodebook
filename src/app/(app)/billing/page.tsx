@@ -5,9 +5,11 @@ import clsx from 'clsx';
 import InvoicesView from '@/components/billing/InvoicesView';
 import PaymentsView from '@/components/billing/PaymentsTable';
 import PricePlansView from '@/components/billing/PricePlansTable';
+import { useBillingStore } from '@/stores/useBillingStore';
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'price plans'>('invoices');
+  const { invoices, payments, pricePlans } = useBillingStore()
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)]">
@@ -36,9 +38,9 @@ export default function Page() {
 
       {/* Right Content View */}
       <div className="flex-1 overflow-y-auto">
-        {activeTab === 'invoices' && <InvoicesView />}
-        {activeTab === 'payments' && <PaymentsView />}
-        {activeTab === 'price plans' && <PricePlansView />}
+        {activeTab === 'invoices' && <InvoicesView invoices={invoices} />}
+        {activeTab === 'payments' && <PaymentsView mockPayments={payments} />}
+        {activeTab === 'price plans' && <PricePlansView priceplans={pricePlans} />}
       </div>
     </div>
   );

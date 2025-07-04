@@ -13,11 +13,11 @@ import {
 } from '@/ui/command';
 import { Card } from '@/ui/card';
 import Pagination from '../Pagination';
-import invoices from './invoices.json';
 import InvoicesTable from './InvoicesTable';
 import { DateRangePicker } from './DateRangePicker';
+import { Invoice } from '@/types/Billing';
 
-export default function InvoicesView() {
+export default function InvoicesView({ invoices }: { invoices: Invoice[] }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [companyQuery, setCompanyQuery] = useState('');
     const [companyFilter, setCompanyFilter] = useState('');
@@ -25,7 +25,6 @@ export default function InvoicesView() {
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [fromDate, setFromDate] = useState<Date | null>(null);
     const [toDate, setToDate] = useState<Date | null>(null);
-
 
     // Extract unique company names
     const companyNames = Array.from(new Set(invoices.map((inv) => inv.company)));

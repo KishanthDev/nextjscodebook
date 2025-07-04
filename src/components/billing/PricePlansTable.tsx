@@ -14,7 +14,6 @@ import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import Pagination from '../Pagination';
-import mockPlans from './priceplans.json';
 import CreatePlanForm from './PlanForm';
 import {
     Dialog,
@@ -24,13 +23,14 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/ui/dialog';
+import { PricePlan } from '@/types/Billing';
 
-export default function PricePlansTable() {
+export default function PricePlansTable({ priceplans }: { priceplans: PricePlan[] }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredPlans = mockPlans.filter((plan) =>
+    const filteredPlans = priceplans.filter((plan) =>
         plan.planName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 

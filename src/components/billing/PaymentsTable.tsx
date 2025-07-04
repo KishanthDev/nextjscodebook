@@ -4,9 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 import Pagination from '../Pagination';
-import mockPayments from './payments.json';
-
-export default function PaymentsTable() {
+import { Payment } from '@/types/Billing'; 
+export default function PaymentsTable({ mockPayments }: { mockPayments: Payment[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 

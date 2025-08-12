@@ -68,6 +68,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/modifier', icon: Settings2, label: 'Chat Widget' },
     { href: '/archived-chats', icon: MessageCircle, label: 'Archived Chats' },
     { href: '/billing', icon: BadgeDollarSign, label: 'Billing' },
+    { href: '/ai', icon: Bot, label: 'AI' },
+
   ];
 
   return (

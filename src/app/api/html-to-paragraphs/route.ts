@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `HTML retrieval failed with HTTP code: ${res.status}` }, { status: res.status });
     }
 
-    let html = await res.text();
+    const html = await res.text();
 
     // Load with cheerio
     const $ = cheerio.load(html);
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const seen: Set<string> = new Set();
 
     $("p, h1, h2, h3, h4, h5, h6").each((i, el) => {
-      let text = $(el).text().replace(/\s+/g, " ").trim();
+      const text = $(el).text().replace(/\s+/g, " ").trim();
       if (text.length > 20 && !seen.has(text)) {
         seen.add(text);
         paragraphs.push([text, language, url]);

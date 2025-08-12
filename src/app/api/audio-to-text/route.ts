@@ -5,11 +5,12 @@ import path from "path";
 import os from "os";
 import { NextResponse } from "next/server";
 
-export async function POST(req) {
+export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("audio");
-    const language = formData.get("language") || undefined;
+    const languageEntry = formData.get("language");
+    const language = typeof languageEntry === "string" ? languageEntry : undefined;
 
     if (!file || typeof file === "string") {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -26,6 +27,7 @@ export async function POST(req) {
     await fs.unlink(filePath); // cleanup
     return NextResponse.json({ text: transcription });
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

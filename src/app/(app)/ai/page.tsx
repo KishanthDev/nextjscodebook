@@ -7,6 +7,7 @@ import AudioToText from '@/components/openai/AudioToText';
 import MessageForm from '@/components/openai/MessageForm';
 import SmartReplyForm from '@/components/openai/SmartReplyForm';
 import HtmlToParagraphsForm from '@/components/openai/HtmlToParagraphsForm';
+import UserExpressionsForm from '@/components/openai/UserExpressionsForm';
 
 // Define all tabs in one place
 const tabs = [
@@ -34,6 +35,11 @@ const tabs = [
     id: 'htmltotext',
     label: 'HTML → Text',
     component: <HtmlToParagraphsForm />
+  },
+  {
+    id: 'userexpression',
+    label: 'User Expression',
+    component: <UserExpressionsForm />
   }
 ];
 

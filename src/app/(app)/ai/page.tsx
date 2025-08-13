@@ -10,6 +10,7 @@ import HtmlToParagraphsForm from '@/components/openai/HtmlToParagraphsForm';
 import UserExpressionsForm from '@/components/openai/UserExpressionsForm';
 import PlaygroundMessageForm from '@/components/openai/PlaygroundMessageForm';
 import TextFormatterForm from '@/components/openai/TextFormatterForm';
+import QeaTraining from '@/components/openai/QeaTraining';
 
 // Define all tabs in one place
 const tabs = [
@@ -52,6 +53,11 @@ const tabs = [
     id: 'textformatter',
     label: 'Text Formatter',
     component: <TextFormatterForm/>
+  },
+  {
+    id: 'quetraining',
+    label: 'QEA Training',
+    component: <QeaTraining/>
   }
 ];
 

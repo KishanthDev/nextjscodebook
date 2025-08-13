@@ -8,6 +8,8 @@ import MessageForm from '@/components/openai/MessageForm';
 import SmartReplyForm from '@/components/openai/SmartReplyForm';
 import HtmlToParagraphsForm from '@/components/openai/HtmlToParagraphsForm';
 import UserExpressionsForm from '@/components/openai/UserExpressionsForm';
+import PlaygroundMessageForm from '@/components/openai/PlaygroundMessageForm';
+import TextFormatterForm from '@/components/openai/TextFormatterForm';
 
 // Define all tabs in one place
 const tabs = [
@@ -40,6 +42,16 @@ const tabs = [
     id: 'userexpression',
     label: 'User Expression',
     component: <UserExpressionsForm />
+  },
+  {
+    id: 'playgroundmessage',
+    label: 'Playground Message',
+    component: <PlaygroundMessageForm/>
+  },
+  {
+    id: 'textformatter',
+    label: 'Text Formatter',
+    component: <TextFormatterForm/>
   }
 ];
 

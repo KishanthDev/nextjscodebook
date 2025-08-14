@@ -17,11 +17,23 @@ type Stats = {
 export default function EmbeddingsDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
 
-  useEffect(() => {
-    fetch("/api/embeddings")
-      .then((res) => res.json())
-      .then((data) => setStats(data));
-  }, []);
+useEffect(() => {
+  const fetchStats = async () => {
+    try {
+      const res = await fetch("/api/embeddings");
+      if (!res.ok) {
+        throw new Error(`Failed to fetch: ${res.statusText}`);
+      }
+      const data = await res.json();
+      setStats(data);
+    } catch (err) {
+      console.error("Error fetching embeddings stats:", err);
+    }
+  };
+
+  fetchStats();
+}, []);
+
 
   if (!stats) {
     return <div className="p-6">Loading...</div>;

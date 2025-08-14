@@ -59,7 +59,7 @@ const tabs = [
     id: 'quetraining',
     label: 'QEA Training',
     component: <QeaTraining/>
-  }
+  },
   {
     id: 'embeddingdashboard',
     label: 'Embedding Dashboard',

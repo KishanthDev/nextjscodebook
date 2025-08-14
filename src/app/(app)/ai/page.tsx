@@ -11,6 +11,7 @@ import UserExpressionsForm from '@/components/openai/UserExpressionsForm';
 import PlaygroundMessageForm from '@/components/openai/PlaygroundMessageForm';
 import TextFormatterForm from '@/components/openai/TextFormatterForm';
 import QeaTraining from '@/components/openai/QeaTraining';
+import EmbeddingsDashboard from '@/components/openai/EmbeddingsDashboard';
 
 // Define all tabs in one place
 const tabs = [
@@ -58,6 +59,11 @@ const tabs = [
     id: 'quetraining',
     label: 'QEA Training',
     component: <QeaTraining/>
+  }
+  {
+    id: 'embeddingdashboard',
+    label: 'Embedding Dashboard',
+    component: <EmbeddingsDashboard/>
   }
 ];
 

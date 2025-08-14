@@ -10,18 +10,19 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid or empty qaPairs" }, { status: 400 });
         }
 
-        // Connect to MongoDB and get collections
         const client = await clientPromise;
-        const db = client.db("zotly_sb"); // Replace with your DB name
+        const db = client.db("zotly_sb");
         const qeaCollection = db.collection("qea_embeddings");
+        const settingsCollection = db.collection("settings");
 
-        // Filter out duplicates already in DB by question
+        // Find duplicates
         const existingQuestions = await qeaCollection.find({
             question: { $in: qaPairs.map((q: any) => q[0]) },
         }).project({ question: 1 }).toArray();
 
         const existingQuestionsSet = new Set(existingQuestions.map(q => q.question));
 
+        // Filter new entries
         const newEntries = qaPairs
             .filter((pair: [string, string]) => pair[0] && pair[1] && !existingQuestionsSet.has(pair[0]))
             .map((pair: [string, string]) => ({
@@ -35,13 +36,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "No new QA pairs to train." });
         }
 
-        // Insert new QA pairs
+        // Insert into QEA
         await qeaCollection.insertMany(newEntries);
 
-        // Optionally generate embeddings here with OpenAI embedding API for each question and store alongside
-        const openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY!,
-        });
+        // Create embeddings for each question
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
         for (const entry of newEntries) {
             const embeddingResponse = await openai.embeddings.create({
@@ -49,7 +48,6 @@ export async function POST(request: Request) {
                 input: entry.question,
             });
 
-            // Save embedding vector to the document
             if (embeddingResponse.data.length > 0) {
                 await qeaCollection.updateOne(
                     { question: entry.question },
@@ -57,6 +55,20 @@ export async function POST(request: Request) {
                 );
             }
         }
+
+        // 🔹 Update or create settings doc for Q&A
+        await settingsCollection.updateOne(
+            { key: "qa_settings" }, // unique key for Q&A settings
+            {
+                $set: {
+                    key: "qa_settings",
+                    lastUpdated: new Date(),
+                    totalQuestions: await qeaCollection.countDocuments(),
+                    languagesAvailable: await qeaCollection.distinct("language"),
+                }
+            },
+            { upsert: true }
+        );
 
         return NextResponse.json({ success: true, inserted: newEntries.length });
 

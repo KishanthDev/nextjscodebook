@@ -13,6 +13,7 @@ import TextFormatterForm from '@/components/openai/TextFormatterForm';
 import QeaTraining from '@/components/openai/QeaTraining';
 import FileTrainingForm from '@/components/openai/FileTrainingForm';
 import EmbeddingsDashboard from '@/components/openai/EmbeddingsDashboard';
+import UrlTrain from '@/components/openai/UrlTraining';
 
 // Define all tabs in one place
 const tabs = [
@@ -70,6 +71,11 @@ const tabs = [
     id: 'embeddingdashboard',
     label: 'Embedding Dashboard',
     component: <EmbeddingsDashboard/>
+  },
+  {
+    id: 'trainurl',
+    label: 'Train URL',
+    component: <UrlTrain/>
   }
 ];
 

@@ -1,9 +1,11 @@
+// src/app/api/ask/route.ts
+import { NextResponse } from "next/server";
 import { generateText, type LanguageModel } from "ai";
-//import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
+// import { anthropic } from "@ai-sdk/anthropic"; // Uncomment if needed
 
-// A reusable function to call any provider + model
-export async function ask(prompt: string, model: LanguageModel) {
+// ✅ Reusable ask function
+async function ask(prompt: string, model: LanguageModel) {
   const { text } = await generateText({
     model,
     prompt,
@@ -12,17 +14,21 @@ export async function ask(prompt: string, model: LanguageModel) {
   return text;
 }
 
-// Example usage:
-async function example() {
-  const prompt = "Tell me a story about your grandmother.";
+// ✅ API route
+export async function POST(req: Request) {
+  try {
+    const { prompt } = await req.json();
 
-  // Use Anthropic Claude
-//  const anthroStory = await ask(prompt, anthropic("claude-3-haiku-20240307"));
-//  console.log("Anthropic:", anthroStory);
+    if (!prompt) {
+      return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
+    }
 
-  // Use OpenAI GPT
-  const openaiStory = await ask(prompt, openai("gpt-4o-mini"));
-  console.log("OpenAI:", openaiStory);
+    // Example with OpenAI GPT
+    const answer = await ask(prompt, openai("gpt-4o-mini"));
+
+    return NextResponse.json({ answer });
+  } catch (err: any) {
+    console.error("❌ Error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
-
-example().catch(console.error);

@@ -8,14 +8,12 @@ export const initialData: UIMessage[] = [
         parts: [
             {
                 type: "text",
-                text: `You are the official support assistant for "Support Brand Company".
+                text: `You are the support assistant for "Support Brand Company".
 
-You should:
-- Answer questions about Support Brand Company, its services, or its subscription plans.  
-- Respond politely to greetings (e.g., "hello", "hi", "good morning") etc with a friendly welcome.  
-
-If the user asks about unrelated topics, respond with:  
-"I'm sorry, I don't have information on that topic right now. How can I assist you with Support Brand Company's services or plans?"`,
+Rules:
+- Answer only about Support Brand Company, its plans, or services.  
+- Reply politely to greetings like "hi", "hello", "good morning" etc.  
+- If the question is not related, say: "I'm sorry, I don't know about that. Can I help you with Support Brand Company?"`,
             },
         ],
     },
@@ -25,27 +23,15 @@ If the user asks about unrelated topics, respond with:
         parts: [
             {
                 type: "text",
-                text: `Welcome to Support Brand Company! 👋  
-We are a platform created and managed by the admin team to provide premium support services.
+                text: `👋 Hello! Welcome to Support Brand Company.  
+We provide customer support and subscription services.  
 
-Here’s what we currently offer:
+**Plans:**  
+- Free Plan – Basic features, community help.  
+- Pro Plan – ₹499/month, email support + tickets.  
+- Enterprise Plan – ₹1,999/month, manager + live chat.  
 
-**Subscription Plans**  
-- **Free Plan**: Limited access to basic features, community support only.  
-- **Pro Plan**: ₹499/month – Includes priority email support and ticket system access.  
-- **Enterprise Plan**: ₹1,999/month – Includes dedicated account manager, live chat support, and SLA guarantees.
-
-**Support Channels**  
-- Email Support: support@supportbrand.com  
-- Live Chat: Available 9 AM to 6 PM IST on weekdays  
-- Phone Support: +91 98765 43210 (for Enterprise Plan only)
-
-**Additional Services**  
-- Onboarding assistance for new users  
-- Custom integrations for Enterprise clients  
-- Monthly webinars and training sessions  
-
-If you’d like, I can help you upgrade, check your subscription, explain our features, or assist with billing. 🚀`,
+How can I help you today?`,
             },
         ],
     },
@@ -55,22 +41,20 @@ If you’d like, I can help you upgrade, check your subscription, explain our fe
         parts: [
             {
                 type: "text",
-                text: `**How to Get Started**  
-1. Sign up for a free account on our website.  
-2. Choose a subscription plan that fits your needs.  
-3. Access support via your preferred channel.  
+                text: `**Getting Started**  
+1. Sign up on our website.  
+2. Pick a plan.  
+3. Start using our support.  
 
-**Billing & Payments**  
-- Payment methods accepted: Credit/Debit Cards, UPI, Net Banking.  
-- Billing cycle: Monthly, auto-renewal enabled.  
-- Cancel anytime via your account settings.
+**Payments:**  
+- Pay by Card, UPI, or Net Banking.  
+- Auto-renew every month.  
+- Cancel anytime.  
 
-**Frequently Asked Questions**  
-- Can I upgrade or downgrade my plan anytime? Yes, changes take effect immediately.  
-- Do you offer refunds? We offer a 7-day money-back guarantee.  
-- How secure is my data? We follow industry best practices and GDPR compliance.
-
-Feel free to ask me anything about your account or our services!`,
+**FAQ:**  
+- Upgrade/downgrade anytime.  
+- 7-day money-back guarantee.  
+- Your data is safe and secure.`,
             },
         ],
     },
@@ -80,13 +64,12 @@ Feel free to ask me anything about your account or our services!`,
         parts: [
             {
                 type: "text",
-                text: `**Contact Us**  
-If you need further assistance, you can reach us at:  
+                text: `📞 **Contact Us**  
 - Email: support@supportbrand.com  
 - Phone: +91 98765 43210 (9 AM - 6 PM IST)  
-- Website: https://supportbrand.com/contact  
+- Website: supportbrand.com/contact  
 
-We aim to respond to all inquiries within 24 hours. Thank you for choosing Support Brand Company! 🙏`,
+We reply within 24 hours. Thanks for choosing Support Brand Company! 🙏`,
             },
         ],
     },

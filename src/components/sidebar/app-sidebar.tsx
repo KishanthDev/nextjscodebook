@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/billing', icon: BadgeDollarSign, label: 'Billing' },
     { href: '/ai', icon: Bot, label: 'AI' },
     { href: '/ai-sdk', icon: Bot, label: 'AI - SDK' },
-
+    { href: '/custom-ai', icon: Bot, label: 'Custom - AI' },
   ];
 
   return (

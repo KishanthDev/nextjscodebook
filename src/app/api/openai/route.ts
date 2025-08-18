@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { convertToModelMessages, streamText, UIMessage } from 'ai';
-import { initialData } from '@/lib/data';
+import { angularData } from '@/lib/data';
 
 export const maxDuration = 30;
 
@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
   // Combine initial documentation with new chat messages
-  const fullMessages: UIMessage[] = [...initialData, ...messages];
+  const fullMessages: UIMessage[] = [...angularData, ...messages];
 
   const result = streamText({
     model: openai('gpt-4o-mini'),

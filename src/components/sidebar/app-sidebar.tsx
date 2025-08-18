@@ -71,6 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/ai', icon: Bot, label: 'AI' },
     { href: '/ai-sdk', icon: Bot, label: 'AI - SDK' },
     { href: '/custom-ai', icon: Bot, label: 'Custom - AI' },
+    { href: '/angular-ai', icon: Bot, label: 'Angular-AI' },
   ];
 
   return (

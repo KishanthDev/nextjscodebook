@@ -74,3 +74,31 @@ We reply within 24 hours. Thanks for choosing Support Brand Company! 🙏`,
         ],
     },
 ];
+
+
+export const angularData: UIMessage[] = [
+  {
+    id: "init-1",
+    role: "system",
+    parts: [
+      {
+        type: "text",
+        text: `You are an AI assistant that only provides information related to Angular (https://angular.dev).
+- If the user asks about Angular, respond clearly and helpfully using Angular.dev documentation.
+- If the user asks anything unrelated to Angular, reply with:
+"I'm sorry, I can only provide information related to Angular. Please ask me about Angular framework or features."`
+      },
+    ],
+  },
+  {
+    id: "init-2",
+    role: "assistant",
+    parts: [
+      {
+        type: "text",
+        text: `Hello 👋 I’m your Angular assistant!  
+Ask me anything about Angular — setup, components, directives, services, routing, or best practices.`
+      },
+    ],
+  },
+];

@@ -7,7 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 export default function Page() {
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
-      api: '/api/openai',
+      api: '/api/gemini',
     }),
   });
   const [input, setInput] = useState('');

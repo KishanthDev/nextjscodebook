@@ -14,39 +14,39 @@ function AIPageContent() {
   const answerRef = useRef<HTMLDivElement>(null);
 
   const handleAsk = async () => {
-  if (!question) return;
+    if (!question) return;
 
-  setAnswer("");
-  setLoading(true);
+    setAnswer("");
+    setLoading(true);
 
-  try {
-    const res = await fetch("/api/url/ai-ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, url }), // ✅ FIXED
-    });
+    try {
+      const res = await fetch("/api/url/ai-ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, url }), // ✅ FIXED
+      });
 
-    if (!res.body) throw new Error("No response body.");
+      if (!res.body) throw new Error("No response body.");
 
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
 
-    while (!done) {
-      const { value, done: readerDone } = await reader.read();
-      done = readerDone;
-      if (value) {
-        const chunk = decoder.decode(value, { stream: true });
-        setAnswer(prev => prev + chunk);
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          setAnswer(prev => prev + chunk);
+        }
       }
-    }
 
-    setLoading(false);
-  } catch (err: any) {
-    setAnswer(err.message || "Error occurred.");
-    setLoading(false);
-  }
-};
+      setLoading(false);
+    } catch (err: any) {
+      setAnswer(err.message || "Error occurred.");
+      setLoading(false);
+    }
+  };
 
 
   // Scroll to answer automatically
@@ -60,7 +60,7 @@ function AIPageContent() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <h2 className="text-xl font-semibold">AI for: {url}</h2>
+      <h2 className="text-xl font-semibold uppercase">{url}</h2>
       <textarea
         value={question}
         onChange={e => setQuestion(e.target.value)}

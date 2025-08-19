@@ -3,6 +3,17 @@ import clientPromise from "@/lib/mongodb";
 import * as cheerio from "cheerio";
 import { OpenAI } from "openai";
 
+// ✅ helper to normalize short slug from url
+function normalizeUrl(url: string) {
+  try {
+    const { hostname } = new URL(url);
+    const slug = hostname.replace(/^www\./, "").split(".")[0]; // e.g. "qdrant"
+    return `${slug}-ai-bot`; // 👈 append -ai-bot
+  } catch {
+    return url.replace(/[^a-z0-9]/gi, "-").toLowerCase();
+  }
+}
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: Request) {
@@ -69,23 +80,24 @@ export async function POST(req: Request) {
       chunkDocs.push({ chunk, embedding });
     }
 
-    // Save all chunks with embeddings in MongoDB
+    // ✅ Save all chunks with slug
     const client = await clientPromise;
     const db = client.db("mydb");
 
     await db.collection("websites").insertOne({
       url,
+      slug: normalizeUrl(url), // 👈 added
       language,
       chunks: chunkDocs,
       uploadedAt: new Date(),
     });
 
-    // ✅ Enforce 10-document limit (delete oldest if > 10)
+    // ✅ Enforce 10-document limit
     const count = await db.collection("websites").countDocuments();
     if (count > 10) {
       const oldest = await db.collection("websites")
         .find({})
-        .sort({ uploadedAt: 1 }) // oldest first
+        .sort({ uploadedAt: 1 })
         .limit(count - 10)
         .toArray();
 
@@ -95,7 +107,7 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, url, chunks: chunkDocs.length });
+    return NextResponse.json({ success: true, url, slug: normalizeUrl(url), chunks: chunkDocs.length });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
   }

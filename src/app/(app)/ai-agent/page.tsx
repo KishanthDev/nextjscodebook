@@ -16,9 +16,14 @@ import { Plus } from "lucide-react";
 
 const MAX_URLS = 10;
 
+type Site = {
+  url: string;
+  slug: string;
+};
+
 export default function WebsitesTable() {
   const [url, setUrl] = useState("");
-  const [urls, setUrls] = useState<string[]>([]);
+  const [urls, setUrls] = useState<Site[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +31,7 @@ export default function WebsitesTable() {
     try {
       const res = await fetch("/api/url/url-list");
       const data = await res.json();
-      setUrls(data.urls || []);
+      setUrls(data.sites || []); // backend returns { sites: [{ url, slug }] }
     } catch (err: any) {
       setError(err.message || "Failed to fetch URLs");
     }
@@ -49,7 +54,12 @@ export default function WebsitesTable() {
       const data = await res.json();
       if (data.success) {
         setUrl("");
-        fetchUrls();
+        // append instead of full fetch to save request
+        if (data.site) {
+          setUrls((prev) => [...prev, data.site]); // backend should return { site: { url, slug } }
+        } else {
+          fetchUrls();
+        }
       } else {
         setError(data.error || "Upload failed");
       }
@@ -115,13 +125,13 @@ export default function WebsitesTable() {
           <TableBody>
             {urls.length > 0 ? (
               urls.map((u) => (
-                <TableRow key={u}>
-                  <TableCell>{u}</TableCell>
+                <TableRow key={u.slug}>
+                  <TableCell>{u.url}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       size="sm"
                       onClick={() =>
-                        (window.location.href = `/ai-agent-website?url=${encodeURIComponent(u)}`)
+                        (window.location.href = `/ai-agent-website?url=${encodeURIComponent(u.slug)}`)
                       }
                     >
                       Go

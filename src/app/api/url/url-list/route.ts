@@ -7,8 +7,11 @@ export async function GET() {
     const db = client.db("mydb");
     const collection = db.collection("websites");
 
-    const urls = await collection.find({}, { projection: { url: 1 } }).toArray();
-    return NextResponse.json({ urls: urls.map(u => u.url) });
+    const urls = await collection.find({}, { projection: { url: 1, slug: 1 } }).toArray();
+    return NextResponse.json({
+      sites: urls.map(u => ({ url: u.url, slug: u.slug }))
+    });
+
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

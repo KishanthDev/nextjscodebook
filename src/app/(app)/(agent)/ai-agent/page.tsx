@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -18,7 +19,8 @@ const MAX_URLS = 10;
 
 type Site = {
   url: string;
-  slug: string;
+  slug: string;       // bot name
+  createdAt?: string; // ISO date string
 };
 
 export default function WebsitesTable() {
@@ -26,12 +28,13 @@ export default function WebsitesTable() {
   const [urls, setUrls] = useState<Site[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const fetchUrls = async () => {
     try {
       const res = await fetch("/api/url/url-list");
       const data = await res.json();
-      setUrls(data.sites || []); // backend returns { sites: [{ url, slug }] }
+      setUrls(data.sites || []);
     } catch (err: any) {
       setError(err.message || "Failed to fetch URLs");
     }
@@ -54,9 +57,8 @@ export default function WebsitesTable() {
       const data = await res.json();
       if (data.success) {
         setUrl("");
-        // append instead of full fetch to save request
         if (data.site) {
-          setUrls((prev) => [...prev, data.site]); // backend should return { site: { url, slug } }
+          setUrls((prev) => [...prev, data.site]);
         } else {
           fetchUrls();
         }
@@ -118,7 +120,9 @@ export default function WebsitesTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>URL</TableHead>
+              <TableHead>Bot Name</TableHead>
+              <TableHead>Website URL</TableHead>
+              <TableHead>Created At</TableHead>
               <TableHead className="text-right">AI Agent</TableHead>
             </TableRow>
           </TableHeader>
@@ -126,12 +130,27 @@ export default function WebsitesTable() {
             {urls.length > 0 ? (
               urls.map((u) => (
                 <TableRow key={u.slug}>
+                  {/* Bot name from slug */}
+                  <TableCell className="font-medium">
+                    {u.slug.toUpperCase()}
+                  </TableCell>
+
+                  {/* Website URL */}
                   <TableCell>{u.url}</TableCell>
+
+                  {/* Created At */}
+                  <TableCell>
+                    {u.createdAt
+                      ? new Date(u.createdAt).toLocaleString()
+                      : "—"}
+                  </TableCell>
+
+                  {/* Go button */}
                   <TableCell className="text-right">
                     <Button
                       size="sm"
                       onClick={() =>
-                        (window.location.href = `/ai-agent-website?url=${encodeURIComponent(u.slug)}`)
+                        router.push(`/ai-agent-website?url=${encodeURIComponent(u.slug)}`)
                       }
                     >
                       Go
@@ -141,7 +160,7 @@ export default function WebsitesTable() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={2} className="text-center text-gray-500">
+                <TableCell colSpan={4} className="text-center text-gray-500">
                   No websites uploaded yet.
                 </TableCell>
               </TableRow>

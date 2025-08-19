@@ -7,9 +7,9 @@ export async function GET() {
     const db = client.db("mydb");
     const collection = db.collection("websites");
 
-    const urls = await collection.find({}, { projection: { url: 1, slug: 1 } }).toArray();
+    const urls = await collection.find({}, { projection: { url: 1, slug: 1, uploadedAt: 1 } }).toArray();
     return NextResponse.json({
-      sites: urls.map(u => ({ url: u.url, slug: u.slug }))
+      sites: urls.map(u => ({ url: u.url, slug: u.slug, createdAt: u.uploadedAt?.toISOString() })),
     });
 
   } catch (err: any) {

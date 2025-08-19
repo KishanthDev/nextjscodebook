@@ -6,6 +6,7 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const [urls, setUrls] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false); // new state
   const router = useRouter();
 
   const fetchUrls = async () => {
@@ -17,18 +18,26 @@ export default function Home() {
   useEffect(() => { fetchUrls(); }, []);
 
   const handleUpload = async () => {
+    if (!url) return;
     setError("");
-    const res = await fetch("/api/url/url-upload", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      setUrl("");
-      fetchUrls();
-    } else {
-      setError(data.error || "Upload failed");
+    setLoading(true); // disable button
+    try {
+      const res = await fetch("/api/url/url-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUrl("");
+        fetchUrls();
+      } else {
+        setError(data.error || "Upload failed");
+      }
+    } catch (err: any) {
+      setError(err.message || "Upload failed");
+    } finally {
+      setLoading(false); // enable button
     }
   };
 
@@ -45,9 +54,10 @@ export default function Home() {
         />
         <button
           onClick={handleUpload}
-          className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          disabled={loading} // disable during upload
+          className={`mt-3 px-4 py-2 text-white rounded-lg ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}`}
         >
-          Upload
+          {loading ? "Uploading..." : "Upload"}
         </button>
         {error && <p className="text-red-600 mt-2">{error}</p>}
       </div>

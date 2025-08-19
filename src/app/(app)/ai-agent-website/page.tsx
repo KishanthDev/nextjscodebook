@@ -1,28 +1,60 @@
 "use client";
 export const dynamic = "force-dynamic";
-import { useState, Suspense } from "react";
+
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-// Create a separate component for the part that uses useSearchParams
 function AIPageContent() {
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+  const answerRef = useRef<HTMLDivElement>(null);
 
   const handleAsk = async () => {
-    setLoading(true);
-    setAnswer("");
+  if (!question) return;
+
+  setAnswer("");
+  setLoading(true);
+
+  try {
     const res = await fetch("/api/url/ai-ask", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, url }),
+      body: JSON.stringify({ question, url }), // ✅ FIXED
     });
-    const data = await res.json();
-    setAnswer(data.answer || "No answer found.");
+
+    if (!res.body) throw new Error("No response body.");
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let done = false;
+
+    while (!done) {
+      const { value, done: readerDone } = await reader.read();
+      done = readerDone;
+      if (value) {
+        const chunk = decoder.decode(value, { stream: true });
+        setAnswer(prev => prev + chunk);
+      }
+    }
+
     setLoading(false);
-  };
+  } catch (err: any) {
+    setAnswer(err.message || "Error occurred.");
+    setLoading(false);
+  }
+};
+
+
+  // Scroll to answer automatically
+  useEffect(() => {
+    if (answerRef.current) {
+      answerRef.current.scrollTop = answerRef.current.scrollHeight;
+    }
+  }, [answer]);
 
   if (!url) return <p className="p-6">No website selected.</p>;
 
@@ -37,22 +69,22 @@ function AIPageContent() {
       />
       <button
         onClick={handleAsk}
-        className="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+        className="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400"
         disabled={loading || !question}
       >
         {loading ? "Thinking..." : "Send"}
       </button>
-      {answer && (
-        <div className="mt-4 p-3 bg-gray-100 rounded-lg">
-          <strong>Answer:</strong>
-          <p>{answer}</p>
-        </div>
-      )}
+
+      <div
+        ref={answerRef}
+        className="mt-4 p-3 bg-gray-100 rounded-lg max-h-96 overflow-y-auto whitespace-pre-wrap"
+      >
+        {answer || <em>Answer will appear here...</em>}
+      </div>
     </div>
   );
 }
 
-// Main component that wraps the content in Suspense
 export default function AIPage() {
   return (
     <Suspense fallback={<div className="p-6">Loading...</div>}>

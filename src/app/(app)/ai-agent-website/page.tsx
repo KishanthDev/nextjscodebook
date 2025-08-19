@@ -1,8 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+export const dynamic = "force-dynamic";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function AIPage() {
+// Create a separate component for the part that uses useSearchParams
+function AIPageContent() {
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
   const [question, setQuestion] = useState("");
@@ -47,5 +49,14 @@ export default function AIPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Main component that wraps the content in Suspense
+export default function AIPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <AIPageContent />
+    </Suspense>
   );
 }

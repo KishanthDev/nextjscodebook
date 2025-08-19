@@ -30,6 +30,7 @@ import {
   Command,
   Send,
   BadgeDollarSign,
+  ChartGanttIcon,
 } from 'lucide-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -72,6 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/ai-sdk', icon: Bot, label: 'AI - SDK' },
     { href: '/custom-ai', icon: Bot, label: 'Custom - AI' },
     { href: '/angular-ai', icon: Bot, label: 'Angular-AI' },
+    { href: '/pdf-chat', icon: ChartGanttIcon, label: 'PDF Chat' },
   ];
 
   return (

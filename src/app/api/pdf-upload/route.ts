@@ -1,8 +1,12 @@
+// /api/pdf-upload/route.ts
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import pdfParse from "pdf-parse";
+import { OpenAI } from "openai";
 
-export const maxDuration = 30;
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+const CHUNK_SIZE = 500; // words per chunk
 
 export async function POST(req: Request) {
   try {
@@ -13,32 +17,42 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
     const pdfData = await pdfParse(buffer);
 
-    // Connect DB
     const client = await clientPromise;
     const db = client.db("mydb");
-    const collection = db.collection("pdfs");
+    const collection = db.collection("pdf_embeddings");
 
-    // Check if PDF already exists by filename
-    const existing = await collection.findOne({ filename: file.name });
+    // Check if PDF already uploaded
+    const existing = await collection.findOne({ pdfName: file.name });
     if (existing) {
-      return NextResponse.json(
-        { success: false, message: "File already uploaded", filename: file.name },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: false, message: "File already uploaded", filename: file.name }, { status: 200 });
     }
 
-    // Insert new PDF
-    const doc = {
-      filename: file.name,
-      content: pdfData.text,
-      uploadedAt: new Date(),
-    };
+    // Split text into chunks
+    const words = pdfData.text.split(/\s+/);
+    const chunks = [];
+    for (let i = 0; i < words.length; i += CHUNK_SIZE) {
+      chunks.push(words.slice(i, i + CHUNK_SIZE).join(" "));
+    }
 
-    await collection.insertOne(doc);
+    // Generate embeddings for each chunk and store
+    for (const chunk of chunks) {
+      const embeddingResp = await openai.embeddings.create({
+        model: "text-embedding-3-small",
+        input: chunk,
+      });
+
+      const embedding = embeddingResp.data[0].embedding;
+
+      await collection.insertOne({
+        pdfName: file.name,
+        chunk,
+        embedding,
+        uploadedAt: new Date(),
+      });
+    }
 
     return NextResponse.json({ success: true, filename: file.name });
   } catch (error: any) {

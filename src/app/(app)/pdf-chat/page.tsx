@@ -16,9 +16,19 @@ export default function PdfChat() {
 
   // Fetch PDFs from DB
   const fetchPdfs = async () => {
-    const res = await fetch("/api/pdf-list");
-    const data = await res.json();
-    setPdfs(data.files || []);
+    try {
+      const res = await fetch("/api/pdf-list");
+      const data = await res.json();
+      const files = data.files || [];
+      setPdfs(files);
+
+      // Set default selected PDF if none selected
+      if (files.length > 0 && !filename) {
+        setFilename(files[0]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch PDFs:", err);
+    }
   };
 
   useEffect(() => {
@@ -34,19 +44,24 @@ export default function PdfChat() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/pdf-upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("/api/pdf-upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.success) {
-      setFilename(file.name);
-      setUploaded(true);
-      fetchPdfs(); // refresh list
-    } else {
-      setError(data.message || "Upload failed");
+      if (data.success) {
+        setFilename(file.name);
+        setUploaded(true);
+        fetchPdfs(); // refresh list
+      } else {
+        setError(data.message || "Upload failed");
+      }
+    } catch (err) {
+      setError("Upload failed");
+      console.error(err);
     }
 
     setUploading(false);
@@ -58,14 +73,20 @@ export default function PdfChat() {
     setLoading(true);
     setAnswer("");
 
-    const res = await fetch("/api/pdf-ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, filename }),
-    });
+    try {
+      const res = await fetch("/api/pdf-ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, filename }),
+      });
 
-    const data = await res.json();
-    setAnswer(data.answer || "No answer found.");
+      const data = await res.json();
+      setAnswer(data.answer || "No answer found.");
+    } catch (err) {
+      console.error(err);
+      setAnswer("Failed to get answer.");
+    }
+
     setLoading(false);
   };
 
@@ -99,11 +120,17 @@ export default function PdfChat() {
         <div className="border p-4 rounded-xl shadow-md">
           <h2 className="text-lg font-semibold mb-3">Uploaded PDFs</h2>
           {pdfs.length > 0 ? (
-            <ul className="list-disc ml-5 space-y-1">
-              {pdfs.map((name, i) => (
-                <li key={i}>{name}</li>
+            <select
+              value={filename}
+              onChange={(e) => setFilename(e.target.value)}
+              className="w-full border p-2 rounded-lg mb-2"
+            >
+              {pdfs.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
               ))}
-            </ul>
+            </select>
           ) : (
             <p className="text-gray-600">No PDFs uploaded yet.</p>
           )}
@@ -120,13 +147,15 @@ export default function PdfChat() {
             placeholder="Type your question here..."
             className="w-full border p-2 rounded-lg"
           />
-          <button
-            onClick={handleAsk}
-            disabled={loading || !question}
-            className="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
-          >
-            {loading ? "Thinking..." : "Ask"}
-          </button>
+          <div className="mt-3 flex justify-start">
+            <button
+              onClick={handleAsk}
+              disabled={loading || !question || !filename}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+            >
+              {loading ? "Thinking..." : "Ask"}
+            </button>
+          </div>
 
           {answer && (
             <div className="mt-4 p-3 bg-gray-100 rounded-lg">

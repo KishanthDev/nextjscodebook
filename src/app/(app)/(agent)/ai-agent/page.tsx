@@ -150,7 +150,7 @@ export default function WebsitesTable() {
                     <Button
                       size="sm"
                       onClick={() =>
-                        router.push(`/ai-agent-website?url=${encodeURIComponent(u.slug)}`)
+                        router.push(`/website?ai=${encodeURIComponent(u.slug)}`)
                       }
                     >
                       Go

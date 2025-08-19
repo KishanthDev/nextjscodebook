@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 function AIPageContent() {
   const searchParams = useSearchParams();
-  const url = searchParams.get("url") || "";
+  const url = searchParams.get("ai") || "";
 
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");

@@ -72,12 +72,28 @@ export async function POST(req: Request) {
     // Save all chunks with embeddings in MongoDB
     const client = await clientPromise;
     const db = client.db("mydb");
+
     await db.collection("websites").insertOne({
       url,
       language,
       chunks: chunkDocs,
       uploadedAt: new Date(),
     });
+
+    // ✅ Enforce 10-document limit (delete oldest if > 10)
+    const count = await db.collection("websites").countDocuments();
+    if (count > 10) {
+      const oldest = await db.collection("websites")
+        .find({})
+        .sort({ uploadedAt: 1 }) // oldest first
+        .limit(count - 10)
+        .toArray();
+
+      const idsToRemove = oldest.map(doc => doc._id);
+      if (idsToRemove.length > 0) {
+        await db.collection("websites").deleteMany({ _id: { $in: idsToRemove } });
+      }
+    }
 
     return NextResponse.json({ success: true, url, chunks: chunkDocs.length });
   } catch (err: any) {

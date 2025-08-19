@@ -14,6 +14,8 @@ import { Button } from "@/ui/button";
 import { Card } from "@/ui/card";
 import { Plus } from "lucide-react";
 
+const MAX_URLS = 10;
+
 export default function WebsitesTable() {
   const [url, setUrl] = useState("");
   const [urls, setUrls] = useState<string[]>([]);
@@ -35,7 +37,7 @@ export default function WebsitesTable() {
   }, []);
 
   const handleUpload = async () => {
-    if (!url) return;
+    if (!url || urls.length >= MAX_URLS) return;
     setLoading(true);
     setError("");
     try {
@@ -62,22 +64,42 @@ export default function WebsitesTable() {
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* Upload Section */}
       <Card className="p-4 space-y-4">
-        <h2 className="text-xl font-semibold">Upload Website URL</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Upload Website URL</h2>
+          <span className="text-sm text-gray-600">
+            {urls.length} / {MAX_URLS} uploaded
+          </span>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           <Input
             placeholder="https://example.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             className="flex-1"
+            disabled={urls.length >= MAX_URLS}
           />
           <Button
             onClick={handleUpload}
-            disabled={loading}
-            className={`flex items-center gap-2 ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}`}
+            disabled={loading || urls.length >= MAX_URLS}
+            className={`flex items-center gap-2 ${
+              loading || urls.length >= MAX_URLS
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            {loading ? "Uploading..." : <><Plus size={16} /> Upload</>}
+            {loading
+              ? "Uploading..."
+              : urls.length >= MAX_URLS
+              ? "Limit Reached"
+              : (
+                <>
+                  <Plus size={16} /> Upload
+                </>
+              )}
           </Button>
         </div>
+
         {error && <p className="text-red-600">{error}</p>}
       </Card>
 

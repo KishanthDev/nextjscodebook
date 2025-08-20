@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAIConfig } from "@/stores/aiConfig";
 import { useDebounce } from "@/hooks/useDebounce";
 
-// Remove surrounding quotes
+// Remove surrounding quotes helper
 export function removeSurroundingQuotes(text: string) {
   return text.replace(/^"+|"+$/g, "");
 }
@@ -21,23 +21,27 @@ type Props = {
 export default function ChatInput({ settings, onSend, onEmojiClick, onAttachmentClick }: Props) {
   const [message, setMessage] = useState("");
   const [smartReplies, setSmartReplies] = useState<string[]>([]);
-  const { spellingCorrection, textFormatter, smartReply } = useAIConfig();
+  const [userExpressions, setUserExpressions] = useState<string[]>([]);
+
+  const { spellingCorrection, textFormatter, smartReply: smartReplyEnabled, userExpression } = useAIConfig();
+
   const debouncedMessage = useDebounce(message, 2000);
+  const lastCorrectedRef = useRef<string>(""); // tracks last corrected/formatted text
+  const sentRef = useRef(false); // prevent effect from firing right after send
 
-  const lastCorrectedRef = useRef<string>("");
-  const sentRef = useRef(false);
-
+  // Handle sending message
   const handleSend = () => {
     if (message.trim()) {
       onSend(message.trim());
       setMessage("");
       lastCorrectedRef.current = "";
-      sentRef.current = true;
+      sentRef.current = true; // prevent immediate debounce correction
       setSmartReplies([]);
+      setUserExpressions([]);
     }
   };
 
-  // Handle spelling correction / text formatting
+  /** Spelling Correction / Text Formatting */
   useEffect(() => {
     const processText = async () => {
       const textToProcess = debouncedMessage.trim();
@@ -50,7 +54,6 @@ export default function ChatInput({ settings, onSend, onEmojiClick, onAttachment
       let endpoint = "";
       if (spellingCorrection) endpoint = "/api/correct-spelling";
       if (textFormatter) endpoint = "/api/text-format";
-
       if (!endpoint) return;
 
       try {
@@ -60,8 +63,8 @@ export default function ChatInput({ settings, onSend, onEmojiClick, onAttachment
           body: JSON.stringify({ input_text: textToProcess }),
         });
         const data = await res.json();
-        const newText = data.corrected || data.result;
-        if (newText && newText !== message) {
+        const newText = data.corrected ?? data.result;
+        if (newText && newText !== lastCorrectedRef.current) {
           const cleaned = removeSurroundingQuotes(newText);
           setMessage(cleaned);
           lastCorrectedRef.current = cleaned;
@@ -70,14 +73,13 @@ export default function ChatInput({ settings, onSend, onEmojiClick, onAttachment
         console.error("Text processing failed:", err);
       }
     };
-
     processText();
-  }, [debouncedMessage, spellingCorrection, textFormatter, message]);
+  }, [debouncedMessage, spellingCorrection, textFormatter]);
 
-  // Fetch smart replies
+  /** Smart Replies */
   useEffect(() => {
     const fetchSmartReplies = async () => {
-      if (!smartReply || !message.trim()) return;
+      if (!smartReplyEnabled || !message.trim()) return;
 
       try {
         const res = await fetch("/api/smart-reply", {
@@ -86,19 +88,37 @@ export default function ChatInput({ settings, onSend, onEmojiClick, onAttachment
           body: JSON.stringify({ input_text: message.trim() }),
         });
         const data = await res.json();
-        if (Array.isArray(data.replies)) {
-          setSmartReplies(data.replies);
-        }
+        if (Array.isArray(data.replies)) setSmartReplies(data.replies.slice(0, 3));
       } catch (err) {
-        console.error("Smart reply fetch failed:", err);
+        console.error("Smart replies fetch failed:", err);
       }
     };
-
     fetchSmartReplies();
-  }, [debouncedMessage, smartReply]);
+  }, [debouncedMessage, smartReplyEnabled]);
+
+  /** User Expressions */
+  useEffect(() => {
+    const fetchUserExpressions = async () => {
+      if (!userExpression || !message.trim()) return;
+
+      try {
+        const res = await fetch("/api/user-expressions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: message.trim() }),
+        });
+        const data = await res.json();
+        if (Array.isArray(data.expressions)) setUserExpressions(data.expressions.slice(0, 5));
+      } catch (err) {
+        console.error("User expressions fetch failed:", err);
+      }
+    };
+    fetchUserExpressions();
+  }, [debouncedMessage, userExpression]);
 
   return (
     <div className="flex flex-col gap-2 border-t bg-white px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900">
+      {/* Input row */}
       <div className="flex items-center gap-2">
         <button
           title="emoji"
@@ -136,19 +156,35 @@ export default function ChatInput({ settings, onSend, onEmojiClick, onAttachment
         </button>
       </div>
 
-      {/* Smart reply buttons */}
-      <div className="flex gap-2 flex-wrap">
-        {smartReplies.map((reply, idx) => (
-          <button
-            key={idx}
-            onClick={() => setMessage(reply)} // fills input box
-            className="bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 px-3 py-1 rounded-full text-sm"
-          >
-            {reply}
-          </button>
-        ))}
-      </div>
+      {/* Smart Replies */}
+      {smartReplies.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          {smartReplies.map((reply, idx) => (
+            <button
+              key={idx}
+              onClick={() => setMessage(reply)}
+              className="bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100"
+            >
+              {reply}
+            </button>
+          ))}
+        </div>
+      )}
 
+      {/* User Expressions */}
+      {userExpressions.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          {userExpressions.map((expr, idx) => (
+            <button
+              key={idx}
+              onClick={() => setMessage(expr)}
+              className="bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 dark:bg-green-900 dark:text-green-100"
+            >
+              {expr}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

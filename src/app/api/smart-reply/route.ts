@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!, // Make sure you set this in .env.local
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
 export async function POST(req: Request) {
@@ -12,12 +12,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing or invalid input_text" }, { status: 400 });
     }
 
-    // This is equivalent to what sb_open_ai_smart_reply likely does:
-    const systemPrompt = `You are a smart reply generator. Given a user message, generate 3 short, natural, contextually relevant replies as a JSON array of strings. 
-Only return JSON.`;
+    const systemPrompt = `
+      You are a smart reply generator. Given a user message, generate 3 short, natural, contextually relevant replies.
+      Only return a JSON array of strings, like ["Hi!", "Hello!", "Hey!"]. Do not include extra text or quotes outside the array.
+    `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Use your preferred model
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: input_text },
@@ -26,15 +27,22 @@ Only return JSON.`;
       max_tokens: 200,
     });
 
-    const raw = completion.choices[0]?.message?.content?.trim() || "[]";
+    let raw = completion.choices[0]?.message?.content?.trim() || "[]";
 
-    // Try parsing as JSON array
+    // Remove extra surrounding quotes/brackets if model sometimes wraps it
+    raw = raw.replace(/^```json/, "").replace(/```$/, "").trim();
+
     let replies: string[] = [];
     try {
       replies = JSON.parse(raw);
+      // Ensure all elements are strings
+      replies = replies.filter(r => typeof r === "string");
     } catch {
-      // If it's not valid JSON, just split by newlines
-      replies = raw.split("\n").map(r => r.replace(/^[-*]\s*/, "").trim()).filter(Boolean);
+      // fallback: split lines and clean
+      replies = raw
+        .split("\n")
+        .map(r => r.replace(/^[-*]\s*/, "").trim())
+        .filter(Boolean);
     }
 
     return NextResponse.json({ replies });

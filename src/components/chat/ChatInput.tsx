@@ -16,9 +16,10 @@ type Props = {
   onSend: (message: string) => void;
   onEmojiClick?: () => void;
   onAttachmentClick?: () => void;
+  suggestedReply?: string
 };
 
-export default function ChatInput({ settings, onSend, onEmojiClick, onAttachmentClick }: Props) {
+export default function ChatInput({ settings, suggestedReply, onSend, onEmojiClick, onAttachmentClick }: Props) {
   const [message, setMessage] = useState("");
   const [smartReplies, setSmartReplies] = useState<string[]>([]);
   const [userExpressions, setUserExpressions] = useState<string[]>([]);
@@ -40,6 +41,12 @@ export default function ChatInput({ settings, onSend, onEmojiClick, onAttachment
       setUserExpressions([]);
     }
   };
+
+  useEffect(() => {
+    if (suggestedReply) {
+      setMessage(suggestedReply);
+    }
+  }, [suggestedReply]);
 
   /** Spelling Correction / Text Formatting */
   useEffect(() => {

@@ -17,6 +17,7 @@ export default function ChatUI() {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [isLoadingContacts, setIsLoadingContacts] = useState(true);
+  const [suggestedReply, setSuggestedReply] = useState<string>('');
   const { acceptChats } = useUserStatus();
   const { settings, fetchSettings } = useSettingsStore();
 
@@ -80,6 +81,34 @@ export default function ChatUI() {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      handleIncomingMessage("hello where is my location");
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleIncomingMessage = async (text: string) => {
+    setMessages((prev) => [...prev, { fromUser: false, text }]); 
+    try {
+      const res = await fetch('/api/ai-reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      const aiSuggestion = data.reply || '';
+
+      setSuggestedReply(aiSuggestion);
+    } catch (err) {
+      console.error('AI suggestion failed:', err);
+      setSuggestedReply('');
+    }
+  };
+
+
+
+  useEffect(() => {
     const timer = setTimeout(() => setIsLoadingContacts(false), 100);
     return () => clearTimeout(timer);
   }, []);
@@ -102,9 +131,8 @@ export default function ChatUI() {
 
       {/* Chat Area - Dynamic width */}
       <div
-        className={`flex flex-col min-h-0 transition-all duration-300 ${
-          profileExpanded ? 'w-[40%]' : 'w-[70%]'
-        }`}
+        className={`flex flex-col min-h-0 transition-all duration-300 ${profileExpanded ? 'w-[40%]' : 'w-[70%]'
+          }`}
       >
         <ChatHeader contact={selectedContact} />
         <ChatMessages
@@ -116,6 +144,7 @@ export default function ChatUI() {
           <ChatInput
             settings={chatWidgetSettings}
             onSend={handleSendMessage}
+            suggestedReply={suggestedReply}
             onEmojiClick={() => alert('Emoji picker not implemented yet')}
             onAttachmentClick={() => alert('Attachment upload not implemented yet')}
           />
@@ -124,9 +153,8 @@ export default function ChatUI() {
 
       {/* Right Sidebar - Contact Profile */}
       <div
-        className={`transition-all duration-300 ${
-          profileExpanded ? 'w-[30%]' : 'w-12'
-        } border-l border-gray-300 dark:border-gray-700`}
+        className={`transition-all duration-300 ${profileExpanded ? 'w-[30%]' : 'w-12'
+          } border-l border-gray-300 dark:border-gray-700`}
       >
         <ContactProfile
           contact={selectedContact}

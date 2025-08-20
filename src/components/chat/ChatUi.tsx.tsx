@@ -80,7 +80,7 @@ export default function ChatUI() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoadingContacts(false), 5000);
+    const timer = setTimeout(() => setIsLoadingContacts(false), 100);
     return () => clearTimeout(timer);
   }, []);
 

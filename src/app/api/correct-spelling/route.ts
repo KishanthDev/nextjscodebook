@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt =
       "Fix spelling mistakes of the following text, return only the corrected version, or the original if none. Never add comments:";
     const openaiBody = {
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `"""${input_text}"""` },

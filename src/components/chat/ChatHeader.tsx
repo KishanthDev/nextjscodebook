@@ -1,7 +1,7 @@
 import { CircleUser } from "lucide-react";
 import clsx from "clsx";
 import Contact from "@/types/Contact";
-
+import AISettingsDropdown from "./AISettingsDropdown";
 const statusColor = {
   online: "bg-green-500",
   offline: "bg-red-500",
@@ -22,6 +22,7 @@ export default function ChatHeader({ contact }: { contact: Contact | null }) {
             />
           </div>
           <span className="text-lg font-semibold">{contact.name}</span>
+          <AISettingsDropdown />
         </div>
       ) : (
         <h3 className="text-lg text-gray-400">Select a conversation</h3>

@@ -47,12 +47,12 @@ export default function ChatInput({ settings, suggestedReply, onSend, onEmojiCli
       setMessage(suggestedReply);
     }
   }, [suggestedReply]);
-
+  const rawInputRef = useRef("");
   /** Spelling Correction / Text Formatting */
   useEffect(() => {
     const processText = async () => {
       const textToProcess = debouncedMessage.trim();
-      if (!textToProcess || textToProcess === lastCorrectedRef.current) return;
+      if (!textToProcess || textToProcess === rawInputRef.current) return;
       if (sentRef.current) {
         sentRef.current = false;
         return;
@@ -69,19 +69,23 @@ export default function ChatInput({ settings, suggestedReply, onSend, onEmojiCli
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ input_text: textToProcess }),
         });
+
         const data = await res.json();
         const newText = data.corrected ?? data.result;
-        if (newText && newText !== lastCorrectedRef.current) {
+        if (newText) {
           const cleaned = removeSurroundingQuotes(newText);
           setMessage(cleaned);
-          lastCorrectedRef.current = cleaned;
+          rawInputRef.current = textToProcess; // ✅ track last raw input
         }
       } catch (err) {
         console.error("Text processing failed:", err);
       }
     };
-    processText();
+
+    processText(); // ✅ make sure it runs
   }, [debouncedMessage, spellingCorrection, textFormatter]);
+
+
 
   /** Smart Replies */
   useEffect(() => {

@@ -11,13 +11,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const systemPrompt =
-      "Fix spelling mistakes of the following text, return only the corrected version, or the original if none. Never add comments:";
-    const openaiBody = {
+   const systemPrompt = `
+Fix spelling mistakes of the following text.
+Return only the corrected text (no explanations, no quotes).
+`;
+ const openaiBody = {
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `"""${input_text}"""` },
+        { role: "user", content: `${input_text}` },
       ],
       max_tokens: 1000,
       temperature: 0,
@@ -53,7 +55,7 @@ export async function POST(req: NextRequest) {
 
     return new Response(
       JSON.stringify({
-        corrected: json.choices?.[0]?.message?.content?.trim() || "",
+        result: json.choices?.[0]?.message?.content?.trim() || "",
       }),
       {
         status: 200,

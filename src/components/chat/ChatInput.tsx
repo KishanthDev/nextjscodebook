@@ -11,7 +11,6 @@ export function removeSurroundingQuotes(text: string) {
   return text.replace(/^"+|"+$/g, "");
 }
 
-
 type Props = {
   settings: ChatWidgetSettings;
   onSend: (message: string) => void;
@@ -21,54 +20,61 @@ type Props = {
 
 export default function ChatInput({ settings, onSend, onEmojiClick, onAttachmentClick }: Props) {
   const [message, setMessage] = useState("");
-  const { spellingCorrection } = useAIConfig();
+  const { spellingCorrection, textFormatter } = useAIConfig();
   const debouncedMessage = useDebounce(message, 2000);
 
-  // Track last corrected message to avoid repeat API calls
-  const lastCorrectedRef = useRef<string>("");
-
+  const lastProcessedRef = useRef<string>("");
   const sentRef = useRef(false);
 
   const handleSend = () => {
     if (message.trim()) {
       onSend(message.trim());
       setMessage("");
-      lastCorrectedRef.current = ""; // reset last corrected
-      sentRef.current = true; // mark that we just sent
+      lastProcessedRef.current = "";
+      sentRef.current = true;
     }
   };
 
   useEffect(() => {
-    const fixSpelling = async () => {
-      if (!spellingCorrection) return;
-      const textToCorrect = debouncedMessage.trim();
-      if (!textToCorrect || textToCorrect === lastCorrectedRef.current) return;
+    const processText = async () => {
+      const text = debouncedMessage.trim();
+      if (!text) return;
 
-      // Skip if we just sent a message
+      // skip if just sent
       if (sentRef.current) {
-        sentRef.current = false; // reset flag
+        sentRef.current = false;
         return;
       }
 
+      // skip if already processed
+      if (text === lastProcessedRef.current) return;
+
+      let endpoint = "";
+      if (spellingCorrection) endpoint = "/api/correct-spelling";
+      if (textFormatter) endpoint = "/api/text-format";
+
+      if (!endpoint) return;
+
       try {
-        const res = await fetch("/api/correct-spelling", {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input_text: textToCorrect }),
+          body: JSON.stringify({ input_text: text }),
         });
         const data = await res.json();
-        if (data.corrected && data.corrected !== message) {
-          const cleaned = removeSurroundingQuotes(data.corrected);
+        if (data.result && data.result !== message) {
+          const cleaned = removeSurroundingQuotes(data.result);
           setMessage(cleaned);
-          lastCorrectedRef.current = cleaned;
+          lastProcessedRef.current = cleaned;
         }
+
       } catch (err) {
-        console.error("Spelling correction failed:", err);
+        console.error("Text processing failed:", err);
       }
     };
 
-    fixSpelling();
-  }, [debouncedMessage, spellingCorrection, message]);
+    processText();
+  }, [debouncedMessage, spellingCorrection, textFormatter]);
 
   return (
     <div className="flex items-center gap-2 border-t bg-white px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900">

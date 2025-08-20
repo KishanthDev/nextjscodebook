@@ -1,6 +1,6 @@
 "use client";
 
-import { Paperclip, Send, Smile } from "lucide-react";
+import { MessageCircleReplyIcon, Paperclip, Send, Smile } from "lucide-react";
 import { ChatWidgetSettings } from "@/types/Modifier";
 import { useState, useEffect, useRef } from "react";
 import { useAIConfig } from "@/stores/aiConfig";
@@ -128,74 +128,90 @@ export default function ChatInput({ settings, suggestedReply, onSend, onEmojiCli
   }, [debouncedMessage, userExpression]);
 
   return (
-    <div className="flex flex-col gap-2 border-t bg-white px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900">
-      {/* Input row */}
-      <div className="flex items-center gap-2">
-        <button
-          title="emoji"
-          className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
-          onClick={onEmojiClick}
-        >
-          <Smile size={20} style={{ color: settings.sendBtnIconColor }} />
-        </button>
-        <button
-          title="attachment"
-          className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
-          onClick={onAttachmentClick}
-        >
-          <Paperclip size={20} style={{ color: settings.sendBtnIconColor }} />
-        </button>
-        <input
-          type="text"
-          placeholder={settings.inputPlaceholder || "Type your message..."}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-black focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-        />
+    <div className="m-2 w-[97%]">
+      {/* Row: Input (with border) + Send Btn outside */}
+      <div className="flex items-center">
+        {/* Typing area inside border */}
+        <div className="flex-1 border rounded-lg px-4 pt-2 pb-8 relative">
+          {/* Input */}
+          <input
+            type="text"
+            placeholder={settings.inputPlaceholder || "Write a message..."}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            className="w-full bg-transparent text-black dark:text-white 
+                     placeholder-gray-400 dark:placeholder-gray-500 
+                     focus:outline-none pr-20"
+          />
+
+          {/* Emoji + Attachments bottom-right */}
+          <div className="absolute bottom-2 right-2 flex gap-2">
+            <button
+              title="emoji"
+              onClick={onEmojiClick}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+            >
+              <Smile size={20} style={{ color: settings.sendBtnIconColor }} />
+            </button>
+            <button
+              title="attachment"
+              onClick={onAttachmentClick}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+            >
+              <Paperclip size={20} style={{ color: settings.sendBtnIconColor }} />
+            </button>
+            <button
+              title="reply"
+              onClick={onEmojiClick}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+            >
+              <MessageCircleReplyIcon size={20} style={{ color: settings.sendBtnIconColor }} />
+            </button>
+          </div>
+        </div>
+
+        {/* Send button right OUTSIDE */}
         <button
           title="send"
-          className="rounded-lg p-1"
-          style={{
-            backgroundColor: message.trim() ? settings.sendBtnBgColor : "transparent",
-            color: settings.sendBtnIconColor,
-          }}
           onClick={handleSend}
           disabled={!message.trim()}
+          className="ml-2 rounded-full p-2 transition-colors"
+          style={{
+            backgroundColor: message.trim()
+              ? settings.sendBtnBgColor
+              : "transparent",
+            color: settings.sendBtnIconColor,
+          }}
         >
           <Send size={20} />
         </button>
       </div>
 
-      {/* Smart Replies */}
-      {smartReplies.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
-          {smartReplies.map((reply, idx) => (
-            <button
-              key={idx}
-              onClick={() => setMessage(reply)}
-              className="bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100"
-            >
-              {reply}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Smart Replies + User Expressions BELOW, centered */}
+      <div className="mt-2 flex flex-wrap justify-center gap-2">
+        {smartReplies.map((reply, idx) => (
+          <button
+            key={idx}
+            onClick={() => setMessage(reply)}
+            className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg 
+                     hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100"
+          >
+            {reply}
+          </button>
+        ))}
 
-      {/* User Expressions */}
-      {userExpressions.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
-          {userExpressions.map((expr, idx) => (
-            <button
-              key={idx}
-              onClick={() => setMessage(expr)}
-              className="bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 dark:bg-green-900 dark:text-green-100"
-            >
-              {expr}
-            </button>
-          ))}
-        </div>
-      )}
+        {userExpressions.map((expr, idx) => (
+          <button
+            key={idx}
+            onClick={() => setMessage(expr)}
+            className="bg-green-100 text-green-800 px-3 py-1 rounded-lg 
+                     hover:bg-green-200 dark:bg-green-900 dark:text-green-100"
+          >
+            {expr}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

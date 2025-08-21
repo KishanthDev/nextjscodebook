@@ -12,8 +12,6 @@ import UserExpressions from "./UserExpressions";
 type Props = {
   settings: ChatWidgetSettings;
   onSend: (message: string) => void;
-  onEmojiClick?: () => void;
-  onAttachmentClick?: () => void;
   suggestedReply?: string;
 };
 
@@ -25,8 +23,6 @@ export default function ChatInput({
   settings,
   suggestedReply,
   onSend,
-  onEmojiClick,
-  onAttachmentClick,
 }: Props) {
   const [message, setMessage] = useState("");
   const [smartReplies, setSmartReplies] = useState<string[]>([]);
@@ -135,8 +131,6 @@ export default function ChatInput({
           message={message}
           setMessage={setMessage}
           settings={settings}
-          onEmojiClick={onEmojiClick}
-          onAttachmentClick={onAttachmentClick}
           onSend={handleSend}
         />
         <ChatSendButton

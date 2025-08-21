@@ -145,8 +145,6 @@ export default function ChatUI() {
             settings={chatWidgetSettings}
             onSend={handleSendMessage}
             suggestedReply={suggestedReply}
-            onEmojiClick={() => alert('Emoji picker not implemented yet')}
-            onAttachmentClick={() => alert('Attachment upload not implemented yet')}
           />
         )}
       </div>

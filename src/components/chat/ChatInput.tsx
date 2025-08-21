@@ -1,25 +1,33 @@
 "use client";
 
-import { MessageCircleReplyIcon, Paperclip, Send, Smile } from "lucide-react";
-import { ChatWidgetSettings } from "@/types/Modifier";
 import { useState, useEffect, useRef } from "react";
 import { useAIConfig } from "@/stores/aiConfig";
 import { useDebounce } from "@/hooks/useDebounce";
-
-// Remove surrounding quotes helper
-export function removeSurroundingQuotes(text: string) {
-  return text.replace(/^"+|"+$/g, "");
-}
+import { ChatWidgetSettings } from "@/types/Modifier";
+import ChatInputBox from "./ChatInputBox";
+import ChatSendButton from "./ChatSendButton";
+import SmartReplies from "./SmartReplies";
+import UserExpressions from "./UserExpressions";
 
 type Props = {
   settings: ChatWidgetSettings;
   onSend: (message: string) => void;
   onEmojiClick?: () => void;
   onAttachmentClick?: () => void;
-  suggestedReply?: string
+  suggestedReply?: string;
 };
 
-export default function ChatInput({ settings, suggestedReply, onSend, onEmojiClick, onAttachmentClick }: Props) {
+export function removeSurroundingQuotes(text: string) {
+  return text.replace(/^"+|"+$/g, "");
+}
+
+export default function ChatInput({
+  settings,
+  suggestedReply,
+  onSend,
+  onEmojiClick,
+  onAttachmentClick,
+}: Props) {
   const [message, setMessage] = useState("");
   const [smartReplies, setSmartReplies] = useState<string[]>([]);
   const [userExpressions, setUserExpressions] = useState<string[]>([]);
@@ -27,28 +35,27 @@ export default function ChatInput({ settings, suggestedReply, onSend, onEmojiCli
   const { spellingCorrection, textFormatter, smartReply: smartReplyEnabled, userExpression } = useAIConfig();
 
   const debouncedMessage = useDebounce(message, 2000);
-  const lastCorrectedRef = useRef<string>(""); // tracks last corrected/formatted text
-  const sentRef = useRef(false); // prevent effect from firing right after send
+  const rawInputRef = useRef("");
+  const sentRef = useRef(false);
 
-  // Handle sending message
+  // Handle sending
   const handleSend = () => {
     if (message.trim()) {
       onSend(message.trim());
       setMessage("");
-      lastCorrectedRef.current = "";
-      sentRef.current = true; // prevent immediate debounce correction
+      rawInputRef.current = "";
+      sentRef.current = true;
       setSmartReplies([]);
       setUserExpressions([]);
     }
   };
 
+  // Suggested reply
   useEffect(() => {
-    if (suggestedReply) {
-      setMessage(suggestedReply);
-    }
+    if (suggestedReply) setMessage(suggestedReply);
   }, [suggestedReply]);
-  const rawInputRef = useRef("");
-  /** Spelling Correction / Text Formatting */
+
+  // Spelling / formatting
   useEffect(() => {
     const processText = async () => {
       const textToProcess = debouncedMessage.trim();
@@ -69,29 +76,24 @@ export default function ChatInput({ settings, suggestedReply, onSend, onEmojiCli
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ input_text: textToProcess }),
         });
-
         const data = await res.json();
         const newText = data.corrected ?? data.result;
         if (newText) {
           const cleaned = removeSurroundingQuotes(newText);
           setMessage(cleaned);
-          rawInputRef.current = textToProcess; // ✅ track last raw input
+          rawInputRef.current = textToProcess;
         }
       } catch (err) {
         console.error("Text processing failed:", err);
       }
     };
-
-    processText(); // ✅ make sure it runs
+    processText();
   }, [debouncedMessage, spellingCorrection, textFormatter]);
 
-
-
-  /** Smart Replies */
+  // Smart replies
   useEffect(() => {
     const fetchSmartReplies = async () => {
       if (!smartReplyEnabled || !message.trim()) return;
-
       try {
         const res = await fetch("/api/smart-reply", {
           method: "POST",
@@ -107,11 +109,10 @@ export default function ChatInput({ settings, suggestedReply, onSend, onEmojiCli
     fetchSmartReplies();
   }, [debouncedMessage, smartReplyEnabled]);
 
-  /** User Expressions */
+  // User expressions
   useEffect(() => {
     const fetchUserExpressions = async () => {
       if (!userExpression || !message.trim()) return;
-
       try {
         const res = await fetch("/api/user-expressions", {
           method: "POST",
@@ -129,88 +130,25 @@ export default function ChatInput({ settings, suggestedReply, onSend, onEmojiCli
 
   return (
     <div className="m-2 w-[97%]">
-      {/* Row: Input (with border) + Send Btn outside */}
       <div className="flex items-center">
-        {/* Typing area inside border */}
-        <div className="flex-1 border rounded-lg px-4 pt-2 pb-8 relative">
-          {/* Input */}
-          <input
-            type="text"
-            placeholder={settings.inputPlaceholder || "Write a message..."}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            className="w-full bg-transparent text-black dark:text-white 
-                     placeholder-gray-400 dark:placeholder-gray-500 
-                     focus:outline-none pr-20"
-          />
-
-          {/* Emoji + Attachments bottom-right */}
-          <div className="absolute bottom-2 right-2 flex gap-2">
-            <button
-              title="emoji"
-              onClick={onEmojiClick}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
-            >
-              <Smile size={20} style={{ color: settings.sendBtnIconColor }} />
-            </button>
-            <button
-              title="attachment"
-              onClick={onAttachmentClick}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
-            >
-              <Paperclip size={20} style={{ color: settings.sendBtnIconColor }} />
-            </button>
-            <button
-              title="reply"
-              onClick={onEmojiClick}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
-            >
-              <MessageCircleReplyIcon size={20} style={{ color: settings.sendBtnIconColor }} />
-            </button>
-          </div>
-        </div>
-
-        {/* Send button right OUTSIDE */}
-        <button
-          title="send"
-          onClick={handleSend}
-          disabled={!message.trim()}
-          className="ml-2 rounded-full p-2 transition-colors"
-          style={{
-            backgroundColor: message.trim()
-              ? settings.sendBtnBgColor
-              : "transparent",
-            color: settings.sendBtnIconColor,
-          }}
-        >
-          <Send size={20} />
-        </button>
+        <ChatInputBox
+          message={message}
+          setMessage={setMessage}
+          settings={settings}
+          onEmojiClick={onEmojiClick}
+          onAttachmentClick={onAttachmentClick}
+          onSend={handleSend}
+        />
+        <ChatSendButton
+          message={message}
+          settings={settings}
+          onSend={handleSend}
+        />
       </div>
 
-      {/* Smart Replies + User Expressions BELOW, centered */}
       <div className="mt-2 flex flex-wrap justify-center gap-2">
-        {smartReplies.map((reply, idx) => (
-          <button
-            key={idx}
-            onClick={() => setMessage(reply)}
-            className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg 
-                     hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100"
-          >
-            {reply}
-          </button>
-        ))}
-
-        {userExpressions.map((expr, idx) => (
-          <button
-            key={idx}
-            onClick={() => setMessage(expr)}
-            className="bg-green-100 text-green-800 px-3 py-1 rounded-lg 
-                     hover:bg-green-200 dark:bg-green-900 dark:text-green-100"
-          >
-            {expr}
-          </button>
-        ))}
+        <SmartReplies replies={smartReplies} onSelect={setMessage} />
+        <UserExpressions expressions={userExpressions} onSelect={setMessage} />
       </div>
     </div>
   );

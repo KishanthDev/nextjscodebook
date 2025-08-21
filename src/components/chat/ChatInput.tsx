@@ -16,49 +16,38 @@ type Props = {
   onSend: (message: string) => void;
   onEmojiClick?: () => void;
   onAttachmentClick?: () => void;
-  suggestedReply?: string;
+  suggestedReply?: string
 };
 
-export default function ChatInput({
-  settings,
-  suggestedReply,
-  onSend,
-  onEmojiClick,
-  onAttachmentClick,
-}: Props) {
+export default function ChatInput({ settings, suggestedReply, onSend, onEmojiClick, onAttachmentClick }: Props) {
   const [message, setMessage] = useState("");
   const [smartReplies, setSmartReplies] = useState<string[]>([]);
   const [userExpressions, setUserExpressions] = useState<string[]>([]);
-  const [showSmartReplies, setShowSmartReplies] = useState(false);
 
   const { spellingCorrection, textFormatter, smartReply: smartReplyEnabled, userExpression } = useAIConfig();
 
   const debouncedMessage = useDebounce(message, 2000);
-  const lastCorrectedRef = useRef<string>("");
-  const sentRef = useRef(false);
+  const lastCorrectedRef = useRef<string>(""); // tracks last corrected/formatted text
+  const sentRef = useRef(false); // prevent effect from firing right after send
 
-  /** Handle sending message */
+  // Handle sending message
   const handleSend = () => {
     if (message.trim()) {
       onSend(message.trim());
       setMessage("");
       lastCorrectedRef.current = "";
-      sentRef.current = true;
+      sentRef.current = true; // prevent immediate debounce correction
       setSmartReplies([]);
       setUserExpressions([]);
-      setShowSmartReplies(false);
     }
   };
 
-  /** Handle suggested reply */
   useEffect(() => {
     if (suggestedReply) {
       setMessage(suggestedReply);
     }
   }, [suggestedReply]);
-
   const rawInputRef = useRef("");
-
   /** Spelling Correction / Text Formatting */
   useEffect(() => {
     const processText = async () => {
@@ -86,37 +75,37 @@ export default function ChatInput({
         if (newText) {
           const cleaned = removeSurroundingQuotes(newText);
           setMessage(cleaned);
-          rawInputRef.current = textToProcess;
+          rawInputRef.current = textToProcess; // ✅ track last raw input
         }
       } catch (err) {
         console.error("Text processing failed:", err);
       }
     };
 
-    processText();
+    processText(); // ✅ make sure it runs
   }, [debouncedMessage, spellingCorrection, textFormatter]);
 
-  /** Fetch Smart Replies (popup) */
-const fetchSmartReplies = async (prompt?: string) => {
-  if (!smartReplyEnabled) return;
-  try {
-    const res = await fetch("/api/smart-reply", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input_text: prompt || message.trim() }),
-    });
 
-    if (!res.ok) throw new Error("Failed to fetch smart replies");
-    const data = await res.json();
 
-    if (Array.isArray(data.replies)) {
-      setSmartReplies(data.replies.slice(0, 3));
-    }
-  } catch (err) {
-    console.error("Error fetching smart replies:", err);
-  }
-};
+  /** Smart Replies */
+  useEffect(() => {
+    const fetchSmartReplies = async () => {
+      if (!smartReplyEnabled || !message.trim()) return;
 
+      try {
+        const res = await fetch("/api/smart-reply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input_text: message.trim() }),
+        });
+        const data = await res.json();
+        if (Array.isArray(data.replies)) setSmartReplies(data.replies.slice(0, 3));
+      } catch (err) {
+        console.error("Smart replies fetch failed:", err);
+      }
+    };
+    fetchSmartReplies();
+  }, [debouncedMessage, smartReplyEnabled]);
 
   /** User Expressions */
   useEffect(() => {
@@ -140,9 +129,11 @@ const fetchSmartReplies = async (prompt?: string) => {
 
   return (
     <div className="m-2 w-[97%]">
-      {/* Row: Input (bordered) + Send Btn outside */}
-      <div className="flex items-center relative">
+      {/* Row: Input (with border) + Send Btn outside */}
+      <div className="flex items-center">
+        {/* Typing area inside border */}
         <div className="flex-1 border rounded-lg px-4 pt-2 pb-8 relative">
+          {/* Input */}
           <input
             type="text"
             placeholder={settings.inputPlaceholder || "Write a message..."}
@@ -154,7 +145,7 @@ const fetchSmartReplies = async (prompt?: string) => {
                      focus:outline-none pr-20"
           />
 
-          {/* Emoji + Attachments + Reply (popup trigger) */}
+          {/* Emoji + Attachments bottom-right */}
           <div className="absolute bottom-2 right-2 flex gap-2">
             <button
               title="emoji"
@@ -170,53 +161,17 @@ const fetchSmartReplies = async (prompt?: string) => {
             >
               <Paperclip size={20} style={{ color: settings.sendBtnIconColor }} />
             </button>
-
-            {/* Reply popup */}
-            <div className="relative">
-              <button
-                title="reply"
-                onClick={async () => {
-                  try {
-                    await fetchSmartReplies(); // always try fetch
-                    setShowSmartReplies((prev) => !prev);
-                  } catch (err) {
-                    console.error("Smart reply fetch failed:", err);
-                  }
-                }}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
-              >
-                <MessageCircleReplyIcon size={20} style={{ color: settings.sendBtnIconColor }} />
-              </button>
-
-              {showSmartReplies && (
-                <div className="absolute bottom-8 right-0 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-2 z-10 min-w-[200px]">
-                  {smartReplies.length > 0 ? (
-                    smartReplies.map((reply, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          setMessage(reply);
-                          setShowSmartReplies(false);
-                        }}
-                        className="block w-full text-left px-3 py-1 rounded-md 
-                          hover:bg-gray-100 dark:hover:bg-gray-700 
-                          text-gray-800 dark:text-gray-200"
-                      >
-                        {reply}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
-                      Loading smart replies...
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            <button
+              title="reply"
+              onClick={onEmojiClick}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+            >
+              <MessageCircleReplyIcon size={20} style={{ color: settings.sendBtnIconColor }} />
+            </button>
           </div>
         </div>
 
-        {/* Send button OUTSIDE */}
+        {/* Send button right OUTSIDE */}
         <button
           title="send"
           onClick={handleSend}
@@ -233,21 +188,30 @@ const fetchSmartReplies = async (prompt?: string) => {
         </button>
       </div>
 
-      {/* User Expressions BELOW */}
-      {userExpressions.length > 0 && (
-        <div className="mt-2 flex flex-wrap justify-center gap-2">
-          {userExpressions.map((expr, idx) => (
-            <button
-              key={idx}
-              onClick={() => setMessage(expr)}
-              className="bg-green-100 text-green-800 px-3 py-1 rounded-lg 
-                       hover:bg-green-200 dark:bg-green-900 dark:text-green-100"
-            >
-              {expr}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Smart Replies + User Expressions BELOW, centered */}
+      <div className="mt-2 flex flex-wrap justify-center gap-2">
+        {smartReplies.map((reply, idx) => (
+          <button
+            key={idx}
+            onClick={() => setMessage(reply)}
+            className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg 
+                     hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100"
+          >
+            {reply}
+          </button>
+        ))}
+
+        {userExpressions.map((expr, idx) => (
+          <button
+            key={idx}
+            onClick={() => setMessage(expr)}
+            className="bg-green-100 text-green-800 px-3 py-1 rounded-lg 
+                     hover:bg-green-200 dark:bg-green-900 dark:text-green-100"
+          >
+            {expr}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

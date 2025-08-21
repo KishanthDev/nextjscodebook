@@ -124,6 +124,20 @@ export default function ChatInput({
     fetchUserExpressions();
   }, [debouncedMessage, userExpression]);
 
+  // Handle Smart Reply selection
+  const handleSmartReplySelect = (reply: string) => {
+    setMessage(reply);
+    setSmartReplies([]);     // 🔹 remove smart replies
+  };
+
+  // Handle User Expression selection
+  const handleUserExpressionSelect = (expression: string) => {
+    setMessage(expression);
+    setUserExpressions([]);  // 🔹 remove user expressions
+  };
+
+
+
   return (
     <div className="m-2 w-[97%]">
       <div className="flex items-center">
@@ -141,8 +155,8 @@ export default function ChatInput({
       </div>
 
       <div className="mt-2 flex flex-wrap justify-center gap-2">
-        <SmartReplies replies={smartReplies} onSelect={setMessage} />
-        <UserExpressions expressions={userExpressions} onSelect={setMessage} />
+        <SmartReplies replies={smartReplies} onSelect={handleSmartReplySelect} />
+        <UserExpressions expressions={userExpressions} onSelect={handleUserExpressionSelect} />
       </div>
     </div>
   );

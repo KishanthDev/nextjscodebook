@@ -28,7 +28,7 @@ export default function ChatInput({
   const [smartReplies, setSmartReplies] = useState<string[]>([]);
   const [userExpressions, setUserExpressions] = useState<string[]>([]);
 
-  const { spellingCorrection, textFormatter, smartReply: smartReplyEnabled, userExpression } = useAIConfig();
+  const { smartReply: smartReplyEnabled, userExpression } = useAIConfig();
 
   const debouncedMessage = useDebounce(message, 2000);
   const rawInputRef = useRef("");
@@ -50,41 +50,6 @@ export default function ChatInput({
   useEffect(() => {
     if (suggestedReply) setMessage(suggestedReply);
   }, [suggestedReply]);
-
-  // Spelling / formatting
-  useEffect(() => {
-    const processText = async () => {
-      const textToProcess = debouncedMessage.trim();
-      if (!textToProcess || textToProcess === rawInputRef.current) return;
-      if (sentRef.current) {
-        sentRef.current = false;
-        return;
-      }
-
-      let endpoint = "";
-      if (spellingCorrection) endpoint = "/api/correct-spelling";
-      if (textFormatter) endpoint = "/api/text-format";
-      if (!endpoint) return;
-
-      try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input_text: textToProcess }),
-        });
-        const data = await res.json();
-        const newText = data.corrected ?? data.result;
-        if (newText) {
-          const cleaned = removeSurroundingQuotes(newText);
-          setMessage(cleaned);
-          rawInputRef.current = textToProcess;
-        }
-      } catch (err) {
-        console.error("Text processing failed:", err);
-      }
-    };
-    processText();
-  }, [debouncedMessage, spellingCorrection, textFormatter]);
 
   // Smart replies
   useEffect(() => {

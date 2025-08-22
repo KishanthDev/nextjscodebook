@@ -6,6 +6,7 @@ import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { Smile, Paperclip, SpellCheck, Type } from "lucide-react";
 import { ChatWidgetSettings } from "@/types/Modifier";
 import { useAIConfig } from "@/stores/aiConfig";
+import ChatInputBoxFooter from "./ChatInputBoxFooter";
 
 type Props = {
   message: string;
@@ -157,13 +158,7 @@ export default function ChatInputBox({
       </div>
 
       {/* 🔹 Footer (Smart Replies etc.) */}
-      {footer && (
-        <div className="absolute bottom-2 left-2 flex gap-2 max-w-[70%] overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
-          <div className="flex gap-2">
-            {footer}
-          </div>
-        </div>
-      )}
+      {footer && <ChatInputBoxFooter>{footer}</ChatInputBoxFooter>}
 
     </div>
   );

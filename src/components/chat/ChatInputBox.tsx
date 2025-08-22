@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import { Smile, Paperclip, MessageCircleReplyIcon } from "lucide-react";
+import { Smile, Paperclip, MessageCircleReplyIcon, SpellCheck } from "lucide-react";
 import { ChatWidgetSettings } from "@/types/Modifier";
 
 type Props = {
@@ -50,7 +50,7 @@ export default function ChatInputBox({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      alert(`Selected file: ${file.name}`); 
+      alert(`Selected file: ${file.name}`);
       // 🚀file to backend upload
     }
   };
@@ -86,14 +86,27 @@ export default function ChatInputBox({
 
       {/* Action buttons */}
       <div className="absolute bottom-2 right-2 flex gap-2">
-        <button type="button" title="emoji" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+        <button
+          type="button"
+          title="emoji"
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          className="cursor-pointer"
+        >
           <Smile size={20} style={{ color: settings.sendBtnIconColor }} />
         </button>
-        <button type="button" title="attachment" onClick={handleAttachmentClick}>
+        <button
+          type="button"
+          title="attachment"
+          onClick={handleAttachmentClick}
+          className="cursor-pointer"
+        >
           <Paperclip size={20} style={{ color: settings.sendBtnIconColor }} />
         </button>
-        <button type="button" title="reply">
+        <button type="button" title="reply" className="cursor-pointer">
           <MessageCircleReplyIcon size={20} style={{ color: settings.sendBtnIconColor }} />
+        </button>
+        <button type="button" title="spelling check" className="cursor-pointer">
+          <SpellCheck size={20} style={{ color: settings.sendBtnIconColor }} />
         </button>
       </div>
     </div>

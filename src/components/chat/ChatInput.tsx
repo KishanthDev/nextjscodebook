@@ -111,6 +111,10 @@ export default function ChatInput({
           setMessage={setMessage}
           settings={settings}
           onSend={handleSend}
+          footer={
+
+            <SmartReplies replies={smartReplies} onSelect={handleSmartReplySelect} />
+          }
         />
         <ChatSendButton
           message={message}
@@ -120,7 +124,6 @@ export default function ChatInput({
       </div>
 
       <div className="mt-2 flex flex-wrap justify-center gap-2">
-        <SmartReplies replies={smartReplies} onSelect={handleSmartReplySelect} />
         <UserExpressions expressions={userExpressions} onSelect={handleUserExpressionSelect} />
       </div>
     </div>

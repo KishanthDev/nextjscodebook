@@ -5,17 +5,16 @@ type Props = {
 
 export default function SmartReplies({ replies, onSelect }: Props) {
   return (
-    <>
+    <div className="flex gap-2 overflow-x-auto no-scrollbar">
       {replies.map((reply, idx) => (
         <button
           key={idx}
           onClick={() => onSelect(reply)}
-          className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg 
-                     hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100"
+          className="px-3 py-1 rounded-full bg-blue-500 text-white text-sm whitespace-nowrap hover:bg-blue-600 transition"
         >
           {reply}
         </button>
       ))}
-    </>
+    </div>
   );
 }

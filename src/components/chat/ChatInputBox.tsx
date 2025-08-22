@@ -1,16 +1,18 @@
+// ChatInputBox.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, ReactNode } from "react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import { Smile, Paperclip, MessageCircleReplyIcon, SpellCheck, Type } from "lucide-react";
+import { Smile, Paperclip, SpellCheck, Type } from "lucide-react";
 import { ChatWidgetSettings } from "@/types/Modifier";
-import { useAIConfig } from "@/stores/aiConfig"; // ✅ get AI feature toggles
+import { useAIConfig } from "@/stores/aiConfig";
 
 type Props = {
   message: string;
   setMessage: (msg: string) => void;
   settings: ChatWidgetSettings;
   onSend: () => void;
+  footer?: ReactNode; // 🔹 slot for smart replies / expressions
 };
 
 export default function ChatInputBox({
@@ -18,20 +20,19 @@ export default function ChatInputBox({
   setMessage,
   settings,
   onSend,
+  footer,
 }: Props) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // ✅ grab config state
   const { spellingCorrection, textFormatter } = useAIConfig();
 
-  // auto resize until max height
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height =
-        Math.min(textareaRef.current.scrollHeight, 160) + "px"; // limit to ~6 lines
+        Math.min(textareaRef.current.scrollHeight, 160) + "px";
     }
   }, [message]);
 
@@ -47,19 +48,15 @@ export default function ChatInputBox({
     setShowEmojiPicker(false);
   };
 
-  const handleAttachmentClick = () => {
-    fileInputRef.current?.click(); // open file dialog
-  };
+  const handleAttachmentClick = () => fileInputRef.current?.click();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
+    if (e.target.files?.length) {
       const file = e.target.files[0];
       alert(`Selected file: ${file.name}`);
-      // 🚀file to backend upload
     }
   };
 
-  // 🔹 click handlers for AI actions
   const handleFormatClick = async () => {
     if (!textFormatter || !message.trim()) return;
     try {
@@ -137,29 +134,37 @@ export default function ChatInputBox({
         >
           <Paperclip size={20} style={{ color: settings.sendBtnIconColor }} />
         </button>
-
-        {/* Text Format button */}
         <button
           type="button"
           title="text format"
           onClick={handleFormatClick}
-          disabled={!textFormatter} // 🔹 disable if feature not enabled
-          className={`cursor-pointer ${!textFormatter ? "opacity-50 cursor-not-allowed" : ""}`}
+          disabled={!textFormatter}
+          className={`cursor-pointer ${!textFormatter ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
           <Type size={20} style={{ color: settings.sendBtnIconColor }} />
         </button>
-
-        {/* Spell Check button */}
         <button
           type="button"
           title="spelling check"
           onClick={handleSpellCheckClick}
-          disabled={!spellingCorrection} // 🔹 disable if feature not enabled
-          className={`cursor-pointer ${!spellingCorrection ? "opacity-50 cursor-not-allowed" : ""}`}
+          disabled={!spellingCorrection}
+          className={`cursor-pointer ${!spellingCorrection ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
           <SpellCheck size={20} style={{ color: settings.sendBtnIconColor }} />
         </button>
       </div>
+
+      {/* 🔹 Footer (Smart Replies etc.) */}
+      {footer && (
+        <div className="absolute bottom-2 left-2 flex gap-2 max-w-[70%] overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
+          <div className="flex gap-2">
+            {footer}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

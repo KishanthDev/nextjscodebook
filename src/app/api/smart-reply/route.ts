@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     }
 
     const systemPrompt = `
-      You are a smart reply generator. Given a user message, generate 3 short, natural, contextually relevant replies.
+      You are a smart reply generator. Given a user message, generate 3 short, natural, contextually relevant replies(max 6 words each).
       Only return a JSON array of strings, like ["Hi!", "Hello!", "Hey!"]. Do not include extra text or quotes outside the array.
     `;
 

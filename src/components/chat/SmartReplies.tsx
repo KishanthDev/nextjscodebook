@@ -11,7 +11,7 @@ export default function SmartReplies({ replies, onSelect }: Props) {
         <button
           key={idx}
           onClick={() => onSelect(reply)}
-          className="px-3 py-1 rounded-full bg-blue-500 text-white text-sm whitespace-nowrap hover:bg-blue-600 transition"
+          className="px-1.5 py-1 rounded-full bg-blue-500 text-white text-xs whitespace-nowrap hover:bg-blue-600 transition"
         >
           {reply}
         </button>

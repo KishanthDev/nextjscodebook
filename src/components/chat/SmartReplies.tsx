@@ -3,9 +3,10 @@ type Props = {
   onSelect: (reply: string) => void;
 };
 
+// SmartReplies.tsx
 export default function SmartReplies({ replies, onSelect }: Props) {
   return (
-    <div className="flex gap-2 overflow-x-auto no-scrollbar">
+    <div className="flex gap-2">
       {replies.map((reply, idx) => (
         <button
           key={idx}
@@ -18,3 +19,4 @@ export default function SmartReplies({ replies, onSelect }: Props) {
     </div>
   );
 }
+

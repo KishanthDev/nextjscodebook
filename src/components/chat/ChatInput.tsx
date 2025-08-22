@@ -112,7 +112,6 @@ export default function ChatInput({
           settings={settings}
           onSend={handleSend}
           footer={
-
             <SmartReplies replies={smartReplies} onSelect={handleSmartReplySelect} />
           }
         />

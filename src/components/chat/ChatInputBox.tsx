@@ -6,7 +6,6 @@ import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { Smile, Paperclip, SpellCheck, Type } from "lucide-react";
 import { ChatWidgetSettings } from "@/types/Modifier";
 import { useAIConfig } from "@/stores/aiConfig";
-import ChatInputBoxFooter from "./ChatInputBoxFooter";
 
 type Props = {
   message: string;
@@ -122,8 +121,8 @@ export default function ChatInputBox({
       <div className="flex items-center justify-between mt-2">
         {/* 🔹 Footer on the left */}
         {footer && (
-          <div className="flex-1">
-            <ChatInputBoxFooter>{footer}</ChatInputBoxFooter>
+          <div className="mt-2 max-w-[75%] overflow-x-auto scrollbar-thin">
+            {footer}
           </div>
         )}
 
@@ -150,9 +149,8 @@ export default function ChatInputBox({
             title="text format"
             onClick={handleFormatClick}
             disabled={!textFormatter}
-            className={`cursor-pointer ${
-              !textFormatter ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`cursor-pointer ${!textFormatter ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             <Type size={20} style={{ color: settings.sendBtnIconColor }} />
           </button>
@@ -161,9 +159,8 @@ export default function ChatInputBox({
             title="spelling check"
             onClick={handleSpellCheckClick}
             disabled={!spellingCorrection}
-            className={`cursor-pointer ${
-              !spellingCorrection ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`cursor-pointer ${!spellingCorrection ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             <SpellCheck
               size={20}

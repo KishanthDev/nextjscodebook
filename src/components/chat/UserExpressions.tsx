@@ -10,7 +10,7 @@ export default function UserExpressions({ expressions, onSelect }: Props) {
         <button
           key={idx}
           onClick={() => onSelect(expr)}
-          className="bg-green-100 text-green-800 px-3 py-1 rounded-lg 
+          className="bg-green-100 text-green-800 px-3 text-sm py-1 rounded-lg 
                      hover:bg-green-200 dark:bg-green-900 dark:text-green-100"
         >
           {expr}

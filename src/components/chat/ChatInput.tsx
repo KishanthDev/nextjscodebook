@@ -81,7 +81,7 @@ export default function ChatInput({
           body: JSON.stringify({ message: message.trim() }),
         });
         const data = await res.json();
-        if (Array.isArray(data.expressions)) setUserExpressions(data.expressions.slice(0, 5));
+        if (Array.isArray(data.expressions)) setUserExpressions(data.expressions.slice(0, 3));
       } catch (err) {
         console.error("User expressions fetch failed:", err);
       }
@@ -123,9 +123,13 @@ export default function ChatInput({
         />
       </div>
 
-      <div className="mt-2 flex flex-wrap justify-center gap-2">
-        <UserExpressions expressions={userExpressions} onSelect={handleUserExpressionSelect} />
+      <div className="mt-2 max-h-16 overflow-y-auto no-scrollbar flex flex-wrap justify-center gap-2">
+        <UserExpressions
+          expressions={userExpressions}
+          onSelect={handleUserExpressionSelect}
+        />
       </div>
+
     </div>
   );
 }

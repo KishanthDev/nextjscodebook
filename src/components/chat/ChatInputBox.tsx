@@ -13,7 +13,7 @@ type Props = {
   setMessage: (msg: string) => void;
   settings: ChatWidgetSettings;
   onSend: () => void;
-  footer?: ReactNode; // 🔹 slot for smart replies / expressions
+  footer?: ReactNode; // 🔹 smart replies / expressions
 };
 
 export default function ChatInputBox({
@@ -89,7 +89,8 @@ export default function ChatInputBox({
   };
 
   return (
-    <div className="flex-1 border rounded-lg px-4 pt-2 pb-10 relative">
+    <div className="flex flex-col w-full border rounded-lg px-4 pt-2 pb-3 relative">
+      {/* Textarea */}
       <textarea
         ref={textareaRef}
         placeholder={settings.inputPlaceholder || "Write a message..."}
@@ -97,7 +98,7 @@ export default function ChatInputBox({
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
         rows={1}
-        className="w-full resize-none overflow-y-auto bg-transparent text-black dark:text-white 
+        className="w-full  resize-none overflow-y-auto bg-transparent text-black dark:text-white 
                    placeholder-gray-400 dark:placeholder-gray-500 
                    focus:outline-none pr-20 max-h-40"
       />
@@ -117,49 +118,60 @@ export default function ChatInputBox({
         </div>
       )}
 
-      {/* Action buttons */}
-      <div className="absolute bottom-2 right-2 flex gap-2">
-        <button
-          type="button"
-          title="emoji"
-          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="cursor-pointer"
-        >
-          <Smile size={20} style={{ color: settings.sendBtnIconColor }} />
-        </button>
-        <button
-          type="button"
-          title="attachment"
-          onClick={handleAttachmentClick}
-          className="cursor-pointer"
-        >
-          <Paperclip size={20} style={{ color: settings.sendBtnIconColor }} />
-        </button>
-        <button
-          type="button"
-          title="text format"
-          onClick={handleFormatClick}
-          disabled={!textFormatter}
-          className={`cursor-pointer ${!textFormatter ? "opacity-50 cursor-not-allowed" : ""
+      {/* Footer + Action buttons in one row */}
+      <div className="flex items-center justify-between mt-2">
+        {/* 🔹 Footer on the left */}
+        {footer && (
+          <div className="flex-1">
+            <ChatInputBoxFooter>{footer}</ChatInputBoxFooter>
+          </div>
+        )}
+
+        {/* 🔹 Action buttons on the right */}
+        <div className="flex gap-2 ml-2">
+          <button
+            type="button"
+            title="emoji"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className="cursor-pointer"
+          >
+            <Smile size={20} style={{ color: settings.sendBtnIconColor }} />
+          </button>
+          <button
+            type="button"
+            title="attachment"
+            onClick={handleAttachmentClick}
+            className="cursor-pointer"
+          >
+            <Paperclip size={20} style={{ color: settings.sendBtnIconColor }} />
+          </button>
+          <button
+            type="button"
+            title="text format"
+            onClick={handleFormatClick}
+            disabled={!textFormatter}
+            className={`cursor-pointer ${
+              !textFormatter ? "opacity-50 cursor-not-allowed" : ""
             }`}
-        >
-          <Type size={20} style={{ color: settings.sendBtnIconColor }} />
-        </button>
-        <button
-          type="button"
-          title="spelling check"
-          onClick={handleSpellCheckClick}
-          disabled={!spellingCorrection}
-          className={`cursor-pointer ${!spellingCorrection ? "opacity-50 cursor-not-allowed" : ""
+          >
+            <Type size={20} style={{ color: settings.sendBtnIconColor }} />
+          </button>
+          <button
+            type="button"
+            title="spelling check"
+            onClick={handleSpellCheckClick}
+            disabled={!spellingCorrection}
+            className={`cursor-pointer ${
+              !spellingCorrection ? "opacity-50 cursor-not-allowed" : ""
             }`}
-        >
-          <SpellCheck size={20} style={{ color: settings.sendBtnIconColor }} />
-        </button>
+          >
+            <SpellCheck
+              size={20}
+              style={{ color: settings.sendBtnIconColor }}
+            />
+          </button>
+        </div>
       </div>
-
-      {/* 🔹 Footer (Smart Replies etc.) */}
-      {footer && <ChatInputBoxFooter>{footer}</ChatInputBoxFooter>}
-
     </div>
   );
 }

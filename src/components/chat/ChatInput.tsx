@@ -104,7 +104,7 @@ export default function ChatInput({
 
 
   return (
-    <div className="m-2 w-[97%]">
+    <div className="m-5 w-[97%]">
       <div className="flex items-center">
         <ChatInputBox
           message={message}

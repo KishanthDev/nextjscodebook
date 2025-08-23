@@ -118,7 +118,7 @@ export default function ChatInputBox({
       )}
 
       {/* Footer + Action buttons */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-1">
         {/* 🔹 Footer on the left (only if provided) */}
         {footer ? (
           <div className=" max-w-[75%] overflow-x-auto scrollbar-thin">

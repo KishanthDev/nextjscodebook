@@ -117,13 +117,15 @@ export default function ChatInputBox({
         </div>
       )}
 
-      {/* Footer + Action buttons in one row */}
-      <div className="flex items-center justify-between mt-2">
-        {/* 🔹 Footer on the left */}
-        {footer && (
-          <div className="mt-2 max-w-[75%] overflow-x-auto scrollbar-thin">
+      {/* Footer + Action buttons */}
+      <div className="flex items-center justify-between">
+        {/* 🔹 Footer on the left (only if provided) */}
+        {footer ? (
+          <div className=" max-w-[75%] overflow-x-auto scrollbar-thin">
             {footer}
           </div>
+        ) : (
+          <div /> // keeps flex alignment consistent
         )}
 
         {/* 🔹 Action buttons on the right */}
@@ -162,10 +164,7 @@ export default function ChatInputBox({
             className={`cursor-pointer ${!spellingCorrection ? "opacity-50 cursor-not-allowed" : ""
               }`}
           >
-            <SpellCheck
-              size={20}
-              style={{ color: settings.sendBtnIconColor }}
-            />
+            <SpellCheck size={20} style={{ color: settings.sendBtnIconColor }} />
           </button>
         </div>
       </div>

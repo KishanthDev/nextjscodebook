@@ -112,7 +112,12 @@ export default function ChatInput({
           settings={settings}
           onSend={handleSend}
           footer={
-            <SmartReplies replies={smartReplies} onSelect={handleSmartReplySelect} />
+            smartReplyEnabled && smartReplies.length > 0 && (
+              <SmartReplies
+                replies={smartReplies}
+                onSelect={handleSmartReplySelect}
+              />
+            )
           }
         />
         <ChatSendButton
@@ -122,12 +127,14 @@ export default function ChatInput({
         />
       </div>
 
-      <div className="mt-2 max-h-16 overflow-y-auto no-scrollbar flex flex-wrap justify-center gap-2">
-        <UserExpressions
-          expressions={userExpressions}
-          onSelect={handleUserExpressionSelect}
-        />
-      </div>
+      {userExpression && userExpressions.length > 0 && (
+        <div className="mt-2 max-h-16 overflow-y-auto no-scrollbar flex flex-wrap justify-center gap-2">
+          <UserExpressions
+            expressions={userExpressions}
+            onSelect={handleUserExpressionSelect}
+          />
+        </div>
+      )}
 
     </div>
   );

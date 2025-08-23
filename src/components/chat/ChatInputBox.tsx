@@ -88,7 +88,7 @@ export default function ChatInputBox({
   };
 
   return (
-    <div className="flex flex-col w-full border rounded-lg px-4 pt-2 pb-3 relative">
+    <div className="flex flex-col w-full border rounded-lg px-4 pt-2 pb-2 relative">
       {/* Textarea */}
       <textarea
         ref={textareaRef}
@@ -118,7 +118,7 @@ export default function ChatInputBox({
       )}
 
       {/* Footer + Action buttons */}
-      <div className="flex items-center justify-between pt-1">
+      <div className="flex items-center justify-between pt-2">
         {/* 🔹 Footer on the left (only if provided) */}
         {footer ? (
           <div className=" max-w-[75%] overflow-x-auto scrollbar-thin">

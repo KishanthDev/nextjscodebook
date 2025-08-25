@@ -56,14 +56,20 @@ export async function POST(req: Request) {
             .join("\n\n");
 
         const prompt = `
-You are an AI assistant. Only use the following website content to answer:
+You are an AI assistant. 
+Use the following website content if it is relevant to answer the question. 
 
-${topChunks}
+Relevant website content:
+${topChunks || "No relevant website content found."}
 
-Answer the user question in a friendly, conversational way.
-If the answer cannot be found in the content, say you don't have enough info.
+Rules:
+- Prefer using the website content if it directly answers the question.
+- If the website content is not relevant, you may also use your own knowledge to help the user.
+- Always answer in a friendly, conversational way.
+
 User question: ${question}
-    `;
+`;
+
 
         // Stream AI answer
         const { textStream } = await streamText({

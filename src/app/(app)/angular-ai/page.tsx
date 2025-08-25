@@ -1,102 +1,127 @@
-'use client';
+"use client";
 
-import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport } from 'ai';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react";
 
-export default function Page() {
-  const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({
-      api: '/api/openai',
-    }),
-  });
-  const [input, setInput] = useState('');
+type Message = {
+  role: "user" | "assistant";
+  text: string;
+};
+
+export default function AskPage() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll
+  // Auto-scroll to bottom when messages update
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleAsk = async () => {
+    if (!input.trim()) return;
+
+    // Add user message
+    setMessages((prev) => [...prev, { role: "user", text: input }]);
+    setInput("");
+    setLoading(true);
+
+    let botReply = "";
+
+    try {
+      const res = await fetch("/api/training", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: input }),
+      });
+
+      if (!res.body) throw new Error("No response body");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        botReply += decoder.decode(value, { stream: true });
+
+        // Update AI's streaming message
+        setMessages((prev) => {
+          const copy = [...prev];
+          // if AI already started replying, update last assistant message
+          if (copy[copy.length - 1]?.role === "assistant") {
+            copy[copy.length - 1].text = botReply;
+          } else {
+            copy.push({ role: "assistant", text: botReply });
+          }
+          return copy;
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: "❌ Something went wrong." },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col h-[calc(100vh-55px)] bg-gray-100">
       {/* Header */}
       <header className="bg-green-500 text-white p-4 text-lg font-semibold shadow-md">
-        Angular AI Chat
+        🤖 Ask the AI Assistant
       </header>
 
-      {/* Messages */}
+      {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.length === 0 && !error && (
+        {messages.length === 0 && !loading && (
           <p className="text-gray-500 text-center mt-10 italic">
-            No messages yet — start the conversation!
+            Ask me anything to get started!
           </p>
         )}
 
-        {error && (
-          <div className="text-red-600 text-center mt-6 p-3 bg-red-100 border border-red-300 rounded-lg">
-            <p className="font-semibold">⚠️ Oops, something went wrong</p>
-            <p className="text-sm mt-1">
-              {error.message || 'Unknown error occurred.'}
-            </p>
-          </div>
-        )}
-
-        {messages.map(message => (
+        {messages.map((msg, i) => (
           <div
-            key={message.id}
+            key={i}
             className={`flex ${
-              message.role === 'user' ? 'justify-end' : 'justify-start'
+              msg.role === "user" ? "justify-end" : "justify-start"
             }`}
           >
             <div
-              className={`max-w-xs px-4 py-2 rounded-2xl shadow whitespace-pre-line
+              className={`max-w-xs px-4 py-2 rounded-2xl shadow 
                 ${
-                  message.role === 'user'
-                    ? 'bg-green-500 text-white rounded-br-none'
-                    : 'bg-white text-gray-800 rounded-bl-none'
+                  msg.role === "user"
+                    ? "bg-green-500 text-white rounded-br-none"
+                    : "bg-white text-gray-800 rounded-bl-none"
                 }`}
             >
-              {/* Render message text directly */}
-              {message.parts
-                .filter(part => part.type === 'text')
-                .map((part, index) => (
-                  <p key={index} className="text-sm leading-relaxed">
-                    {part.text}
-                  </p>
-                ))}
+              {msg.text}
             </div>
           </div>
         ))}
         <div ref={chatEndRef} />
       </div>
 
-      {/* Input */}
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          if (input.trim()) {
-            sendMessage({ text: input });
-            setInput('');
-          }
-        }}
-        className="p-4 bg-white border-t border-gray-300 flex gap-3"
-      >
+      {/* Input Bar */}
+      <div className="p-4 bg-white border-t border-gray-300 flex gap-3">
         <input
           value={input}
-          onChange={e => setInput(e.target.value)}
-          disabled={status !== 'ready'}
-          placeholder="Type a message..."
+          onChange={(e) => setInput(e.target.value)}
+          disabled={loading}
+          placeholder="Type your question..."
           className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50"
         />
         <button
-          type="submit"
-          disabled={status !== 'ready'}
+          onClick={handleAsk}
+          disabled={loading}
           className="px-5 py-2 bg-green-500 text-white rounded-full font-medium hover:bg-green-600 transition disabled:opacity-50"
         >
-          {status === 'streaming' ? '...' : 'Send 🚀'}
+          {loading ? "..." : "Ask 🚀"}
         </button>
-      </form>
+      </div>
     </div>
   );
 }

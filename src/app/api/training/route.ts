@@ -5,7 +5,7 @@ import { openai } from "@ai-sdk/openai";
 import { OpenAI } from "openai";
 
 const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const TOP_K = 5; // increase to get more context
+const TOP_K = 5; // how many chunks to include
 
 export async function POST(req: Request) {
     try {
@@ -15,21 +15,43 @@ export async function POST(req: Request) {
         }
         const question = text;
 
-
         const client = await clientPromise;
         const db = client.db("mydb");
 
-        // ✅ fetch ALL chunks from all websites
+        // ✅ Fetch websites
         const sites = await db.collection("websites").find({}).toArray();
-        if (!sites.length) {
-            return NextResponse.json({ error: "No websites trained yet" }, { status: 404 });
+
+        // ✅ Fetch pdf embeddings
+        const pdfs = await db.collection("pdf_embeddings").find({}).toArray();
+
+        if (!sites.length && !pdfs.length) {
+            return NextResponse.json(
+                { error: "No training data found (websites or PDFs)" },
+                { status: 404 }
+            );
         }
 
-        const allChunks: { chunk: string; embedding: number[]; url: string }[] = [];
+        // Combine all chunks into one array
+        const allChunks: { chunk: string; embedding: number[]; source: string }[] = [];
+
+        // Websites → normalize
         for (const site of sites) {
             for (const c of site.chunks) {
-                allChunks.push({ ...c, url: site.url });
+                allChunks.push({
+                    chunk: c.chunk,
+                    embedding: c.embedding,
+                    source: `Website: ${site.url}`,
+                });
             }
+        }
+
+        // PDFs → normalize
+        for (const pdf of pdfs) {
+            allChunks.push({
+                chunk: pdf.chunk,
+                embedding: pdf.embedding,
+                source: `PDF: ${pdf.pdfName}`,
+            });
         }
 
         // Generate embedding for user question
@@ -48,28 +70,35 @@ export async function POST(req: Request) {
         };
 
         // Score all chunks
-        const scored = allChunks.map(c => ({ ...c, score: cosineSim(qEmbedding, c.embedding) }));
+        const scored = allChunks.map(c => ({
+            ...c,
+            score: cosineSim(qEmbedding, c.embedding),
+        }));
+
+        // Pick top K chunks
         const topChunks = scored
             .sort((a, b) => b.score - a.score)
             .slice(0, TOP_K)
-            .map(c => `From ${c.url}:\n${c.chunk}`)
+            .map(c => `${c.source}:\n${c.chunk}`)
             .join("\n\n");
 
+        // Build prompt
         const prompt = `
-You are an AI assistant. 
-Use the following website content if it is relevant to answer the question. 
+You are an AI assistant.
+Use the following combined content from both websites and PDFs if it is relevant to answer the question. 
 
-Relevant website content:
-${topChunks || "No relevant website content found."}
+Relevant training content:
+${topChunks || "No relevant context found."}
 
 Rules:
-- Prefer using the website content if it directly answers the question.
-- If the website content is not relevant, you may also use your own knowledge to help the user.
-- Always answer in a friendly, conversational way.
+- Only use the above training content (both websites + PDFs).
+- Never guess or make assumptions beyond the provided content.
+- If the content above does not contain the answer, reply with exactly:
+  "Sorry, I am not yet trained for this data."
+- Keep the response short, clear, and conversational.
 
 User question: ${question}
 `;
-
 
         // Stream AI answer
         const { textStream } = await streamText({

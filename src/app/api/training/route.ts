@@ -3,9 +3,10 @@ import clientPromise from "@/lib/mongodb";
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { OpenAI } from "openai";
+import { cosineSimilarity } from "@/lib/similarity";
 
 const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const TOP_K = 5; // how many chunks to include
+const TOP_K = 5;
 
 export async function POST(req: Request) {
     try {
@@ -18,15 +19,58 @@ export async function POST(req: Request) {
         const client = await clientPromise;
         const db = client.db("mydb");
 
-        // ✅ Fetch websites
-        const sites = await db.collection("websites").find({}).toArray();
+        // ✅ Step 1: Try Q&A pairs first
+        const qaPairs = await db.collection("qa_pairs").find({}).toArray();
 
-        // ✅ Fetch pdf embeddings
+        if (qaPairs.length > 0) {
+            const embeddingResult = await openaiClient.embeddings.create({
+                model: "text-embedding-3-small",
+                input: question,
+            });
+            const qEmbedding = embeddingResult.data[0].embedding as number[];
+
+            let best: any = null;
+            let bestScore = -Infinity;
+            qaPairs.forEach((pair: any) => {
+                const score = cosineSimilarity(pair.embedding, qEmbedding);
+                if (score > bestScore) {
+                    best = pair;
+                    bestScore = score;
+                }
+            });
+
+            if (best && bestScore > 0.75) {
+                const stream = new ReadableStream({
+                    async start(controller) {
+                        try {
+                            const encoder = new TextEncoder();
+                            const words = best.answer.split(" ");
+                            for (const word of words) {
+                                controller.enqueue(encoder.encode(word + " "));
+                                await new Promise(r => setTimeout(r, 30)); 
+                            }
+                            controller.close();
+                        } catch (err) {
+                            controller.error(err);
+                        }
+                    },
+                });
+
+                return new Response(stream, {
+                    headers: { "Content-Type": "text/plain; charset=utf-8" },
+                });
+            }
+
+
+        }
+
+        // ✅ Step 2: If no good Q&A match, fall back to websites + PDFs
+        const sites = await db.collection("websites").find({}).toArray();
         const pdfs = await db.collection("pdf_embeddings").find({}).toArray();
 
         if (!sites.length && !pdfs.length) {
             return NextResponse.json(
-                { error: "No training data found (websites or PDFs)" },
+                { error: "No training data found (websites, PDFs, or Q&A)" },
                 { status: 404 }
             );
         }
@@ -34,7 +78,6 @@ export async function POST(req: Request) {
         // Combine all chunks into one array
         const allChunks: { chunk: string; embedding: number[]; source: string }[] = [];
 
-        // Websites → normalize
         for (const site of sites) {
             for (const c of site.chunks) {
                 allChunks.push({
@@ -45,7 +88,6 @@ export async function POST(req: Request) {
             }
         }
 
-        // PDFs → normalize
         for (const pdf of pdfs) {
             allChunks.push({
                 chunk: pdf.chunk,
@@ -61,28 +103,17 @@ export async function POST(req: Request) {
         });
         const qEmbedding = qEmbResp.data[0].embedding;
 
-        // Cosine similarity
-        const cosineSim = (a: number[], b: number[]) => {
-            const dot = a.reduce((sum, v, i) => sum + v * (b[i] ?? 0), 0);
-            const magA = Math.sqrt(a.reduce((sum, v) => sum + v * v, 0));
-            const magB = Math.sqrt(b.reduce((sum, v) => sum + v * v, 0));
-            return magA && magB ? dot / (magA * magB) : 0;
-        };
-
-        // Score all chunks
         const scored = allChunks.map(c => ({
             ...c,
-            score: cosineSim(qEmbedding, c.embedding),
+            score: cosineSimilarity(qEmbedding, c.embedding),
         }));
 
-        // Pick top K chunks
         const topChunks = scored
             .sort((a, b) => b.score - a.score)
             .slice(0, TOP_K)
             .map(c => `${c.source}:\n${c.chunk}`)
             .join("\n\n");
 
-        // Build prompt
         const prompt = `
 You are an AI assistant.
 Use the following combined content from both websites and PDFs if it is relevant to answer the question. 
@@ -100,7 +131,6 @@ Rules:
 User question: ${question}
 `;
 
-        // Stream AI answer
         const { textStream } = await streamText({
             model: openai("gpt-4o-mini"),
             prompt,
@@ -123,6 +153,7 @@ User question: ${question}
             headers: { "Content-Type": "text/plain; charset=utf-8" },
         });
     } catch (err: any) {
+        console.error("Error in training route:", err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }

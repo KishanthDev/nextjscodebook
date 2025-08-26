@@ -65,7 +65,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/chats', icon: MessageCircle, label: 'Active Chats' },
     { href: '/engage', icon: Send, label: 'Engage' },
-    { href: '/ai-agent', icon: Bot, label: 'AI Agent' },
+    { href: '/ai-agent', icon: Bot, label: 'AI Agent Training' },
     { href: '/modifier', icon: Settings2, label: 'Chat Widget' },
     { href: '/archived-chats', icon: MessageCircle, label: 'Archived Chats' },
     { href: '/billing', icon: BadgeDollarSign, label: 'Billing' },

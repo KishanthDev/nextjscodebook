@@ -6,9 +6,14 @@ import { usePathname } from "next/navigation";
 
 const tabs = [
   { id: "websites", label: "Websites", href: "/ai-agent" },
+  { id: "pdftrain", label: "PDF Train", href: "/pdf" },
 ];
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
 
   return (
@@ -17,9 +22,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="w-[150px] border-r p-2 bg-gray-50 dark:bg-zinc-900">
         <nav className="flex flex-col gap-2">
           {tabs.map((tab) => {
-            const isActive =
-              pathname.startsWith("/ai-agent") ||
-              pathname.startsWith("/website");
+            const isActive = pathname.startsWith(tab.href);
 
             return (
               <Link

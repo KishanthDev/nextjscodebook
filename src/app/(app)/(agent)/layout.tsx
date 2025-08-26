@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   { id: "websites", label: "Websites", href: "/ai-agent" },
   { id: "pdftrain", label: "PDF Train", href: "/pdf" },
+  { id: "qa", label: "Q&A", href: "/qa" },
 ];
 
 export default function DashboardLayout({

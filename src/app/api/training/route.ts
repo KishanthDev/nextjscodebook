@@ -39,7 +39,7 @@ export async function POST(req: Request) {
                 }
             });
 
-            if (best && bestScore > 0.75) {
+            if (best && bestScore > 0.6) {
                 const stream = new ReadableStream({
                     async start(controller) {
                         try {

@@ -47,7 +47,7 @@ export async function POST(req: Request) {
                             const words = best.answer.split(" ");
                             for (const word of words) {
                                 controller.enqueue(encoder.encode(word + " "));
-                                await new Promise(r => setTimeout(r, 30)); 
+                                await new Promise(resolve => setTimeout(resolve, 30));
                             }
                             controller.close();
                         } catch (err) {

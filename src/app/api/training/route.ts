@@ -1,3 +1,4 @@
+// app/api/train/route.ts
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { streamText } from "ai";
@@ -97,13 +98,57 @@ export async function POST(req: Request) {
       }
     }
 
-    // ----- 3️⃣ Fall back to websites + PDFs -----
+    // ----------------- 2️⃣ Articles -----------------
+    const articles = await db.collection("articles").find({}).toArray();
+
+    if (articles.length > 0) {
+      const embeddingResult = await openaiClient.embeddings.create({
+        model: "text-embedding-3-small",
+        input: userText,
+      });
+      const qEmbedding = embeddingResult.data[0].embedding as number[];
+
+      let best: any = null;
+      let bestScore = -Infinity;
+      articles.forEach((a: any) => {
+        const score = cosineSimilarity(a.embedding, qEmbedding);
+        if (score > bestScore) {
+          best = a;
+          bestScore = score;
+        }
+      });
+
+      if (best && bestScore > 0.6) {
+        const content = `**${best.title}**\n\n${best.content}`;
+        const stream = new ReadableStream({
+          async start(controller) {
+            try {
+              const encoder = new TextEncoder();
+              const words = content.split(" ");
+              for (const word of words) {
+                controller.enqueue(encoder.encode(word + " "));
+                await new Promise((resolve) => setTimeout(resolve, 25));
+              }
+              controller.close();
+            } catch (err) {
+              controller.error(err);
+            }
+          },
+        });
+
+        return new Response(stream, {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        });
+      }
+    }
+
+    // ----------------- 3️⃣ Websites + PDFs -----------------
     const sites = await db.collection("websites").find({}).toArray();
     const pdfs = await db.collection("pdf_embeddings").find({}).toArray();
 
     if (!sites.length && !pdfs.length) {
       return NextResponse.json(
-        { error: "No training data found (websites, PDFs, or Q&A)" },
+        { error: "No training data found (articles, websites, PDFs, or Q&A)" },
         { status: 404 }
       );
     }
@@ -145,13 +190,13 @@ export async function POST(req: Request) {
 
     const prompt = `
 You are an AI assistant.
-Use the following combined content from both websites and PDFs if it is relevant to answer the question. 
+Use the following combined content from articles, websites, and PDFs if it is relevant to answer the question. 
 
 Relevant training content:
 ${topChunks || "No relevant context found."}
 
 Rules:
-- Only use the above training content (both websites + PDFs).
+- Only use the above training content.
 - Never guess or make assumptions beyond the provided content.
 - If the content above does not contain the answer, reply with exactly:
   "Sorry, I am not yet trained for this data."

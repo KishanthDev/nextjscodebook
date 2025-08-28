@@ -10,6 +10,7 @@ const tabs = [
   { id: "qa", label: "Q&A", href: "/qa" },
   { id: "articles", label: "Articles", href: "/articles" },
   { id: "flows", label: "Flows", href: "/flows" },
+  { id: "stats", label: "Stats", href: "/training-stats" },
 ];
 
 export default function DashboardLayout({

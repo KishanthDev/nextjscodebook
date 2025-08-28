@@ -11,6 +11,7 @@ const tabs = [
   { id: "articles", label: "Articles", href: "/articles" },
   { id: "flows", label: "Flows", href: "/flows" },
   { id: "stats", label: "Stats", href: "/training-stats" },
+  { id: "dialogflows", label: "Dialog Flows", href: "/dialog-flows" }
 ];
 
 export default function DashboardLayout({

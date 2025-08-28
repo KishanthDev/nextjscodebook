@@ -28,10 +28,19 @@ export default function FlowBuilder() {
 
     // Fetch flows from API
     useEffect(() => {
-        fetch("/api/training/flows")
-            .then((res) => res.json())
-            .then(setFlows);
+        const loadFlows = async () => {
+            try {
+                const res = await fetch("/api/training/flows");
+                const data = await res.json();
+                setFlows(data);
+            } catch (err) {
+                console.error("Failed to load flows:", err);
+            }
+        };
+
+        loadFlows();
     }, []);
+
 
     // Create new flow
     const createFlow = async () => {

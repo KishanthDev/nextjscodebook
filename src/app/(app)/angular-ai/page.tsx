@@ -39,7 +39,6 @@ export default function AskPage() {
     setInput("");
     setLoading(true);
 
-    let botReply = "";
 
     try {
       const res = await fetch("/api/training", {

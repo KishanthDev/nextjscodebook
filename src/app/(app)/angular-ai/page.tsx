@@ -2,10 +2,23 @@
 
 import { useState, useRef, useEffect } from "react";
 
-type Message = {
-  role: "user" | "assistant";
-  text: string;
-};
+type Message =
+  | { role: "user"; text: string }
+  | { role: "assistant"; type: "text"; text: string }
+  | {
+    role: "assistant";
+    type: "buttons";
+    text: string;
+    buttons: { label: string; action: string }[];
+  }
+  | {
+    role: "assistant";
+    type: "action";
+    text: string;
+    label: string;
+    action: string;
+  };
+
 
 export default function AskPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -35,33 +48,42 @@ export default function AskPage() {
         body: JSON.stringify({ text: input }),
       });
 
-      if (!res.body) throw new Error("No response body");
+      // 👇 Try to parse JSON first
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await res.json();
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", ...data, type: data.type || "text" },
+        ]);
+      } else {
+        // Fallback: streaming text
+        const reader = res.body!.getReader();
+        const decoder = new TextDecoder();
+        let botReply = "";
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          botReply += decoder.decode(value, { stream: true });
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        botReply += decoder.decode(value, { stream: true });
-
-        // Update AI's streaming message
-        setMessages((prev) => {
-          const copy = [...prev];
-          // if AI already started replying, update last assistant message
-          if (copy[copy.length - 1]?.role === "assistant") {
-            copy[copy.length - 1].text = botReply;
-          } else {
-            copy.push({ role: "assistant", text: botReply });
-          }
-          return copy;
-        });
+          setMessages((prev) => {
+            const copy = [...prev];
+            if (copy[copy.length - 1]?.role === "assistant") {
+              (copy[copy.length - 1] as any).text = botReply;
+            } else {
+              copy.push({ role: "assistant", type: "text", text: botReply });
+            }
+            return copy;
+          });
+        }
       }
+
     } catch (err) {
       console.error(err);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", text: "❌ Something went wrong." },
+        { role: "assistant", type: "text", text: "❌ Something went wrong." },
       ]);
     } finally {
       setLoading(false);
@@ -86,22 +108,47 @@ export default function AskPage() {
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-xs px-4 py-2 rounded-2xl shadow 
-                ${
-                  msg.role === "user"
-                    ? "bg-green-500 text-white rounded-br-none"
-                    : "bg-white text-gray-800 rounded-bl-none"
-                }`}
+              className={`max-w-xs px-4 py-2 rounded-2xl shadow
+        ${msg.role === "user"
+                  ? "bg-green-500 text-white rounded-br-none"
+                  : "bg-white text-gray-800 rounded-bl-none"}
+      `}
             >
-              {msg.text}
+              {msg.role === "assistant" && msg.type === "buttons" ? (
+                <div>
+                  <p className="mb-2">{msg.text}</p>
+                  <div className="flex flex-col gap-2">
+                    {msg.buttons.map((btn, j) => (
+                      <button
+                        key={j}
+                        className="px-3 py-2 rounded bg-green-500 text-white hover:bg-green-600"
+                        onClick={() => {
+                          if (btn.action.startsWith("redirect:")) {
+                            window.open(btn.action.replace("redirect:", ""), "_blank");
+                          } else {
+                            setInput(btn.label);
+                          }
+                        }}
+                      >
+                        {btn.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : msg.role === "assistant" && msg.type === "action" ? (
+                <div>
+                  <p>{msg.text}</p>
+                </div>
+              ) : (
+                <p>{msg.text}</p>
+              )}
             </div>
           </div>
         ))}
+
         <div ref={chatEndRef} />
       </div>
 

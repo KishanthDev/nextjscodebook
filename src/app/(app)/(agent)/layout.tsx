@@ -8,7 +8,8 @@ const tabs = [
   { id: "websites", label: "Websites", href: "/ai-agent" },
   { id: "pdftrain", label: "PDF Train", href: "/pdf" },
   { id: "qa", label: "Q&A", href: "/qa" },
-  { id: "articles", label: "Articles", href: "/articles" }
+  { id: "articles", label: "Articles", href: "/articles" },
+  { id: "flows", label: "Flows", href: "/flows" },
 ];
 
 export default function DashboardLayout({

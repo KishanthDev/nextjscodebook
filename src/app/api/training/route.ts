@@ -1,39 +1,12 @@
-// app/api/train/route.ts
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { OpenAI } from "openai";
 import { cosineSimilarity } from "@/lib/similarity";
-// import { getIntentsClient } from "@/lib/dialogflow";
 
-// const intentsClient = getIntentsClient();
-// const projectId = process.env.DIALOGFLOW_PROJECT_ID as string; 
 const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const TOP_K = 5;
-
-// --------------- Helper: Check Dialogflow intents -----------------
-// async function findIntentResponse(userText: string) {
-//   const agentPath = intentsClient.projectAgentPath(projectId);
-//   const [intents] = await intentsClient.listIntents({ parent: agentPath });
-
-//   for (const intent of intents) {
-//     // Match WELCOME event
-//     if (intent.events?.includes("WELCOME") && /hi|hello|hey/i.test(userText)) {
-//       return intent.messages?.[0]?.text?.text?.[0] || null;
-//     }
-
-//     // Match training phrases
-//     for (const phrase of intent.trainingPhrases || []) {
-//       const text = (phrase.parts ?? []).map((p: any) => p.text).join("");
-//       if (text && userText.toLowerCase().includes(text.toLowerCase())) {
-//         return intent.messages?.[0]?.text?.text?.[0] || null;
-//       }
-//     }
-//   }
-
-//   return null;
-// }
 
 // ------------------ Chat Handler -----------------------
 export async function POST(req: Request) {
@@ -44,27 +17,99 @@ export async function POST(req: Request) {
     }
 
     const userText = text;
-
-    // ----- 1️⃣ Try Dialogflow intents first -----
-    // const intentResponse = await findIntentResponse(userText);
-    // if (intentResponse) {
-    //   return new Response(new TextEncoder().encode(intentResponse), {
-    //     headers: { "Content-Type": "text/plain; charset=utf-8" },
-    //   });
-    // } 
-
-    // ----- 2️⃣ Q&A pairs with embeddings -----
     const client = await clientPromise;
     const db = client.db("mydb");
-    const qaPairs = await db.collection("qa_pairs").find({}).toArray();
 
-    if (qaPairs.length > 0) {
+    // ----- Flows and Flow Buttons -----
+    const [flows, flowButtons] = await Promise.all([
+      db.collection("flows").find({}).toArray(),
+      db.collection("flow_buttons").find({}).toArray(),
+    ]);
+
+    if (flows.length || flowButtons.length) {
       const embeddingResult = await openaiClient.embeddings.create({
         model: "text-embedding-3-small",
         input: userText,
       });
       const qEmbedding = embeddingResult.data[0].embedding as number[];
 
+      let best: any = null;
+      let bestScore = -Infinity;
+      let bestType: "flow" | "flow_button" | null = null;
+
+      // Match flows
+      flows.forEach((f: any) => {
+        if (!f.embedding) return;
+        const score = cosineSimilarity(f.embedding, qEmbedding);
+        if (score > bestScore) {
+          best = f;
+          bestScore = score;
+          bestType = "flow";
+        }
+      });
+
+      // Match buttons
+      flowButtons.forEach((b: any) => {
+        if (!b.embedding) return;
+        const score = cosineSimilarity(b.embedding, qEmbedding);
+        if (score > bestScore) {
+          best = b;
+          bestScore = score;
+          bestType = "flow_button";
+        }
+      });
+
+      if (best && bestScore > 0.6) {
+        if (bestType === "flow") {
+          const startBlock = best.blocks.find((b: any) => b.id === "start");
+          let reply: any = {
+            type: startBlock?.type ?? "message",
+            text: startBlock?.message ?? best.title,
+          };
+          if (startBlock?.next) {
+            const nextBlock = best.blocks.find((b: any) => b.id === startBlock.next);
+            if (nextBlock?.type === "send_button_list" && nextBlock.buttons?.length) {
+              reply = {
+                type: "buttons",
+                text: nextBlock.message ?? reply.text,
+                buttons: nextBlock.buttons.map((btn: any) => ({
+                  label: btn.label,
+                  action: btn.action,
+                })),
+              };
+            } else if (nextBlock?.type === "send_message") {
+              reply = {
+                type: "message",
+                text: nextBlock.message,
+              };
+            }
+          }
+          return NextResponse.json(reply);
+        }
+
+        if (bestType === "flow_button") {
+          // Respond as a clean action object
+          const isRedirect = best.action && best.action.startsWith("redirect:");
+          return NextResponse.json({
+            type: "action",
+            label: best.label,
+            action: best.action,
+            message: isRedirect
+              ? `Redirecting you to ${best.label} 👉 ${best.action.replace("redirect:", "")}`
+              : `Action: ${best.action}`,
+          });
+        }
+      }
+    }
+
+    // ----- Q&A pairs with embeddings -----
+    const qaPairs = await db.collection("qa_pairs").find({}).toArray();
+    if (qaPairs.length > 0) {
+      const embeddingResult = await openaiClient.embeddings.create({
+        model: "text-embedding-3-small",
+        input: userText,
+      });
+      const qEmbedding = embeddingResult.data[0].embedding as number[];
       let best: any = null;
       let bestScore = -Infinity;
       qaPairs.forEach((pair: any) => {
@@ -98,16 +143,14 @@ export async function POST(req: Request) {
       }
     }
 
-    // ----------------- 2️⃣ Articles -----------------
+    // ----------------- Articles -----------------
     const articles = await db.collection("articles").find({}).toArray();
-
     if (articles.length > 0) {
       const embeddingResult = await openaiClient.embeddings.create({
         model: "text-embedding-3-small",
         input: userText,
       });
       const qEmbedding = embeddingResult.data[0].embedding as number[];
-
       let best: any = null;
       let bestScore = -Infinity;
       articles.forEach((a: any) => {
@@ -142,7 +185,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // ----------------- 3️⃣ Websites + PDFs -----------------
+    // ----------------- Websites + PDFs -----------------
     const sites = await db.collection("websites").find({}).toArray();
     const pdfs = await db.collection("pdf_embeddings").find({}).toArray();
 

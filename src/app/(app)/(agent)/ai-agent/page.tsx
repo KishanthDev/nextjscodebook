@@ -14,6 +14,7 @@ import { Input } from "@/ui/input";
 import { Button } from "@/ui/button";
 import { Card } from "@/ui/card";
 import { Plus } from "lucide-react";
+import BotSelector from "@/components/agent-bots/SelectBots"; // 👈 your bot dropdown
 
 const MAX_URLS = 10;
 
@@ -21,11 +22,13 @@ type Site = {
   url: string;
   slug: string;       // bot name
   createdAt?: string; // ISO date string
+  botId?: string;     // 👈 added
 };
 
 export default function WebsitesTable() {
   const [url, setUrl] = useState("");
   const [urls, setUrls] = useState<Site[]>([]);
+  const [botId, setBotId] = useState(""); // 👈 selected bot
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -45,14 +48,14 @@ export default function WebsitesTable() {
   }, []);
 
   const handleUpload = async () => {
-    if (!url || urls.length >= MAX_URLS) return;
+    if (!url || !botId || urls.length >= MAX_URLS) return;
     setLoading(true);
     setError("");
     try {
       const res = await fetch("/api/url/url-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url, botId }), // 👈 include botId
       });
       const data = await res.json();
       if (data.success) {
@@ -83,6 +86,9 @@ export default function WebsitesTable() {
           </span>
         </div>
 
+        {/* 👇 Bot Selector */}
+        <BotSelector onSelect={(id) => setBotId(id)} />
+
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           <Input
             placeholder="https://example.com"
@@ -93,9 +99,9 @@ export default function WebsitesTable() {
           />
           <Button
             onClick={handleUpload}
-            disabled={loading || urls.length >= MAX_URLS}
+            disabled={loading || urls.length >= MAX_URLS || !botId}
             className={`flex items-center gap-2 ${
-              loading || urls.length >= MAX_URLS
+              loading || urls.length >= MAX_URLS || !botId
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
@@ -113,60 +119,6 @@ export default function WebsitesTable() {
         </div>
 
         {error && <p className="text-red-600">{error}</p>}
-      </Card>
-
-      {/* URLs Table */}
-      <Card className="p-4 overflow-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Bot Name</TableHead>
-              <TableHead>Website URL</TableHead>
-              <TableHead>Created At</TableHead>
-              <TableHead className="text-right">AI Agent</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {urls.length > 0 ? (
-              urls.map((u) => (
-                <TableRow key={u.slug}>
-                  {/* Bot name from slug */}
-                  <TableCell className="font-medium">
-                    {u.slug.toUpperCase()}
-                  </TableCell>
-
-                  {/* Website URL */}
-                  <TableCell>{u.url}</TableCell>
-
-                  {/* Created At */}
-                  <TableCell>
-                    {u.createdAt
-                      ? new Date(u.createdAt).toLocaleString()
-                      : "—"}
-                  </TableCell>
-
-                  {/* Go button */}
-                  <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      onClick={() =>
-                        router.push(`/website?ai=${encodeURIComponent(u.slug)}`)
-                      }
-                    >
-                      Go
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center text-gray-500">
-                  No websites uploaded yet.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
       </Card>
     </div>
   );

@@ -18,13 +18,14 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: Request) {
   try {
-    const { url } = await req.json();
-    if (!url || typeof url !== "string") {
-      return NextResponse.json({ error: "Missing or invalid URL" }, { status: 400 });
+    const { url, botId } = await req.json();
+
+    if (!url || typeof url !== "string" || !botId) {
+      return NextResponse.json({ error: "Missing url or botId" }, { status: 400 });
     }
 
     // Validate URL
-    try { new URL(url); } catch { 
+    try { new URL(url); } catch {
       return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
     }
 
@@ -86,17 +87,18 @@ export async function POST(req: Request) {
 
     await db.collection("websites").insertOne({
       url,
-      slug: normalizeUrl(url), // 👈 added
+      slug: normalizeUrl(url),
+      botId,                     // 👈 store botId
       language,
       chunks: chunkDocs,
       uploadedAt: new Date(),
     });
 
-    // ✅ Enforce 10-document limit
-    const count = await db.collection("websites").countDocuments();
+    // ✅ Enforce limit per bot (10 sites per bot)
+    const count = await db.collection("websites").countDocuments({ botId });
     if (count > 10) {
       const oldest = await db.collection("websites")
-        .find({})
+        .find({ botId })
         .sort({ uploadedAt: 1 })
         .limit(count - 10)
         .toArray();

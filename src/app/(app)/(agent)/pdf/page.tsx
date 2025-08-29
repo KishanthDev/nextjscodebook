@@ -1,9 +1,11 @@
 "use client";
+import BotSelector from "@/components/agent-bots/SelectBots";
 import { useState } from "react";
 
 export default function PdfUpload() {
   const [file, setFile] = useState<File | null>(null);
   const [filename, setFilename] = useState<string>("");
+  const [botId, setBotId] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [error, setError] = useState<string>("");
@@ -16,6 +18,7 @@ export default function PdfUpload() {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("botId", botId);
 
     try {
       const res = await fetch("/api/pdf-upload", {
@@ -43,6 +46,7 @@ export default function PdfUpload() {
     <div className="p-6 max-w-md mx-auto">
       <div className="border p-4 rounded-xl shadow-md">
         <h2 className="text-xl font-semibold mb-3">Upload PDF</h2>
+        <BotSelector onSelect={(id) => setBotId(id)} />
         <input
           type="file"
           accept="application/pdf"

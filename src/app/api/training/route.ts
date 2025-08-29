@@ -11,14 +11,20 @@ const TOP_K = 5;
 // ------------------ Chat Handler -----------------------
 export async function POST(req: Request) {
   try {
-    const { text } = await req.json();
-    if (!text) {
-      return NextResponse.json({ error: "Text required" }, { status: 400 });
+    const { botId, text } = await req.json();
+    if (!botId || !text) {
+      return NextResponse.json({ error: "Bot ID and text are required" }, { status: 400 });
     }
 
     const userText = text;
     const client = await clientPromise;
     const db = client.db("mydb");
+
+    const qaPairs = await db.collection("qa_pairs").find({ botId }).toArray();
+    const articles = await db.collection("articles").find({ botId }).toArray();
+    const sites = await db.collection("websites").find({ botId }).toArray();
+    const pdfs = await db.collection("pdf_embeddings").find({ botId }).toArray();
+
 
     // ----- Flows and Flow Buttons -----
     const [flows, flowButtons] = await Promise.all([
@@ -103,7 +109,6 @@ export async function POST(req: Request) {
     }
 
     // ----- Q&A pairs with embeddings -----
-    const qaPairs = await db.collection("qa_pairs").find({}).toArray();
     if (qaPairs.length > 0) {
       const embeddingResult = await openaiClient.embeddings.create({
         model: "text-embedding-3-small",
@@ -144,7 +149,6 @@ export async function POST(req: Request) {
     }
 
     // ----------------- Articles -----------------
-    const articles = await db.collection("articles").find({}).toArray();
     if (articles.length > 0) {
       const embeddingResult = await openaiClient.embeddings.create({
         model: "text-embedding-3-small",
@@ -186,9 +190,6 @@ export async function POST(req: Request) {
     }
 
     // ----------------- Websites + PDFs -----------------
-    const sites = await db.collection("websites").find({}).toArray();
-    const pdfs = await db.collection("pdf_embeddings").find({}).toArray();
-
     if (!sites.length && !pdfs.length) {
       return NextResponse.json(
         { error: "No training data found (articles, websites, PDFs, or Q&A)" },

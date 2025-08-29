@@ -1,70 +1,46 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { Button } from "@/ui/button";
 import { Card, CardContent } from "@/ui/card";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
+import BotSelector from "@/components/agent-bots/SelectBots";
 
-type Block = {
-    id: string;
-    type: string;
-    message: string;
-    next?: string;
-    buttons?: { label: string; action: string }[];
-};
-
-type Flow = {
-    _id?: string;
-    flow_id: string;
-    title: string;
-    blocks: Block[];
-};
+type Block = { id: string; type: string; message: string; next?: string; buttons?: { label: string; action: string }[]; };
+type Flow = { _id?: string; flow_id: string; title: string; blocks: Block[]; };
 
 export default function FlowBuilder() {
-    const [flows, setFlows] = useState<Flow[]>([]);
-    const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
-    const [newFlowTitle, setNewFlowTitle] = useState("");
+  const [flows, setFlows] = useState<Flow[]>([]);
+  const [botId, setBotId] = useState<string>("");
+  const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
+  const [newFlowTitle, setNewFlowTitle] = useState("");
+  const [message, setMessage] = useState("");
 
-    // Fetch flows from API
-    useEffect(() => {
-        const loadFlows = async () => {
-            try {
-                const res = await fetch("/api/training/flows");
-                const data = await res.json();
-                setFlows(data);
-            } catch (err) {
-                console.error("Failed to load flows:", err);
-            }
-        };
+  useEffect(() => { if (botId) loadFlows(); }, [botId]);
 
-        loadFlows();
-    }, []);
+  const loadFlows = async () => {
+    const res = await fetch(`/api/training/flows?botId=${botId}`);
+    const data = await res.json();
+    setFlows(data);
+  };
 
-
-    // Create new flow
-    const createFlow = async () => {
-        const flow: Flow = {
-            flow_id: newFlowTitle.toLowerCase().replace(/\s+/g, "_"),
-            title: newFlowTitle,
-            blocks: [
-                {
-                    id: "start",
-                    type: "start",
-                    message: "New flow start message",
-                },
-            ],
-        };
-        const res = await fetch("/api/training/flows", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(flow),
-        });
-        const saved = await res.json();
-        setFlows([...flows, saved]);
-        setSelectedFlow(saved);
-        setNewFlowTitle("");
+  const createFlow = async () => {
+    if (!botId) { setMessage("❌ Please select a bot first."); return; }
+    const flow: Flow = {
+      flow_id: newFlowTitle.toLowerCase().replace(/\s+/g, "_"),
+      title: newFlowTitle,
+      blocks: [{ id: "start", type: "start", message: "New flow start message" }],
     };
+    const res = await fetch("/api/training/flows", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...flow, botId }), // ✅ attach botId
+    });
+    const saved = await res.json();
+    setFlows([...flows, saved]);
+    setSelectedFlow(saved);
+    setNewFlowTitle("");
+  };
 
     // Add block
     const addBlock = () => {
@@ -81,21 +57,20 @@ export default function FlowBuilder() {
     };
 
     // Save flow
-    const saveFlow = async () => {
-        if (!selectedFlow) return;
-        await fetch(`/api/training/flows/${selectedFlow._id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(selectedFlow),
-        });
-        alert("Flow saved!");
-    };
+  const saveFlow = async () => {
+    if (!botId || !selectedFlow) return;
+    await fetch(`/api/training/flows/${selectedFlow._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...selectedFlow, botId }), // ✅ attach botId
+    });
+    alert("Flow saved!");
+  };
 
-    return (
-        <div className="grid grid-cols-4 gap-4 p-6">
-            {/* Sidebar */}
-            <div className="col-span-1 space-y-4">
-                <h2 className="font-bold">Flows</h2>
+  return (
+    <div className="grid grid-cols-4 gap-4 p-6">
+      <div className="col-span-1">
+        <BotSelector onSelect={setBotId} /> {/* ✅ dropdown */}
                 {flows.map((flow) => (
                     <Card
                         key={flow._id}

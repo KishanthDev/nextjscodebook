@@ -1,78 +1,80 @@
-// app/articles/page.tsx
 "use client";
 import { useEffect, useState } from "react";
+import BotSelector from "@/components/agent-bots/SelectBots";
 
 type Article = {
-    _id: string;
-    title: string;
-    content: string;
-    link?: string;
-    parent_category?: string;
-    categories?: string[];
-    createdAt?: string;
+  _id: string;
+  title: string;
+  content: string;
+  link?: string;
+  parent_category?: string;
+  categories?: string[];
+  createdAt?: string;
 };
 
 export default function ArticlesPage() {
-    const [articles, setArticles] = useState<Article[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [botId, setBotId] = useState<string>("");
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    // form state
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
-    const [link, setLink] = useState("");
-    const [parentCategory, setParentCategory] = useState("");
-    const [categories, setCategories] = useState("");
+  // form state
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [link, setLink] = useState("");
+  const [parentCategory, setParentCategory] = useState("");
+  const [categories, setCategories] = useState("");
+  const [message, setMessage] = useState("");
 
-    useEffect(() => {
-        loadArticles();
-    }, []);
+  useEffect(() => {
+    loadArticles();
+  }, []);
 
-   
-        const loadArticles = async () => {
-            try {
-                const res = await fetch("/api/training/articles");
-                const data = await res.json();
-                setArticles(data);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const loadArticles = async () => {
+    try {
+      const res = await fetch(`/api/training/articles?botId=${botId}`);
+      const data = await res.json();
+      setArticles(data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const newArticle = {
-            title,
-            content,
-            link,
-            parent_category: parentCategory,
-            categories: categories.split(",").map((c) => c.trim()),
-        };
-
-        await fetch("/api/training/articles", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newArticle),
-        });
-
-        // refresh list
-        loadArticles();
-
-        // clear form
-        setTitle("");
-        setContent("");
-        setLink("");
-        setParentCategory("");
-        setCategories("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!botId) {
+      setMessage("❌ Please select a bot first.");
+      return;
+    }
+    const newArticle = {
+      botId, // ✅ attach botId
+      title,
+      content,
+      link,
+      parent_category: parentCategory,
+      categories: categories.split(",").map((c) => c.trim()),
     };
 
-    if (loading) {
-        return <p className="text-center text-gray-500">Loading articles...</p>;
-    }
+    await fetch("/api/training/articles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newArticle),
+    });
 
-    return (
-        <div className="prose max-w-3xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Knowledge Base Articles</h1>
+    loadArticles();
+    setTitle("");
+    setContent("");
+    setLink("");
+    setParentCategory("");
+    setCategories("");
+  };
+
+  if (loading) return <p>Loading...</p>;
+
+  return (
+    <div className="prose max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Knowledge Base Articles</h1>
+
+      <BotSelector onSelect={setBotId} /> {/* ✅ added dropdown */}
 
             {/* Add New Article Form */}
             <form

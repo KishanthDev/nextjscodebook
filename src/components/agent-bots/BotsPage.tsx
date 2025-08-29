@@ -107,20 +107,6 @@ export default function BotsPage() {
           </form>
         </CardContent>
       </Card>
-
-      {/* Bot List */}
-      <div className="max-w-2xl mx-auto space-y-3">
-        <h3 className="text-lg font-semibold">Existing Bots</h3>
-        {bots.map((bot, i) => (
-          <Card key={i}>
-            <CardContent className="p-4">
-              <p className="font-bold">{bot.name}</p>
-              <p className="text-sm text-gray-600">{bot.description}</p>
-              <p className="text-xs">Type: {bot.type}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
     </div>
   );
 }

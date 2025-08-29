@@ -35,3 +35,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+dialogflow-470504-ffa613263830.json
+gcloud-key.json

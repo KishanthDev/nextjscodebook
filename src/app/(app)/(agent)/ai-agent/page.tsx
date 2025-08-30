@@ -1,15 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/ui/table";
 import { Input } from "@/ui/input";
 import { Button } from "@/ui/button";
 import { Card } from "@/ui/card";
@@ -31,11 +22,10 @@ export default function WebsitesTable() {
   const [botId, setBotId] = useState(""); // 👈 selected bot
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const fetchUrls = async () => {
     try {
-      const res = await fetch("/api/url/url-list");
+      const res = await fetch("/api/training/url");
       const data = await res.json();
       setUrls(data.sites || []);
     } catch (err: any) {
@@ -52,7 +42,7 @@ export default function WebsitesTable() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/url/url-upload", {
+      const res = await fetch("/api/training/url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url, botId }), // 👈 include botId

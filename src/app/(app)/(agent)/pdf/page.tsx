@@ -21,7 +21,7 @@ export default function PdfUpload() {
     formData.append("botId", botId);
 
     try {
-      const res = await fetch("/api/pdf-upload", {
+      const res = await fetch("/api/training/pdf", {
         method: "POST",
         body: formData,
       });

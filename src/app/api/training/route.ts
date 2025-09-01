@@ -242,6 +242,7 @@ ${topChunks || "No relevant context found."}
 Rules:
 - Only use the above training content.
 - Never guess or make assumptions beyond the provided content.
+- Format responses in Markdown with clear headings, bullet points, and emojis for readability.
 - If the content above does not contain the answer, reply with exactly:
   "Sorry, I am not yet trained for this data."
 - Keep the response short, clear, and conversational.

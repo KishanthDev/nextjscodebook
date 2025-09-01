@@ -1,36 +1,39 @@
-"use client";
-
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import CodeBlock from "./CodeBlock";
 
 type Message =
   | { role: "user"; text: string }
   | { role: "assistant"; type: "text"; text: string }
   | {
-      role: "assistant";
-      type: "buttons";
-      text: string;
-      buttons: { label: string; action: string }[];
-    }
+    role: "assistant";
+    type: "buttons";
+    text: string;
+    buttons: { label: string; action: string }[];
+  }
   | {
-      role: "assistant";
-      type: "action";
-      text: string;
-      label: string;
-      action: string;
-    };
+    role: "assistant";
+    type: "action";
+    text: string;
+    label: string;
+    action: string;
+  };
 
 interface AskPageProps {
   botId: string;
-  botName:string // 👈 accept botId
+  botName: string; // 👈 accept botId
 }
 
-export default function AskPage({ botId ,botName }: AskPageProps) {
+export default function AskPage({ botId, botName }: AskPageProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll
+  useEffect(() => {
+    setMessages([]);
+  }, [botId]);
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -94,7 +97,7 @@ export default function AskPage({ botId ,botName }: AskPageProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-55px)] bg-gray-100">
+    <div className="flex flex-col h-[calc(100vh-56px)] bg-gray-100">
       {/* Header */}
       <header className="bg-green-500 text-white p-4 text-lg font-semibold shadow-md">
         🤖 Chat with Bot: {botName}
@@ -111,17 +114,15 @@ export default function AskPage({ botId ,botName }: AskPageProps) {
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-xs px-4 py-2 rounded-2xl shadow ${
-                msg.role === "user"
-                  ? "bg-green-500 text-white rounded-br-none"
-                  : "bg-white text-gray-800 rounded-bl-none"
-              }`}
+              className={`px-4 py-2 rounded-2xl shadow ${msg.role === "user"
+                ? "max-w-xs bg-green-500 text-white rounded-br-none"
+                : "w-full bg-white text-gray-800 rounded-bl-none"
+                }`}
             >
+
               {msg.role === "assistant" && msg.type === "buttons" ? (
                 <div>
                   <p className="mb-2">{msg.text}</p>
@@ -132,10 +133,7 @@ export default function AskPage({ botId ,botName }: AskPageProps) {
                         className="px-3 py-2 rounded bg-green-500 text-white hover:bg-green-600"
                         onClick={() => {
                           if (btn.action.startsWith("redirect:")) {
-                            window.open(
-                              btn.action.replace("redirect:", ""),
-                              "_blank"
-                            );
+                            window.open(btn.action.replace("redirect:", ""), "_blank");
                           } else {
                             setInput(btn.label);
                           }
@@ -149,6 +147,35 @@ export default function AskPage({ botId ,botName }: AskPageProps) {
               ) : msg.role === "assistant" && msg.type === "action" ? (
                 <div>
                   <p>{msg.text}</p>
+                </div>
+              ) : msg.role === "assistant" && msg.type === "text" ? (
+                <div className="prose max-w-none">
+                  <ReactMarkdown
+
+                    components={{
+                      code: CodeBlock, // Only this for code!
+                      h1: ({ node, ...props }) => (
+                        <h1 className="text-xl font-bold my-2" {...props} />
+                      ),
+                      h2: ({ node, ...props }) => (
+                        <h2 className="text-lg font-semibold my-2" {...props} />
+                      ),
+                      li: ({ node, ...props }) => <li className="list-disc ml-6" {...props} />,
+                      ul: ({ node, ...props }) => <ul className="mb-2" {...props} />,
+                      strong: ({ node, ...props }) => (
+                        <strong className="font-bold" {...props} />
+                      ),
+                      em: ({ node, ...props }) => (
+                        <em className="italic" {...props} />
+                      ),
+                      p: ({ node, ...props }) => (
+                        <p className="my-2" {...props} />
+                      ),
+                    }}
+
+                  >
+                    {msg.text}
+                  </ReactMarkdown>
                 </div>
               ) : (
                 <p>{msg.text}</p>

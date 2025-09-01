@@ -171,6 +171,14 @@ export default function AskPage({ botId, botName }: AskPageProps) {
                       p: ({ node, ...props }) => (
                         <p className="my-2" {...props} />
                       ),
+                      a: ({ node, ...props }) => (
+                        <a
+                          className="text-blue-600 underline hover:text-blue-800"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          {...props}
+                        />
+                      ),
                     }}
 
                   >

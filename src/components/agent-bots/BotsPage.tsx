@@ -5,13 +5,16 @@ import { Card, CardContent } from "@/ui/card";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
+import { Switch } from "@/ui/switch";
+import { Label } from "@/ui/label";
 
 export default function BotsPage() {
   const [form, setForm] = useState({
     name: "",
     description: "",
     type: "",
-    settings: { temperature: "0.7", language: "en" }
+    settings: { temperature: "0.7", language: "en" },
+    useMongo: true,
   });
   const [loading, setLoading] = useState(false);
   const [bots, setBots] = useState<any[]>([]);
@@ -21,14 +24,13 @@ export default function BotsPage() {
     if (name.includes(".")) {
       // for nested settings
       const [parent, child] = name.split(".");
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
         [parent]: {
           ...(prev[parent as keyof typeof prev] as Record<string, any>),
           [child]: value,
         },
       }));
-
     } else {
       setForm({ ...form, [name]: value });
     }
@@ -50,7 +52,8 @@ export default function BotsPage() {
         name: "",
         description: "",
         type: "",
-        settings: { temperature: "0.7", language: "en" }
+        settings: { temperature: "0.7", language: "en" },
+        useMongo: true,
       });
     } catch (err) {
       console.error(err);
@@ -99,6 +102,19 @@ export default function BotsPage() {
                 value={form.settings.language}
                 onChange={handleChange}
               />
+            </div>
+
+            {/* Switch for MongoDB vs In-Memory */}
+            <div className="flex items-center space-x-3">
+              <Switch
+                checked={form.useMongo}
+                onCheckedChange={(val) =>
+                  setForm((prev) => ({ ...prev, useMongo: val }))
+                }
+              />
+              <Label>
+                {form.useMongo ? "Using MongoDB" : "Using In-Memory JSON"}
+              </Label>
             </div>
 
             <Button type="submit" disabled={loading} className="w-full">

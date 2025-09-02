@@ -4,11 +4,30 @@ import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { OpenAI } from "openai";
 import { cosineSimilarity } from "@/lib/similarity";
+import fs from "fs";
+import path from "path";
 
 const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const TOP_K = 5;
 
-// ------------------ Chat Handler -----------------------
+// JSON storage paths
+const BOTS_PATH = path.join(process.cwd(), "data", "bots.json");
+const QA_PATH = path.join(process.cwd(), "data", "qa_pairs.json");
+const ARTICLES_PATH = path.join(process.cwd(), "data", "articles.json");
+const FLOWS_PATH = path.join(process.cwd(), "data", "flows.json");
+const FLOW_BTNS_PATH = path.join(process.cwd(), "data", "flow_buttons.json");
+const WEBSITES_PATH = path.join(process.cwd(), "data", "websites.json");
+const PDFS_PATH = path.join(process.cwd(), "data", "pdf_embeddings.json");
+
+// Helpers
+function loadJson(file: string) {
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch {
+    return [];
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const { botId, text } = await req.json();
@@ -17,21 +36,38 @@ export async function POST(req: Request) {
     }
 
     const userText = text;
-    const client = await clientPromise;
-    const db = client.db("mydb");
 
-    const qaPairs = await db.collection("qa_pairs").find({ botId }).toArray();
-    const articles = await db.collection("articles").find({ botId }).toArray();
-    const sites = await db.collection("websites").find({ botId }).toArray();
-    const pdfs = await db.collection("pdf_embeddings").find({ botId }).toArray();
+    // --- Step 1: Check if bot is in JSON ---
+    const bots = loadJson(BOTS_PATH);
+    const isJsonBot = bots.some((b: any) => b._id === botId);
 
+    let qaPairs: any[] = [];
+    let articles: any[] = [];
+    let sites: any[] = [];
+    let pdfs: any[] = [];
+    let flows: any[] = [];
+    let flowButtons: any[] = [];
 
-    // ----- Flows and Flow Buttons -----
-    const [flows, flowButtons] = await Promise.all([
-      db.collection("flows").find({}).toArray(),
-      db.collection("flow_buttons").find({}).toArray(),
-    ]);
+    if (isJsonBot) {
+      qaPairs = loadJson(QA_PATH).filter((q: any) => q.botId === botId);
+      articles = loadJson(ARTICLES_PATH).filter((a: any) => a.botId === botId);
+      sites = loadJson(WEBSITES_PATH).filter((s: any) => s.botId === botId);
+      pdfs = loadJson(PDFS_PATH).filter((p: any) => p.botId === botId);
+      flows = loadJson(FLOWS_PATH).filter((f: any) => f.botId === botId);
+      flowButtons = loadJson(FLOW_BTNS_PATH).filter((b: any) => b.botId === botId);
+    } else {
+      const client = await clientPromise;
+      const db = client.db("mydb");
 
+      qaPairs = await db.collection("qa_pairs").find({ botId }).toArray();
+      articles = await db.collection("articles").find({ botId }).toArray();
+      sites = await db.collection("websites").find({ botId }).toArray();
+      pdfs = await db.collection("pdf_embeddings").find({ botId }).toArray();
+      flows = await db.collection("flows").find({ botId }).toArray();
+      flowButtons = await db.collection("flow_buttons").find({ botId }).toArray();
+    }
+
+    // --- Step 2: Handle Flows + Buttons ---
     if (flows.length || flowButtons.length) {
       const embeddingResult = await openaiClient.embeddings.create({
         model: "text-embedding-3-small",
@@ -43,7 +79,6 @@ export async function POST(req: Request) {
       let bestScore = -Infinity;
       let bestType: "flow" | "flow_button" | null = null;
 
-      // Match flows
       flows.forEach((f: any) => {
         if (!f.embedding) return;
         const score = cosineSimilarity(f.embedding, qEmbedding);
@@ -54,7 +89,6 @@ export async function POST(req: Request) {
         }
       });
 
-      // Match buttons
       flowButtons.forEach((b: any) => {
         if (!b.embedding) return;
         const score = cosineSimilarity(b.embedding, qEmbedding);
@@ -84,17 +118,13 @@ export async function POST(req: Request) {
                 })),
               };
             } else if (nextBlock?.type === "send_message") {
-              reply = {
-                type: "message",
-                text: nextBlock.message,
-              };
+              reply = { type: "message", text: nextBlock.message };
             }
           }
           return NextResponse.json(reply);
         }
 
         if (bestType === "flow_button") {
-          // Respond as a clean action object
           const isRedirect = best.action && best.action.startsWith("redirect:");
           return NextResponse.json({
             type: "action",
@@ -108,7 +138,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // ----- Q&A pairs with embeddings -----
+    // --- Step 3: Q&A pairs ---
     if (qaPairs.length > 0) {
       const embeddingResult = await openaiClient.embeddings.create({
         model: "text-embedding-3-small",
@@ -141,14 +171,13 @@ export async function POST(req: Request) {
             }
           },
         });
-
         return new Response(stream, {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         });
       }
     }
 
-    // ----------------- Articles -----------------
+    // --- Step 4: Articles ---
     if (articles.length > 0) {
       const embeddingResult = await openaiClient.embeddings.create({
         model: "text-embedding-3-small",
@@ -182,14 +211,13 @@ export async function POST(req: Request) {
             }
           },
         });
-
         return new Response(stream, {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         });
       }
     }
 
-    // ----------------- Websites + PDFs -----------------
+    // --- Step 5: Websites + PDFs ---
     if (!sites.length && !pdfs.length) {
       return NextResponse.json(
         { error: "No training data found (articles, websites, PDFs, or Q&A)" },
@@ -199,7 +227,7 @@ export async function POST(req: Request) {
 
     const allChunks: { chunk: string; embedding: number[]; source: string }[] = [];
     for (const site of sites) {
-      for (const c of site.chunks) {
+      for (const c of site.chunks || []) {
         allChunks.push({
           chunk: c.chunk,
           embedding: c.embedding,
@@ -272,7 +300,7 @@ User question: ${userText}
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
   } catch (err: any) {
-    console.error("Error in training route:", err);
+    console.error("Error in chat route:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

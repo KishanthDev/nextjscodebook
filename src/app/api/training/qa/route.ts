@@ -45,7 +45,7 @@ export async function POST(req: Request) {
 
     if (bot) {
       // Save QA in JSON
-      let qaPairs = loadJson(QA_PATH);
+      const qaPairs = loadJson(QA_PATH);
 
       // If question already exists, update
       const existingIndex = qaPairs.findIndex(

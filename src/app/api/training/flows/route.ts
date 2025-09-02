@@ -108,7 +108,7 @@ export async function PUT(req: NextRequest) {
     const data = await formatFlow(updateData, true);
 
     if (isJsonBot(updateData.botId)) {
-      let flows = loadJson(FLOWS_PATH);
+      const flows = loadJson(FLOWS_PATH);
       const idx = flows.findIndex((f: any) => f._id === id);
       if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
       flows[idx] = { ...flows[idx], ...data, _id: id };
@@ -139,7 +139,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     if (isJsonBot(botId)) {
-      let flows = loadJson(FLOWS_PATH);
+      const flows = loadJson(FLOWS_PATH);
       const updated = flows.filter((f: any) => f._id !== id);
       saveJson(FLOWS_PATH, updated);
       return NextResponse.json({ success: updated.length < flows.length });

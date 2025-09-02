@@ -119,7 +119,7 @@ export async function PUT(req: NextRequest) {
   const data = await formatArticle(updateData, true);
 
   if (isJsonBot(updateData.botId)) {
-    let articles = loadJson(ARTICLES_PATH);
+    const articles = loadJson(ARTICLES_PATH);
     const idx = articles.findIndex((a: any) => a._id === id);
     if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
     articles[idx] = { ...articles[idx], ...data, _id: id };
@@ -147,7 +147,7 @@ export async function DELETE(req: NextRequest) {
   }
 
   if (isJsonBot(botId)) {
-    let articles = loadJson(ARTICLES_PATH);
+    const articles = loadJson(ARTICLES_PATH);
     const updated = articles.filter((a: any) => a._id !== id);
     saveJson(ARTICLES_PATH, updated);
     return NextResponse.json({ success: updated.length < articles.length });

@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
     // 🔹 In-Memory JSON mode
     if (!body.useMongo) {
-      let bots = loadMemoryBots();
+      const bots = loadMemoryBots();
       const newBot = { _id: `mem_${Date.now()}`, ...body };
       bots.push(newBot);
       saveMemoryBots(bots);

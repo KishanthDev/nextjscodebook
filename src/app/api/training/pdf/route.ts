@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
     // ✅ JSON Mode
     if (isJsonBot(botId)) {
-      let pdfs = loadJson(PDF_PATH);
+      const pdfs = loadJson(PDF_PATH);
 
       // Prevent duplicate upload
       if (pdfs.some((p: any) => p.botId === botId && p.pdfName === file.name)) {

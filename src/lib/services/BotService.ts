@@ -1,7 +1,10 @@
 // lib/services/BotService.ts
-import clientPromise from "@/lib/mongodb";
-import fs from "fs";
 import path from "path";
+import {
+  loadJson,
+  saveJson,
+} from "@/lib/jsonDb"; 
+import { getCollection } from "@/lib/mongodbHelper";
 
 const COLLECTION = "bots";
 const memoryFile = path.join(process.cwd(), "data/bots.json");
@@ -9,13 +12,12 @@ const memoryFile = path.join(process.cwd(), "data/bots.json");
 export class BotService {
   // 🔹 Load bots from JSON file
   private static loadMemoryBots() {
-    if (!fs.existsSync(memoryFile)) return [];
-    return JSON.parse(fs.readFileSync(memoryFile, "utf-8"));
+    return loadJson(memoryFile);
   }
-
+  
   // 🔹 Save bots to JSON file
   private static saveMemoryBots(bots: any[]) {
-    fs.writeFileSync(memoryFile, JSON.stringify(bots, null, 2));
+    saveJson(memoryFile, bots);
   }
 
   // 🔹 Create bot
@@ -30,20 +32,16 @@ export class BotService {
       return newBot;
     }
 
-    const client = await clientPromise;
-    const db = client.db("mydb");
-    const result = await db.collection(COLLECTION).insertOne(body);
+    const collection = await getCollection(COLLECTION);
+    const result = await collection.insertOne(body);
     return { _id: result.insertedId, ...body };
   }
 
   // 🔹 Get all bots
   static async getBots() {
     const memoryBots = this.loadMemoryBots();
-
-    const client = await clientPromise;
-    const db = client.db("mydb");
-    const mongoBots = await db.collection(COLLECTION).find({}).toArray();
-
+    const collection = await getCollection(COLLECTION);
+    const mongoBots = await collection.find({}).toArray();
     return [...memoryBots, ...mongoBots];
   }
 }

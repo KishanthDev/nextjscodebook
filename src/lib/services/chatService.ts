@@ -1,12 +1,14 @@
-import clientPromise from "@/lib/mongodb";
-import { OpenAI } from "openai";
-import { cosineSimilarity } from "@/lib/similarity";
-import { loadJson } from "@/lib/jsonDb"; // reuse your helpers
 import path from "path";
+import {
+  loadJson,
+  isJsonBot
+} from "@/lib/jsonDb";
+import { getCollection } from "@/lib/mongodbHelper";
+import { createEmbedding } from "@/lib/embedding";
+import { cosineSimilarity } from "@/lib/similarity";
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 
-const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const TOP_K = 5;
 
 // JSON storage paths
@@ -20,10 +22,8 @@ const PDFS_PATH = path.join(process.cwd(), "data", "pdf_embeddings.json");
 
 export class ChatService {
   async getBotData(botId: string) {
-    const bots = loadJson(BOTS_PATH);
-    const isJsonBot = bots.some((b: any) => b._id === botId);
-
-    if (isJsonBot) {
+    const jsonBot = isJsonBot(botId, BOTS_PATH);
+    if (jsonBot) {
       return {
         qaPairs: loadJson(QA_PATH).filter((q: any) => q.botId === botId),
         articles: loadJson(ARTICLES_PATH).filter((a: any) => a.botId === botId),
@@ -34,26 +34,18 @@ export class ChatService {
       };
     }
 
-    const client = await clientPromise;
-    const db = client.db("mydb");
-
     return {
-      qaPairs: await db.collection("qa_pairs").find({ botId }).toArray(),
-      articles: await db.collection("articles").find({ botId }).toArray(),
-      sites: await db.collection("websites").find({ botId }).toArray(),
-      pdfs: await db.collection("pdf_embeddings").find({ botId }).toArray(),
-      flows: await db.collection("flows").find({ botId }).toArray(),
-      flowButtons: await db.collection("flow_buttons").find({ botId }).toArray(),
+      qaPairs: await (await getCollection("qa_pairs")).find({ botId }).toArray(),
+      articles: await (await getCollection("articles")).find({ botId }).toArray(),
+      sites: await (await getCollection("websites")).find({ botId }).toArray(),
+      pdfs: await (await getCollection("pdf_embeddings")).find({ botId }).toArray(),
+      flows: await (await getCollection("flows")).find({ botId }).toArray(),
+      flowButtons: await (await getCollection("flow_buttons")).find({ botId }).toArray(),
     };
   }
 
   async handleFlows(userText: string, flows: any[], flowButtons: any[]) {
-    const embeddingResult = await openaiClient.embeddings.create({
-      model: "text-embedding-3-small",
-      input: userText,
-    });
-    const qEmbedding = embeddingResult.data[0].embedding as number[];
-
+    const qEmbedding = await createEmbedding(userText);
     let best: any = null;
     let bestScore = -Infinity;
     let bestType: "flow" | "flow_button" | null = null;
@@ -121,13 +113,7 @@ export class ChatService {
 
   async handleQAPairs(userText: string, qaPairs: any[]) {
     if (!qaPairs.length) return null;
-
-    const embeddingResult = await openaiClient.embeddings.create({
-      model: "text-embedding-3-small",
-      input: userText,
-    });
-    const qEmbedding = embeddingResult.data[0].embedding as number[];
-
+    const qEmbedding = await createEmbedding(userText);
     let best: any = null;
     let bestScore = -Infinity;
     qaPairs.forEach((pair: any) => {
@@ -146,13 +132,7 @@ export class ChatService {
 
   async handleArticles(userText: string, articles: any[]) {
     if (!articles.length) return null;
-
-    const embeddingResult = await openaiClient.embeddings.create({
-      model: "text-embedding-3-small",
-      input: userText,
-    });
-    const qEmbedding = embeddingResult.data[0].embedding as number[];
-
+    const qEmbedding = await createEmbedding(userText);
     let best: any = null;
     let bestScore = -Infinity;
     articles.forEach((a: any) => {
@@ -173,7 +153,6 @@ export class ChatService {
     if (!sites.length && !pdfs.length) {
       throw new Error("No training data found (articles, websites, PDFs, or Q&A)");
     }
-
     const allChunks: { chunk: string; embedding: number[]; source: string }[] = [];
     for (const site of sites) {
       for (const c of site.chunks || []) {
@@ -192,11 +171,7 @@ export class ChatService {
       });
     }
 
-    const qEmbResp = await openaiClient.embeddings.create({
-      model: "text-embedding-3-small",
-      input: userText,
-    });
-    const qEmbedding = qEmbResp.data[0].embedding;
+    const qEmbedding = await createEmbedding(userText);
 
     const scored = allChunks.map((c) => ({
       ...c,

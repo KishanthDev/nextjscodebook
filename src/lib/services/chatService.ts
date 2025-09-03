@@ -151,7 +151,11 @@ export class ChatService {
 
   async handleWebsitesAndPDFs(userText: string, sites: any[], pdfs: any[]) {
     if (!sites.length && !pdfs.length) {
-      throw new Error("No training data found (articles, websites, PDFs, or Q&A)");
+      return {
+        textStream: (async function* () {
+          yield "Sorry, I am not yet trained for this data.";
+        })(),
+      }
     }
     const allChunks: { chunk: string; embedding: number[]; source: string }[] = [];
     for (const site of sites) {

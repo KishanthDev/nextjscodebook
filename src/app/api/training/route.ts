@@ -24,7 +24,7 @@ export async function POST(req: Request) {
           const encoder = new TextEncoder();
           for (const word of qaReply.split(" ")) {
             controller.enqueue(encoder.encode(word + " "));
-            await new Promise((r) => setTimeout(r, 30));
+            await new Promise((resolve) => setTimeout(resolve, 30));
           }
           controller.close();
         },
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
           const encoder = new TextEncoder();
           for (const word of articleReply.split(" ")) {
             controller.enqueue(encoder.encode(word + " "));
-            await new Promise((r) => setTimeout(r, 25));
+            await new Promise((resolve) => setTimeout(resolve, 25));
           }
           controller.close();
         },

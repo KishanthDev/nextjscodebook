@@ -51,7 +51,7 @@ export default function MessagesContainer({ messages, settings, isTyping, onTagC
         {messages.map((message, index) => (
           <div key={index} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
             <div
-              className={`px-3 py-2 rounded-lg max-w-xs break-all whitespace-normal ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'
+              className={`px-3 py-2 rounded-lg max-w-xs break-words whitespace-pre-line ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'
                 }`}
               style={{
                 backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor,

@@ -1,6 +1,7 @@
 export type Message = {
   text: string;
   isUser: boolean;
+  tags?: string[];
 };
 
 export type ChatWidgetSettings = {
@@ -18,7 +19,7 @@ export type ChatWidgetSettings = {
 };
 
 export type ChatWidgetContactSettings = {
-  formTitle:string;
+  formTitle: string;
   botMsgBgColor: string;
   formMessage1: string;
   formMessage2: string;
@@ -28,7 +29,7 @@ export type ChatWidgetContactSettings = {
   footerBgColor: string;
   footerTextColor: string;
   footerText: string;
-   submitBtnBgColor: string;
+  submitBtnBgColor: string;
   formBgColor: string;
   submitBtnFontColor: string;
   submitBtnText: string;

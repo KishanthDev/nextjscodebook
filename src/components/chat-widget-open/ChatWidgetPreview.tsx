@@ -9,16 +9,18 @@ import defaultConfig from '../../../data/modifier.json';
 import ChatPreview from '../modifier/chat-widget/ChatPreview';
 
 export default function ChatWidgetPreview() {
-  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
+  const { settings, loading, fetchSettings } = useSettingsStore();
   const [newMessage, setNewMessage] = useState('');
   const [soundsEnabled, setSoundsEnabled] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
-      const [isSaving, setIsSaving] = useState(false);
-
+  const [isSaving, setIsSaving] = useState(false);
 
   const defaultSettings: ChatWidgetSettings = defaultConfig.chatWidget;
+
+  // ✅ keep preview messages in local state only
+  const [previewMessages, setPreviewMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -32,12 +34,24 @@ export default function ChatWidgetPreview() {
     }
   }, [mounted, resolvedTheme]);
 
+  useEffect(() => {
+    if (settings.chatWidget?.messages?.length > 0) {
+      setPreviewMessages(settings.chatWidget.messages);
+    } else {
+      setPreviewMessages([
+        {
+          text: 'What would you like to do?',
+          isUser: false,
+          tags: ['View Products', 'Support', 'Pricing'],
+        },
+      ]);
+    }
+  }, [settings.chatWidget]);
+
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
     const newMsg: Message = { text: newMessage, isUser: true };
-    updateSettings<ChatWidgetSettings>('chatWidget', {
-      messages: [...settings.chatWidget.messages, newMsg],
-    });
+    setPreviewMessages((prev) => [...prev, newMsg]); // ✅ local only
     setNewMessage('');
     setTimeout(() => {
       const messagesContainer = document.getElementById('messagesContainer');
@@ -45,6 +59,14 @@ export default function ChatWidgetPreview() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
     }, 10);
+  };
+
+  const handleTagClick = (tag: string, msgIndex: number) => {
+    const newMsg: Message = { text: tag, isUser: true };
+    setPreviewMessages((prev) => [
+      ...prev.map((m, i) => (i === msgIndex ? { ...m, tags: [] } : m)),
+      newMsg,
+    ]); // ✅ local only
   };
 
   const toggleSounds = () => {
@@ -98,22 +120,21 @@ export default function ChatWidgetPreview() {
   const chatSettings: ChatWidgetSettings = {
     ...defaultSettings,
     ...settings.chatWidget,
-    messages: settings.chatWidget?.messages ?? defaultSettings.messages,
+    messages: previewMessages, // ✅ use local previewMessages
   };
-
-  console.log('ChatWidgetPreview settings:', chatSettings);
 
   return (
     <div className="flex justify-center items-start p-6">
       <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden shadow-lg flex flex-col">
         <ChatPreview
-                    settings={chatSettings}
-                    messages={chatSettings.messages}
-                    newMessage={newMessage}
-                    setNewMessage={setNewMessage}
-                    onSendMessage={handleSendMessage}
-                    isSaving={isSaving}
-                  />
+          settings={chatSettings}
+          messages={chatSettings.messages}
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+          onSendMessage={handleSendMessage}
+          isSaving={isSaving}
+          onTagClick={handleTagClick}
+        />
       </div>
     </div>
   );

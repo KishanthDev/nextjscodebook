@@ -29,20 +29,7 @@
     "inputPlaceholder": "Type a message...",
     "logoUrl": "https://res.cloudinary.com/dfbqxsiud/image/upload/v1720047961/users/663e7a3a159e95e303d68afb/ChatMatrix/66415c89d553dbb92bacbbf4/profile_picture.png",
     "chatTitle": "LiveChat",
-    "messages": [
-      {
-        "text": "Hello! How can I assist you today?",
-        "isUser": false
-      },
-      {
-        "text": "I need help with my order.",
-        "isUser": true
-      },
-      {
-        "text": "Sure, could you please provide your order number?",
-        "isUser": false
-      }
-    ]
+    "messages": []
   },
   "greeting": {
     "headingColor": "#000000",

@@ -12,6 +12,7 @@ type Props = {
     setNewMessage: (value: string) => void;
     onSendMessage: () => void;
     isSaving: boolean;
+    onTagClick?: (tag: string, index: number) => void;
 };
 
 export default function ChatPreview({
@@ -20,6 +21,7 @@ export default function ChatPreview({
     newMessage,
     setNewMessage,
     onSendMessage,
+    onTagClick,
     isSaving
 }: Props) {
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -27,7 +29,7 @@ export default function ChatPreview({
         <div className="flex-1 flex justify-center items-start">
             <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden shadow-lg flex flex-col">
                 <ChatHeader settings={settings} isSaving={isSaving} />
-                <MessagesContainer messages={messages} settings={settings}  isTyping={isTyping} />
+                <MessagesContainer messages={messages} settings={settings} onTagClick={onTagClick} isTyping={isTyping} />
                 <ChatInputArea
                     settings={settings}
                     newMessage={newMessage}

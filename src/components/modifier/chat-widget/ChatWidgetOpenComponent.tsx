@@ -29,7 +29,17 @@ const INPUT_FIELDS = [
 ];
 
 export default function ChatWidgetOpenComponent({ defaultSettings, initialMessages }: Props) {
-    const [messages, setMessages] = useState<Message[]>(initialMessages.length > 0 ? initialMessages : [{ text: 'Hi, I have a question!', isUser: true }]);
+    const [messages, setMessages] = useState<Message[]>(
+        initialMessages.length > 0
+            ? initialMessages
+            : [
+                {
+                    text: "What would you like to do?",
+                    isUser: false,
+                    tags: ["View Products", "Support", "Pricing"], // 👈 shows on open
+                },
+            ]
+    );
     const [newMessage, setNewMessage] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -45,6 +55,20 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
         console.log('Fetching chat widget settings...');
         fetchSettings('chatWidget', defaultSettings);
     }, []);
+    // Sync localSettings with global settings when they change
+    useEffect(() => {
+        setLocalSettings((prev) => ({
+            ...prev,
+            ...settings.chatWidget,
+        }));
+    }, [settings.chatWidget]);
+
+    // ✅ Sync messages with DB when they load
+    useEffect(() => {
+        if (settings.chatWidget?.messages?.length > 0) {
+            setMessages(settings.chatWidget.messages);
+        }
+    }, [settings.chatWidget]);
 
     useEffect(() => {
         if (mounted) {
@@ -78,11 +102,25 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
             }
         }, 10);
     };
+    const handleTagClick = (tag: string, msgIndex: number) => {
+        setMessages((prev) => {
+            const updated = prev.map((m, i) =>
+                i === msgIndex ? { ...m, tags: [] } : m
+            );
+            return [...updated, { text: tag, isUser: true }];
+        });
+
+        // 👉 you can also call your backend here if needed
+    };
+
 
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await updateSettings('chatWidget', localSettings);
+            await updateSettings('chatWidget', {
+                ...localSettings,
+                messages, // ✅ include tag questions
+            });
             toast.success('Settings saved!');
         } catch (err) {
             toast.error('Error saving settings');
@@ -187,11 +225,101 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                                 disabled={isSaving}
                             />
                         ))}
+                        <div className="space-y-6 mt-6">
+                            <h3 className="text-lg font-semibold">Tag Questions</h3>
+
+                            {messages.map((msg, msgIndex) => (
+                                <div key={msgIndex} className="border p-3 rounded-md space-y-3">
+                                    {/* Question text */}
+                                    <input
+                                        type="text"
+                                        value={msg.text}
+                                        onChange={(e) => {
+                                            const updated = [...messages];
+                                            updated[msgIndex].text = e.target.value;
+                                            setMessages(updated);
+                                        }}
+                                        className="w-full border rounded-md p-2"
+                                        placeholder="Bot question..."
+                                    />
+
+                                    {/* Dynamic tags */}
+                                    <div className="space-y-2">
+                                        <p className="text-sm font-medium">Tags</p>
+                                        {msg.tags?.map((tag, tagIndex) => (
+                                            <div key={tagIndex} className="flex gap-2 items-center">
+                                                <input
+                                                    type="text"
+                                                    value={tag}
+                                                    onChange={(e) => {
+                                                        const updated = [...messages];
+                                                        updated[msgIndex].tags![tagIndex] = e.target.value;
+                                                        setMessages(updated);
+                                                    }}
+                                                    className="flex-1 border rounded-md p-2"
+                                                    placeholder="Tag name..."
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const updated = [...messages];
+                                                        updated[msgIndex].tags = updated[msgIndex].tags?.filter((_, i) => i !== tagIndex);
+                                                        setMessages(updated);
+                                                    }}
+                                                    className="px-2 py-1 bg-red-500 text-white rounded-md"
+                                                >
+                                                    -
+                                                </button>
+                                            </div>
+                                        ))}
+
+                                        {/* Add new tag */}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const updated = [...messages];
+                                                if (!updated[msgIndex].tags) updated[msgIndex].tags = [];
+                                                updated[msgIndex].tags!.push('');
+                                                setMessages(updated);
+                                            }}
+                                            className="px-3 py-1 bg-green-500 text-white rounded-md"
+                                        >
+                                            + Add Tag
+                                        </button>
+                                    </div>
+
+                                    {/* Remove whole question */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setMessages(messages.filter((_, i) => i !== msgIndex))}
+                                        className="px-3 py-1 bg-gray-500 text-white rounded-md"
+                                    >
+                                        Remove Question
+                                    </button>
+                                </div>
+                            ))}
+
+                            {/* Add new question */}
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setMessages([
+                                        ...messages,
+                                        { text: 'New question...', isUser: false, tags: ['Option 1'] },
+                                    ])
+                                }
+                                className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                            >
+                                + Add Question
+                            </button>
+                        </div>
+
                     </div>
                     <ChatPreview
                         settings={localSettings}
                         messages={messages}
                         newMessage={newMessage}
+                        onTagClick={handleTagClick}
                         setNewMessage={setNewMessage}
                         onSendMessage={handleSendMessage}
                         isSaving={isSaving}

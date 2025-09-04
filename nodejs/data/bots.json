@@ -1,0 +1,10 @@
+[
+  {
+    "_id": "bot1",
+    "name": "Test Bot"
+  },
+  {
+    "_id": "bot2",
+    "name": "Sample Bot"
+  }
+]

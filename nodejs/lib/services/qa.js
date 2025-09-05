@@ -56,6 +56,10 @@ class QaService {
     await saveJson(QA_PATH, qaPairs);
     return { success: true, storage: "json" };
   }
+  static async getQA(botId) {
+    const qaPairs = await loadJson(QA_PATH);
+    return qaPairs.filter((q) => q.botId === botId);
+  }
 }
 
 module.exports = { QaService };

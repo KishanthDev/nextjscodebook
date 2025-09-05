@@ -6,6 +6,7 @@ const multer = require('multer');
 const { QaService } = require('./lib/services/qa');
 const { WebsiteService } = require('./lib/services/websiteService'); // new import
 const { PdfService } = require('./lib/services/pdf');
+const { ChatService } = require("./lib/services/chatService");
 
 const app = express();
 app.use(express.json());
@@ -84,6 +85,28 @@ app.post('/api/pdf', upload.single('file'), async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: error.message });
+  }
+});
+
+
+app.post("/api/chat", async (req, res) => {
+  try {
+    const { botId, text } = req.body;
+    if (!botId || !text) {
+      return res.status(400).json({ error: "Bot ID and text are required" });
+    }
+
+    const { textStream } = await ChatService.chat(botId, text);
+
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+
+    for await (const chunk of textStream) {
+      res.write(chunk);
+    }
+    res.end();
+  } catch (err) {
+    console.error("Chat route error:", err);
+    return res.status(500).json({ error: "Internal Server Error", details: err.message });
   }
 });
 

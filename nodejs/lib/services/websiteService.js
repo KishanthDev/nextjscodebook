@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const cheerio = require('cheerio');
-const OpenAI = require('openai');
+const { createEmbedding } = require('../embedding');
 
 // Paths for JSON data files
 const WEBSITES_PATH = path.join(process.cwd(), 'data', 'websites.json');
@@ -46,19 +46,6 @@ const chunkText = (text, maxLen = 200) => {
   }
   if (chunk.length) chunks.push(chunk.join(' '));
   return chunks;
-};
-
-// Create embedding for text using OpenAI API
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-const createEmbedding = async (input) => {
-  const response = await openai.embeddings.create({
-    model: 'text-embedding-3-small',
-    input,
-    encoding_format: 'float'
-  });
-  return response.data[0].embedding;
 };
 
 class WebsiteService {

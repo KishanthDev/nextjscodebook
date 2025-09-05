@@ -13,12 +13,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.24",
+    "ai": "^5.0.32",
     "body-parser": "^2.2.0",
     "cheerio": "^1.1.2",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "multer": "^2.0.2",
-    "openai": "^5.19.1",
     "pdf-parse": "^1.1.1"
   },
   "devDependencies": {

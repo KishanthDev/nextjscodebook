@@ -15,6 +15,7 @@ export default function BotsPage() {
     type: "",
     settings: { temperature: "0.7", language: "en" },
     useMongo: true,
+    humanTakeover: false,   // 👈 new field
   });
   const [loading, setLoading] = useState(false);
   const [bots, setBots] = useState<any[]>([]);
@@ -53,6 +54,7 @@ export default function BotsPage() {
         description: "",
         type: "",
         settings: { temperature: "0.7", language: "en" },
+        humanTakeover: false,
         useMongo: true,
       });
     } catch (err) {

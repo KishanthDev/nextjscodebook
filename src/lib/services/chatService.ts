@@ -8,6 +8,7 @@ import { createEmbedding } from "@/lib/embedding";
 import { cosineSimilarity } from "@/lib/similarity";
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
+import { handleFallback } from "../handleFallback";
 
 const TOP_K = 5;
 
@@ -149,14 +150,12 @@ export class ChatService {
     return null;
   }
 
-  async handleWebsitesAndPDFs(userText: string, sites: any[], pdfs: any[]) {
-    if (!sites.length && !pdfs.length) {
-      return {
-        textStream: (async function* () {
-          yield "Sorry, I am not yet trained for this data.";
-        })(),
-      }
-    }
+  async handleWebsitesAndPDFs(
+    userText: string,
+    sites: any[],
+    pdfs: any[],
+    botId: string
+  ) {
     const allChunks: { chunk: string; embedding: number[]; source: string }[] = [];
     for (const site of sites) {
       for (const c of site.chunks || []) {
@@ -176,7 +175,6 @@ export class ChatService {
     }
 
     const qEmbedding = await createEmbedding(userText);
-
     const scored = allChunks.map((c) => ({
       ...c,
       score: cosineSimilarity(qEmbedding, c.embedding),
@@ -187,6 +185,10 @@ export class ChatService {
       .slice(0, TOP_K)
       .map((c) => `${c.source}:\n${c.chunk}`)
       .join("\n\n");
+
+    if (allChunks.length === 0) {
+      return handleFallback(botId);
+    }
 
     const prompt = `
 You are an AI assistant.
@@ -199,16 +201,20 @@ Rules:
 - Only use the above training content.
 - Never guess or make assumptions beyond the provided content.
 - Format responses in Markdown with clear headings, bullet points, and emojis for readability.
-- If the content above does not contain the answer, reply with exactly:
-  "Sorry, I am not yet trained for this data."
+- If the content above does not contain the answer, don't reply 
 - Keep the response short, clear, and conversational.
 
 User question: ${userText}
 `;
 
-    return streamText({
-      model: openai("gpt-4o-mini"),
-      prompt,
-    });
+    try {
+      return streamText({
+        model: openai("gpt-4o-mini"),
+        prompt,
+      });
+    } catch (err) {
+      return handleFallback(botId);
+    }
+
   }
 }

@@ -19,29 +19,71 @@ type Message =
     action: string;
   };
 
+interface Conversation {
+  _id: string;
+  name?: string;
+  messages?: Message[];
+}
+
 interface AskPageProps {
   botId: string;
-  botName: string; // 👈 accept botId
+  botName: string;
 }
 
 export default function AskPage({ botId, botName }: AskPageProps) {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [convId, setConvId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll
+  /** 📌 Load all conversations for this bot */
   useEffect(() => {
-    setMessages([]);
+    async function fetchConversations() {
+      try {
+        const res = await fetch(`/api/training/conversations?botId=${botId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setConversations(data);
+        }
+      } catch (err) {
+        console.error("Failed to load conversations:", err);
+      }
+    }
+    fetchConversations();
   }, [botId]);
+
+  /** 📌 Load messages when convId changes */
+  useEffect(() => {
+    async function fetchConversation() {
+      if (!convId) {
+        setMessages([]);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/training/conversations/${convId}?botId=${botId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setMessages(data.messages || []);
+        }
+      } catch (err) {
+        console.error("Failed to load conversation:", err);
+      }
+    }
+    fetchConversation();
+  }, [convId, botId]);
+
+  /** 📌 Auto scroll to bottom */
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  /** 📌 Send message */
   const handleAsk = async () => {
     if (!input.trim()) return;
 
-    // add user msg
     setMessages((prev) => [...prev, { role: "user", text: input }]);
     setInput("");
     setLoading(true);
@@ -50,21 +92,30 @@ export default function AskPage({ botId, botName }: AskPageProps) {
       const res = await fetch("/api/training", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: input,
-          botId, // 👈 send botId to backend
-        }),
+        body: JSON.stringify({ text: input, botId, convId }),
       });
 
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const data = await res.json();
+
+        // Save conversation ID if new one created
+        if (data.convId) {
+          setConvId(data.convId);
+          if (!conversations.find((c) => c._id === data.convId)) {
+            setConversations((prev) => [
+              ...prev,
+              { _id: data.convId, name: "New Conversation" },
+            ]);
+          }
+        }
+
         setMessages((prev) => [
           ...prev,
           { role: "assistant", ...data, type: data.type || "text" },
         ]);
       } else {
-        // fallback streaming
+        // Streaming fallback
         const reader = res.body!.getReader();
         const decoder = new TextDecoder();
         let botReply = "";
@@ -96,11 +147,83 @@ export default function AskPage({ botId, botName }: AskPageProps) {
     }
   };
 
+  /** Edit conversation name */
+  const handleEditConversation = async () => {
+    if (!convId) return;
+    const newName = prompt("Enter new conversation name:");
+    if (!newName) return;
+
+    try {
+      await fetch(`/api/training/conversations/${convId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName, botId }), // ✅ send botId
+      });
+      setConversations((prev) =>
+        prev.map((c) => (c._id === convId ? { ...c, name: newName } : c))
+      );
+    } catch (err) {
+      console.error("Error renaming:", err);
+    }
+  };
+
+  /** Delete conversation */
+  const handleDeleteConversation = async () => {
+    if (!convId) return;
+    if (!confirm("Are you sure you want to delete this conversation?")) return;
+
+    try {
+      await fetch(`/api/training/conversations/${convId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ botId }), // ✅ send botId
+      });
+      setConversations((prev) => prev.filter((c) => c._id !== convId));
+      setMessages([]);
+      setConvId(null);
+    } catch (err) {
+      console.error("Error deleting:", err);
+    }
+  };
+
+
   return (
     <div className="flex flex-col h-[calc(100vh-56px)] bg-gray-100">
       {/* Header */}
-      <header className="bg-green-500 text-white p-4 text-lg font-semibold shadow-md">
-        🤖 Chat with Bot: {botName}
+      <header className="bg-green-500 text-white p-4 shadow-md flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <span className="text-lg font-semibold">🤖 Chat with Bot: {botName}</span>
+
+          <select
+            value={convId || ""}
+            onChange={(e) => setConvId(e.target.value || null)}
+            className="px-3 py-2 rounded-md text-black"
+          >
+            <option value="">+ New Conversation</option>
+            {conversations.map((c) => (
+              <option key={c._id} value={c._id}>
+                {c.name || `Conversation ${c._id.slice(-4)}`}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {convId && (
+          <div className="flex gap-2">
+            <button
+              onClick={handleEditConversation}
+              className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >
+              ✏️ Rename
+            </button>
+            <button
+              onClick={handleDeleteConversation}
+              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              🗑️ Delete
+            </button>
+          </div>
+        )}
       </header>
 
       {/* Chat Area */}
@@ -118,11 +241,10 @@ export default function AskPage({ botId, botName }: AskPageProps) {
           >
             <div
               className={`px-4 py-2 rounded-2xl shadow ${msg.role === "user"
-                ? "max-w-xs bg-green-500 text-white rounded-br-none"
-                : "w-full bg-white text-gray-800 rounded-bl-none"
+                  ? "max-w-xs bg-green-500 text-white rounded-br-none"
+                  : "w-full bg-white text-gray-800 rounded-bl-none"
                 }`}
             >
-
               {msg.role === "assistant" && msg.type === "buttons" ? (
                 <div>
                   <p className="mb-2">{msg.text}</p>
@@ -151,26 +273,23 @@ export default function AskPage({ botId, botName }: AskPageProps) {
               ) : msg.role === "assistant" && msg.type === "text" ? (
                 <div className="prose max-w-none">
                   <ReactMarkdown
-
                     components={{
-                      code: CodeBlock, // Only this for code!
+                      code: CodeBlock,
                       h1: ({ node, ...props }) => (
                         <h1 className="text-xl font-bold my-2" {...props} />
                       ),
                       h2: ({ node, ...props }) => (
                         <h2 className="text-lg font-semibold my-2" {...props} />
                       ),
-                      li: ({ node, ...props }) => <li className="list-disc ml-6" {...props} />,
+                      li: ({ node, ...props }) => (
+                        <li className="list-disc ml-6" {...props} />
+                      ),
                       ul: ({ node, ...props }) => <ul className="mb-2" {...props} />,
                       strong: ({ node, ...props }) => (
                         <strong className="font-bold" {...props} />
                       ),
-                      em: ({ node, ...props }) => (
-                        <em className="italic" {...props} />
-                      ),
-                      p: ({ node, ...props }) => (
-                        <p className="my-2" {...props} />
-                      ),
+                      em: ({ node, ...props }) => <em className="italic" {...props} />,
+                      p: ({ node, ...props }) => <p className="my-2" {...props} />,
                       a: ({ node, ...props }) => (
                         <a
                           className="text-blue-600 underline hover:text-blue-800"
@@ -180,7 +299,6 @@ export default function AskPage({ botId, botName }: AskPageProps) {
                         />
                       ),
                     }}
-
                   >
                     {msg.text}
                   </ReactMarkdown>

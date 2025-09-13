@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     const wrapIfString = (r: any) =>
       typeof r === "string" ? { type: "message", text: r } : r;
 
-    let aiReply =
+    const aiReply =
       wrapIfString(await chatService.handleFlows(text, flows, flowButtons)) ||
       wrapIfString(await chatService.handleQAPairs(text, qaPairs)) ||
       wrapIfString(await chatService.handleArticles(text, articles)) ||

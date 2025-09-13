@@ -4,37 +4,53 @@ import { ObjectId } from "mongodb";
 import { getCollection } from "@/lib/mongodbHelper";
 import { handleFallback } from "@/lib/handleFallback";
 import { saveMessage } from "@/lib/conversationHelper";
+import { loadJson, saveJson } from "@/lib/jsonDb";
 
+const CONV_PATH = process.env.CONV_PATH || "conversations.json";
 const chatService = new ChatService();
 
 export async function POST(req: Request) {
   try {
-    const { botId, convId = null, text } = await req.json(); // ✅ include convId
-    if (!botId || !text) {
+    const { botId, convId = null, text } = await req.json();
+    if (!botId || !text)
       return NextResponse.json({ error: "Bot ID and text are required" }, { status: 400 });
-    }
 
-    // Save user message
     const conversationId = await saveMessage(botId, convId, "user", text);
 
-    const collection = await getCollection("bots");
-    const bot = await collection.findOne({ _id: new ObjectId(botId) });
-
-    // 1️⃣ Human takeover first
-    if (bot?.humanTakeover) {
-      return NextResponse.json({
-        convId: conversationId,
-        type: "handover",
-        text: "👩‍💻 A human agent has been notified and will reply shortly. Please wait...",
+    // Fetch conversation
+    const isJsonBot = botId.startsWith("json-");
+    let conversation;
+    if (isJsonBot) {
+      const conversations = loadJson(CONV_PATH);
+      conversation = conversations.find((c: any) => c._id === conversationId);
+    } else {
+      const collection = await getCollection("conversations");
+      conversation = await collection.findOne({
+        _id: new ObjectId(conversationId),
+        botId: isJsonBot ? conversationId : new ObjectId(botId),
       });
     }
 
-    // 2️⃣ Explicit user request for human
+    // Human takeover logic
+    if (conversation?.humanTakeover) {
+      return NextResponse.json({
+        convId: conversationId,
+        type: "handover",
+        text: "👩‍💻 A human agent has been notified for this conversation.",
+      });
+    }
+
     if (/agent|human|support|talk to (a )?person/i.test(text)) {
-      await collection.updateOne(
-        { _id: new ObjectId(botId) },
-        { $set: { humanTakeover: true } }
-      );
+      if (isJsonBot) {
+        conversation.humanTakeover = true;
+        saveJson(CONV_PATH, loadJson(CONV_PATH));
+      } else {
+        const collection = await getCollection("conversations");
+        await collection.updateOne(
+          { _id: new ObjectId(conversationId) },
+          { $set: { humanTakeover: true } }
+        );
+      }
       return NextResponse.json({
         convId: conversationId,
         type: "handover",
@@ -42,28 +58,33 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3️⃣ AI attempt across all sources
+    // Try AI sources (normalize any string reply to an object)
     const { qaPairs, articles, sites, pdfs, flows, flowButtons } =
       await chatService.getBotData(botId);
+    const wrapIfString = (r: any) =>
+      typeof r === "string" ? { type: "message", text: r } : r;
 
-    const aiReply =
-      (await chatService.handleFlows(text, flows, flowButtons)) ||
-      (await chatService.handleQAPairs(text, qaPairs)) ||
-      (await chatService.handleArticles(text, articles)) ||
-      (await chatService.handleWebsitesAndPDFs(text, sites, pdfs, botId));
+    let aiReply =
+      wrapIfString(await chatService.handleFlows(text, flows, flowButtons)) ||
+      wrapIfString(await chatService.handleQAPairs(text, qaPairs)) ||
+      wrapIfString(await chatService.handleArticles(text, articles)) ||
+      (await chatService.handleWebsitesAndPDFs(text, sites, pdfs, botId, conversationId));
 
-    // 4️⃣ Fallback if no source produced a reply
     if (!aiReply) {
-      const fallback = await handleFallback(botId);
+      const fallback = await handleFallback(botId, conversationId);
       await saveMessage(botId, conversationId, "ai", fallback.text);
       return NextResponse.json({ convId: conversationId, ...fallback });
     }
 
-    // 5️⃣ Return AI reply
-    if ("type" in aiReply && "text" in aiReply) {
+    if (
+      aiReply && typeof aiReply === "object" &&
+      "type" in aiReply && "text" in aiReply
+    ) {
       await saveMessage(botId, conversationId, "ai", aiReply.text);
       return NextResponse.json({ convId: conversationId, ...aiReply });
-    } else if ("textStream" in aiReply) {
+    } else if (
+      aiReply && typeof aiReply === "object" && "textStream" in aiReply
+    ) {
       let fullText = "";
       const { textStream } = aiReply;
       return new Response(
@@ -71,7 +92,11 @@ export async function POST(req: Request) {
           async start(controller) {
             try {
               for await (const chunk of textStream) {
-                const str = new TextDecoder().decode(chunk);
+                let str;
+                if (typeof chunk === "string") str = chunk;
+                else if (chunk instanceof Uint8Array || ArrayBuffer.isView(chunk))
+                  str = new TextDecoder().decode(chunk);
+                else str = String(chunk);
                 fullText += str;
                 controller.enqueue(new TextEncoder().encode(str));
               }
@@ -85,10 +110,9 @@ export async function POST(req: Request) {
         { headers: { "Content-Type": "text/plain; charset=utf-8" } }
       );
     } else {
-      return NextResponse.json({
-        convId: conversationId,
-        ...(await handleFallback(botId)),
-      });
+      const fallback = await handleFallback(botId, conversationId);
+      await saveMessage(botId, conversationId, "ai", fallback.text);
+      return NextResponse.json({ convId: conversationId, ...fallback });
     }
   } catch (err: any) {
     console.error("Error in chat route:", err);

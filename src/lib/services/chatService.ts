@@ -154,7 +154,8 @@ export class ChatService {
     userText: string,
     sites: any[],
     pdfs: any[],
-    botId: string
+    botId: string,
+    convId: string
   ) {
     const allChunks: { chunk: string; embedding: number[]; source: string }[] = [];
     for (const site of sites) {
@@ -187,7 +188,7 @@ export class ChatService {
       .join("\n\n");
 
     if (allChunks.length === 0) {
-      return handleFallback(botId);
+      return handleFallback(botId, convId);
     }
 
     const prompt = `
@@ -213,7 +214,7 @@ User question: ${userText}
         prompt,
       });
     } catch (err) {
-      return handleFallback(botId);
+      return handleFallback(botId, convId);
     }
 
   }

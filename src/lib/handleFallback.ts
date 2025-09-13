@@ -1,53 +1,58 @@
-// handleFallback.ts
 import { getCollection } from "@/lib/mongodbHelper";
 import { loadJson, saveJson } from "@/lib/jsonDb";
 import { ObjectId } from "mongodb";
+import path from "path";
 
-export interface Bot {
-  _id: string;
-  name: string;
-  fallbackCount?: number;
-  humanTakeover?: boolean;
-}
+const CONV_PATH = path.join(process.cwd(), "data", "conversations.json");
 
-export async function handleFallback(botId: string) {
-  // Load JSON bots
-  const bots = loadJson("data/bots.json");
-  let bot = bots.find((b: Bot) => b._id === botId);
+export async function handleFallback(botId: string, convId: string) {
+  const isJsonBot = botId.startsWith("json-");
 
-  if (bot) {
-    if (!bot.humanTakeover) { // ✅ don’t increment once already true
-      bot.fallbackCount = (bot.fallbackCount || 0) + 1;
-      if (bot.fallbackCount > 6) {
-        bot.humanTakeover = true;
+  if (isJsonBot) {
+    const conversations = loadJson(CONV_PATH);
+    const conv = conversations.find((c: any) => c._id === convId);
+
+    if (conv) {
+      if (!conv.humanTakeover) {
+        conv.fallbackCount = (conv.fallbackCount || 0) + 1;
+        if (conv.fallbackCount > 6) conv.humanTakeover = true;
+        conv.updatedAt = new Date();
+        saveJson(CONV_PATH, conversations);
       }
-      saveJson("data/bots.json", bots);
+      return {
+        type: conv.humanTakeover ? "handover" : "message",
+        text: conv.humanTakeover
+          ? "Multiple AI failures detected. Connecting you to a human agent 👤"
+          : "Sorry, I am not yet trained for this data. Can you rephrase?",
+      };
     }
   } else {
-    // MongoDB bot
-    const collection = await getCollection("bots");
-    const existing = await collection.findOne({ _id: new ObjectId(botId) });
+    const collection = await getCollection("conversations");
+    const conv = await collection.findOne({
+      _id: new ObjectId(convId),
+      botId: new ObjectId(botId),
+    });
 
-    if (existing) {
-      if (!existing.humanTakeover) { // ✅ don’t increment once already true
-        const newCount = (existing.fallbackCount || 0) + 1;
+    if (conv) {
+      if (!conv.humanTakeover) {
+        const newCount = (conv.fallbackCount || 0) + 1;
         const humanTakeover = newCount > 6;
         await collection.updateOne(
-          { _id: new ObjectId(botId) },
+          { _id: conv._id },
           { $set: { fallbackCount: newCount, humanTakeover } },
           { upsert: true }
         );
-        bot = { ...existing, fallbackCount: newCount, humanTakeover };
+        return {
+          type: humanTakeover ? "handover" : "message",
+          text: humanTakeover
+            ? "Multiple AI failures detected. Connecting you to a human agent 👤"
+            : "Sorry, I am not yet trained for this data. Can you rephrase?",
+        };
       } else {
-        bot = existing; // keep as is
+        return { type: "handover", text: "Conversation is under human takeover 👤" };
       }
     }
   }
 
-  return {
-    type: bot?.humanTakeover ? "handover" : "message",
-    text: bot?.humanTakeover
-      ? "Multiple AI failures detected. Connecting you to a human agent 👤"
-      : "Sorry, I am not yet trained for this data. Can you rephrase?",
-  };
+  return { type: "message", text: "Sorry, I am not yet trained for this data. Can you rephrase?" };
 }

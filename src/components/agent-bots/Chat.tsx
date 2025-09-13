@@ -57,6 +57,8 @@ export default function AskPage({ botId, botName }: AskPageProps) {
 
   /** 📌 Load messages when convId changes */
   useEffect(() => {
+    setConvId(null);
+    setMessages([]);
     async function fetchConversation() {
       if (!convId) {
         setMessages([]);
@@ -241,8 +243,8 @@ export default function AskPage({ botId, botName }: AskPageProps) {
           >
             <div
               className={`px-4 py-2 rounded-2xl shadow ${msg.role === "user"
-                  ? "max-w-xs bg-green-500 text-white rounded-br-none"
-                  : "w-full bg-white text-gray-800 rounded-bl-none"
+                ? "max-w-xs bg-green-500 text-white rounded-br-none"
+                : "w-full bg-white text-gray-800 rounded-bl-none"
                 }`}
             >
               {msg.role === "assistant" && msg.type === "buttons" ? (

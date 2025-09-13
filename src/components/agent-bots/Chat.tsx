@@ -41,24 +41,31 @@ export default function AskPage({ botId, botName }: AskPageProps) {
 
   /** 📌 Load all conversations for this bot */
   useEffect(() => {
+    // Reset convId and messages whenever bot changes
+    setConvId(null);
+    setMessages([]);
+
     async function fetchConversations() {
       try {
         const res = await fetch(`/api/training/conversations?botId=${botId}`);
         if (res.ok) {
           const data = await res.json();
           setConversations(data);
+        } else {
+          setConversations([]);
         }
       } catch (err) {
         console.error("Failed to load conversations:", err);
+        setConversations([]);
       }
     }
+
     fetchConversations();
   }, [botId]);
 
+
   /** 📌 Load messages when convId changes */
   useEffect(() => {
-    setConvId(null);
-    setMessages([]);
     async function fetchConversation() {
       if (!convId) {
         setMessages([]);

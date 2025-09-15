@@ -101,22 +101,21 @@ export default function AskPage({ botId, botName }: AskPageProps) {
       const res = await fetch("/api/training", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: input, botId, convId }),
+        body: JSON.stringify({ text: input, botId, convId }), // convId can be null first time
       });
 
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const data = await res.json();
 
-        // Save conversation ID if new one created
-        if (data.convId) {
-          setConvId(data.convId);
-          if (!conversations.find((c) => c._id === data.convId)) {
-            setConversations((prev) => [
-              ...prev,
-              { _id: data.convId, name: "New Conversation" },
-            ]);
-          }
+        // ✅ If backend created new convId, set it immediately
+        if (data.convId && convId !== data.convId) {
+          setConvId(data.convId); // ensures next message reuses this
+          setConversations((prev) =>
+            prev.find((c) => c._id === data.convId)
+              ? prev
+              : [...prev, { _id: data.convId, name: "New Conversation" }]
+          );
         }
 
         setMessages((prev) => [
@@ -124,7 +123,7 @@ export default function AskPage({ botId, botName }: AskPageProps) {
           { role: "assistant", ...data, type: data.type || "text" },
         ]);
       } else {
-        // Streaming fallback
+        // Streaming fallback...
         const reader = res.body!.getReader();
         const decoder = new TextDecoder();
         let botReply = "";
@@ -155,6 +154,7 @@ export default function AskPage({ botId, botName }: AskPageProps) {
       setLoading(false);
     }
   };
+
 
   /** Edit conversation name */
   const handleEditConversation = async () => {

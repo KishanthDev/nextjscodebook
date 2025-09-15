@@ -119,30 +119,43 @@ export async function POST(req: Request) {
     }
 
     /** Case: streaming reply */
+    /** Case: streaming reply */
     if (aiReply && typeof aiReply === "object" && "textStream" in aiReply) {
-      let fullText = "";
       const { textStream } = aiReply;
+      let fullText = "";
 
       return new Response(
         new ReadableStream({
           async start(controller) {
             try {
+              // Send initial event with convId so UI updates immediately
+              controller.enqueue(
+                new TextEncoder().encode(
+                  `data: ${JSON.stringify({ convId: conversationId, type: "start" })}\n\n`
+                )
+              );
+
               for await (const chunk of textStream) {
                 let str;
                 if (typeof chunk === "string") str = chunk;
-                else if (
-                  chunk instanceof Uint8Array ||
-                  ArrayBuffer.isView(chunk)
-                )
+                else if (chunk instanceof Uint8Array || ArrayBuffer.isView(chunk))
                   str = new TextDecoder().decode(chunk);
                 else str = String(chunk);
+
                 fullText += str;
-                controller.enqueue(new TextEncoder().encode(str));
+
+                // Send each text piece as JSON with convId
+                controller.enqueue(
+                  new TextEncoder().encode(
+                    `data: ${JSON.stringify({ convId: conversationId, text: str })}\n\n`
+                  )
+                );
               }
 
+              // Save final full text
               await saveMessage(botId, conversationId, "ai", fullText);
 
-              // If reply looks like fallback
+              // ✅ Fallback check after streaming
               if (FALLBACK_REGEX.test(fullText)) {
                 await handleFallback(botId, conversationId);
 
@@ -152,6 +165,11 @@ export async function POST(req: Request) {
                 }
               }
 
+              controller.enqueue(
+                new TextEncoder().encode(
+                  `data: ${JSON.stringify({ convId: conversationId, type: "end" })}\n\n`
+                )
+              );
               controller.close();
             } catch (err) {
               controller.error(err);
@@ -160,12 +178,15 @@ export async function POST(req: Request) {
         }),
         {
           headers: {
-            "Content-Type": "text/plain; charset=utf-8",
-            "X-Conversation-Id": conversationId, // ✅ lets frontend update dropdown immediately
+            "Content-Type": "text/event-stream; charset=utf-8",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
           },
         }
       );
     }
+
+
 
     /** Catch-all fallback */
     const fallback = await handleFallback(botId, conversationId);

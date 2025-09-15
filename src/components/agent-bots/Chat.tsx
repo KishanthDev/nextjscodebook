@@ -90,6 +90,7 @@ export default function AskPage({ botId, botName }: AskPageProps) {
   }, [messages]);
 
   /** 📌 Send message */
+  /** 📌 Send message */
   const handleAsk = async () => {
     if (!input.trim()) return;
 
@@ -101,16 +102,18 @@ export default function AskPage({ botId, botName }: AskPageProps) {
       const res = await fetch("/api/training", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: input, botId, convId }), // convId can be null first time
+        body: JSON.stringify({ text: input, botId, convId }),
       });
 
       const contentType = res.headers.get("content-type") || "";
+
       if (contentType.includes("application/json")) {
+        // ✅ JSON reply (QA, flows, articles)
         const data = await res.json();
 
-        // ✅ If backend created new convId, set it immediately
+        // Update convId immediately if new
         if (data.convId && convId !== data.convId) {
-          setConvId(data.convId); // ensures next message reuses this
+          setConvId(data.convId);
           setConversations((prev) =>
             prev.find((c) => c._id === data.convId)
               ? prev
@@ -122,27 +125,64 @@ export default function AskPage({ botId, botName }: AskPageProps) {
           ...prev,
           { role: "assistant", ...data, type: data.type || "text" },
         ]);
-      } else {
-        // Streaming fallback...
+      } else if (contentType.includes("text/event-stream")) {
+        // ✅ Streaming reply (PDFs, websites)
         const reader = res.body!.getReader();
         const decoder = new TextDecoder();
         let botReply = "";
+        let currentConvId = convId; // store convId from stream
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          botReply += decoder.decode(value, { stream: true });
 
-          setMessages((prev) => {
-            const copy = [...prev];
-            if (copy[copy.length - 1]?.role === "assistant") {
-              (copy[copy.length - 1] as any).text = botReply;
-            } else {
-              copy.push({ role: "assistant", type: "text", text: botReply });
+          const chunk = decoder.decode(value, { stream: true }).trim();
+          if (!chunk) continue;
+
+          // Parse SSE-style JSON chunk: "data: { ... }"
+          const lines = chunk.split("\n");
+          for (const line of lines) {
+            if (!line.startsWith("data:")) continue;
+            const jsonStr = line.replace(/^data:\s*/, "");
+            try {
+              const parsed = JSON.parse(jsonStr);
+
+              // Update convId if received in stream
+              if (parsed.convId && currentConvId !== parsed.convId) {
+                currentConvId = parsed.convId;
+                setConvId(parsed.convId);
+                setConversations((prev) =>
+                  prev.find((c) => c._id === parsed.convId)
+                    ? prev
+                    : [...prev, { _id: parsed.convId, name: "New Conversation" }]
+                );
+              }
+
+              // Append streamed text
+              if (parsed.text) {
+                botReply += parsed.text;
+                setMessages((prev) => {
+                  const copy = [...prev];
+                  if (copy[copy.length - 1]?.role === "assistant") {
+                    (copy[copy.length - 1] as any).text = botReply;
+                  } else {
+                    copy.push({ role: "assistant", type: "text", text: botReply });
+                  }
+                  return copy;
+                });
+              }
+            } catch (e) {
+              console.warn("Failed to parse SSE chunk:", line);
             }
-            return copy;
-          });
+          }
         }
+      } else {
+        // Fallback if unknown content type
+        const text = await res.text();
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", type: "text", text },
+        ]);
       }
     } catch (err) {
       console.error(err);
@@ -154,6 +194,7 @@ export default function AskPage({ botId, botName }: AskPageProps) {
       setLoading(false);
     }
   };
+
 
 
   /** Edit conversation name */

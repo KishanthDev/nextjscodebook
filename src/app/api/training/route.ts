@@ -139,7 +139,7 @@ export async function POST(req: Request) {
               );
 
               for await (const chunk of textStream) {
-                let str =
+                const str =
                   typeof chunk === "string"
                     ? chunk
                     : chunk instanceof Uint8Array || ArrayBuffer.isView(chunk)

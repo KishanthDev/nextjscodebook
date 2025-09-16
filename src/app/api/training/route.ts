@@ -2,14 +2,12 @@ import { NextResponse } from "next/server";
 import { ChatService } from "@/lib/services/chatService";
 import { ObjectId } from "mongodb";
 import { getCollection } from "@/lib/mongodbHelper";
-import { handleFallback } from "@/lib/handleFallback";
+import { resetFallbackCount, handleFallback } from "@/lib/handleFallback";
 import { saveMessage } from "@/lib/conversationHelper";
 import { loadJson, saveJson } from "@/lib/jsonDb";
 
 const CONV_PATH = process.env.CONV_PATH || "conversations.json";
 const chatService = new ChatService();
-
-// Regex to detect fallback-style AI replies
 const FALLBACK_REGEX = /isn't clear|If you have|Could you please|not trained|rephrase|sorry/i;
 
 export async function POST(req: Request) {
@@ -31,12 +29,20 @@ export async function POST(req: Request) {
     if (isJsonBot) {
       const conversations = loadJson(CONV_PATH);
       conversation = conversations.find((c: any) => c._id === conversationId);
+      if (!conversation) {
+        console.error(`Conversation not found for convId: ${conversationId}`);
+        return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+      }
     } else {
       const collection = await getCollection("conversations");
       conversation = await collection.findOne({
         _id: new ObjectId(conversationId),
         botId: new ObjectId(botId),
       });
+      if (!conversation) {
+        console.error(`Conversation not found in MongoDB for convId: ${conversationId}`);
+        return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+      }
     }
 
     /** 🟢 Human takeover logic */
@@ -105,20 +111,18 @@ export async function POST(req: Request) {
     ) {
       await saveMessage(botId, conversationId, "ai", aiReply.text);
 
-      // If looks like fallback → also trigger fallback logic
       if (FALLBACK_REGEX.test(aiReply.text)) {
-        await handleFallback(botId, conversationId);
-
-        if (isJsonBot) {
-          const conversations = loadJson(CONV_PATH);
-          saveJson(CONV_PATH, conversations);
+        const fallback = await handleFallback(botId, conversationId);
+        return NextResponse.json({ convId: conversationId, ...fallback });
+      } else {
+        const resetSuccess = await resetFallbackCount(botId, conversationId);
+        if (!resetSuccess) {
+          console.error(`Failed to reset fallback count for convId: ${conversationId}`);
         }
+        return NextResponse.json({ convId: conversationId, ...aiReply });
       }
-
-      return NextResponse.json({ convId: conversationId, ...aiReply });
     }
 
-    /** Case: streaming reply */
     /** Case: streaming reply */
     if (aiReply && typeof aiReply === "object" && "textStream" in aiReply) {
       const { textStream } = aiReply;
@@ -128,7 +132,6 @@ export async function POST(req: Request) {
         new ReadableStream({
           async start(controller) {
             try {
-              // Send initial event with convId so UI updates immediately
               controller.enqueue(
                 new TextEncoder().encode(
                   `data: ${JSON.stringify({ convId: conversationId, type: "start" })}\n\n`
@@ -136,15 +139,15 @@ export async function POST(req: Request) {
               );
 
               for await (const chunk of textStream) {
-                let str;
-                if (typeof chunk === "string") str = chunk;
-                else if (chunk instanceof Uint8Array || ArrayBuffer.isView(chunk))
-                  str = new TextDecoder().decode(chunk);
-                else str = String(chunk);
+                let str =
+                  typeof chunk === "string"
+                    ? chunk
+                    : chunk instanceof Uint8Array || ArrayBuffer.isView(chunk)
+                      ? new TextDecoder().decode(chunk)
+                      : String(chunk);
 
                 fullText += str;
 
-                // Send each text piece as JSON with convId
                 controller.enqueue(
                   new TextEncoder().encode(
                     `data: ${JSON.stringify({ convId: conversationId, text: str })}\n\n`
@@ -152,16 +155,14 @@ export async function POST(req: Request) {
                 );
               }
 
-              // Save final full text
               await saveMessage(botId, conversationId, "ai", fullText);
 
-              // ✅ Fallback check after streaming
               if (FALLBACK_REGEX.test(fullText)) {
                 await handleFallback(botId, conversationId);
-
-                if (isJsonBot) {
-                  const conversations = loadJson(CONV_PATH);
-                  saveJson(CONV_PATH, conversations);
+              } else {
+                const resetSuccess = await resetFallbackCount(botId, conversationId);
+                if (!resetSuccess) {
+                  console.error(`Failed to reset fallback count for convId: ${conversationId}`);
                 }
               }
 
@@ -172,6 +173,7 @@ export async function POST(req: Request) {
               );
               controller.close();
             } catch (err) {
+              console.error(`Error in streaming reply for convId: ${conversationId}:`, err);
               controller.error(err);
             }
           },
@@ -186,20 +188,13 @@ export async function POST(req: Request) {
       );
     }
 
-
-
     /** Catch-all fallback */
+    console.log(`Catch-all fallback for convId: ${conversationId}`);
     const fallback = await handleFallback(botId, conversationId);
     await saveMessage(botId, conversationId, "ai", fallback.text);
-
-    if (isJsonBot) {
-      const conversations = loadJson(CONV_PATH);
-      saveJson(CONV_PATH, conversations);
-    }
-
     return NextResponse.json({ convId: conversationId, ...fallback });
   } catch (err: any) {
-    console.error("Error in chat route:", err);
+    console.error(`Error in chat route for convId: `, err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

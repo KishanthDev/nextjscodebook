@@ -66,8 +66,8 @@ export default function AssistantPage() {
   };
 
   return (
-    <div className="flex flex-col w-full mx-auto min-h-[calc(100vh-53px)]">
-      {/* Chat area */}
+    <div className="flex flex-col h-[calc(100vh-53px)] w-full mx-auto">
+      {/* Chat area (scrollable) */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white border shadow-sm">
         {messages.length === 0 ? (
           <p className="text-gray-400 text-center mt-20">No conversation yet</p>
@@ -75,24 +75,28 @@ export default function AssistantPage() {
           messages.map((m) => (
             <div
               key={m.id}
-              className={`flex items-start gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex items-start gap-3 ${m.role === "user" ? "justify-end" : "justify-start"
+                }`}
             >
-              {/* Bot avatar on left */}
-              {m.role === 'assistant' && (
+              {/* Bot avatar */}
+              {m.role === "assistant" && (
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
                   <Bot className="w-5 h-5 text-gray-600" />
                 </div>
               )}
 
+              {/* Message bubble */}
               <div
-                className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'
+                className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm ${m.role === "user"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-900"
                   }`}
               >
                 <ReactMarkdown>{m.content}</ReactMarkdown>
               </div>
 
-              {/* User avatar on right */}
-              {m.role === 'user' && (
+              {/* User avatar */}
+              {m.role === "user" && (
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
                   <User className="w-5 h-5 text-white" />
                 </div>
@@ -101,9 +105,10 @@ export default function AssistantPage() {
           ))
         )}
       </div>
-      {/* Input */}
+
+      {/* Selected file preview (fixed above input) */}
       {file && (
-        <div className="px-4 py-2 bg-gray-100 border-b text-sm text-gray-700 flex items-center justify-between">
+        <div className="px-4 py-2 bg-gray-100 border-t text-sm text-gray-700 flex items-center justify-between">
           <span className="truncate max-w-[80%]">{file.name}</span>
           <button
             type="button"
@@ -114,6 +119,8 @@ export default function AssistantPage() {
           </button>
         </div>
       )}
+
+      {/* Input (always fixed at bottom) */}
       <form
         onSubmit={handleSubmit}
         className="flex items-center gap-2 border-t p-4 bg-gray-50"
@@ -149,7 +156,7 @@ export default function AssistantPage() {
           {loading ? "..." : "Send"}
         </button>
       </form>
-
     </div>
+
   );
 }

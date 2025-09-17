@@ -5,6 +5,10 @@ import path from "path";
 
 const CONV_PATH = path.join(process.cwd(), "data", "conversations.json");
 
+function isValidObjectId(id: string) {
+  return /^[0-9a-fA-F]{24}$/.test(id);
+}
+
 /**
  * Save a message into a specific conversation
  * @param botId - Bot ID (Mongo or JSON)
@@ -18,7 +22,7 @@ export async function saveMessage(
   role: "user" | "ai" | "human",
   text: string
 ) {
-  const isJsonBot = botId.startsWith("json-"); // 🔹 detect JSON bot
+  const isJsonBot = botId.startsWith("mem_"); // 🔹 detect JSON bot
   const now = new Date();
 
   if (isJsonBot) {
@@ -29,7 +33,7 @@ export async function saveMessage(
 
     if (!conv) {
       conv = {
-        _id: convId || `conv-${Date.now()}`,
+         _id: new ObjectId().toHexString(), 
         botId,
         name: "New Conversation",
         messages: [],
@@ -47,13 +51,17 @@ export async function saveMessage(
   } else {
     const collection = await getCollection("conversations");
 
-    let conv = convId
-      ? await collection.findOne({ _id: new ObjectId(convId) })
-      : null;
+    // 🔹 Handle convId safely
+    let conv = null;
+    if (convId && isValidObjectId(convId)) {
+      conv = await collection.findOne({ _id: new ObjectId(convId) });
+    } else if (convId) {
+      conv = await collection.findOne({ _id: new ObjectId(convId) });
+    }
 
     if (!conv) {
       const result = await collection.insertOne({
-        botId: new ObjectId(botId),
+        botId: isValidObjectId(botId) ? new ObjectId(botId) : botId, // ✅ fix here
         name: "New Conversation",
         messages: [],
         createdAt: now,
@@ -75,7 +83,6 @@ export async function saveMessage(
         $set: { updatedAt: now },
       } as any
     );
-
 
     return conv._id;
   }

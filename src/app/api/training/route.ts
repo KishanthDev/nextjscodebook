@@ -5,8 +5,9 @@ import { getCollection } from "@/lib/mongodbHelper";
 import { resetFallbackCount, handleFallback } from "@/lib/handleFallback";
 import { saveMessage } from "@/lib/conversationHelper";
 import { loadJson, saveJson } from "@/lib/jsonDb";
+import path from "path";
 
-const CONV_PATH = process.env.CONV_PATH || "conversations.json";
+const CONV_PATH = path.join(process.cwd(), "data", "conversations.json");
 const chatService = new ChatService();
 const FALLBACK_REGEX = /isn't clear|If you have|Could you please|not trained|rephrase|sorry/i;
 
@@ -23,22 +24,32 @@ export async function POST(req: Request) {
     // Save user message
     const conversationId = await saveMessage(botId, convId, "user", text);
 
-    // Load conversation
-    const isJsonBot = botId.startsWith("json-");
+    // Determine bot type
+    const isJsonBot = botId.startsWith("mem_");
     let conversation;
+
     if (isJsonBot) {
+      // JSON bot logic
       const conversations = loadJson(CONV_PATH);
       conversation = conversations.find((c: any) => c._id === conversationId);
+
       if (!conversation) {
         console.error(`Conversation not found for convId: ${conversationId}`);
         return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
       }
     } else {
+      // MongoDB bot logic
       const collection = await getCollection("conversations");
+
+      // Only cast to ObjectId if valid
+      const safeConvId = ObjectId.isValid(conversationId) ? new ObjectId(conversationId) : conversationId;
+      const safeBotId = ObjectId.isValid(botId) ? new ObjectId(botId) : botId;
+
       conversation = await collection.findOne({
-        _id: new ObjectId(conversationId),
-        botId: new ObjectId(botId),
+        _id: safeConvId,
+        botId: safeBotId,
       });
+
       if (!conversation) {
         console.error(`Conversation not found in MongoDB for convId: ${conversationId}`);
         return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
@@ -65,10 +76,11 @@ export async function POST(req: Request) {
       } else {
         const collection = await getCollection("conversations");
         await collection.updateOne(
-          { _id: new ObjectId(conversationId) },
+          { _id: ObjectId.isValid(conversationId) ? new ObjectId(conversationId) : conversationId },
           { $set: { humanTakeover: true } }
         );
       }
+
       return NextResponse.json({
         convId: conversationId,
         type: "handover",
@@ -77,23 +89,15 @@ export async function POST(req: Request) {
     }
 
     /** 🟢 AI reply pipeline */
-    const { qaPairs, articles, sites, pdfs, flows, flowButtons } =
-      await chatService.getBotData(botId);
+    const { qaPairs, articles, sites, pdfs, flows, flowButtons } = await chatService.getBotData(botId);
 
-    const wrapIfString = (r: any) =>
-      typeof r === "string" ? { type: "message", text: r } : r;
+    const wrapIfString = (r: any) => (typeof r === "string" ? { type: "message", text: r } : r);
 
     const aiReply =
       wrapIfString(await chatService.handleFlows(text, flows, flowButtons)) ||
       wrapIfString(await chatService.handleQAPairs(text, qaPairs)) ||
       wrapIfString(await chatService.handleArticles(text, articles)) ||
-      (await chatService.handleWebsitesAndPDFs(
-        text,
-        sites,
-        pdfs,
-        botId,
-        conversationId
-      ));
+      (await chatService.handleWebsitesAndPDFs(text, sites, pdfs, botId, conversationId));
 
     /** Case: no reply → fallback */
     if (!aiReply) {
@@ -103,12 +107,7 @@ export async function POST(req: Request) {
     }
 
     /** Case: normal text reply */
-    if (
-      aiReply &&
-      typeof aiReply === "object" &&
-      "type" in aiReply &&
-      "text" in aiReply
-    ) {
+    if (aiReply && typeof aiReply === "object" && "type" in aiReply && "text" in aiReply) {
       await saveMessage(botId, conversationId, "ai", aiReply.text);
 
       if (FALLBACK_REGEX.test(aiReply.text)) {
@@ -143,8 +142,8 @@ export async function POST(req: Request) {
                   typeof chunk === "string"
                     ? chunk
                     : chunk instanceof Uint8Array || ArrayBuffer.isView(chunk)
-                      ? new TextDecoder().decode(chunk)
-                      : String(chunk);
+                    ? new TextDecoder().decode(chunk)
+                    : String(chunk);
 
                 fullText += str;
 
@@ -189,7 +188,6 @@ export async function POST(req: Request) {
     }
 
     /** Catch-all fallback */
-    console.log(`Catch-all fallback for convId: ${conversationId}`);
     const fallback = await handleFallback(botId, conversationId);
     await saveMessage(botId, conversationId, "ai", fallback.text);
     return NextResponse.json({ convId: conversationId, ...fallback });

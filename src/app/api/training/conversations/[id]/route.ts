@@ -15,7 +15,7 @@ export async function PATCH(req: Request, context: any) {
     if (!botId) return NextResponse.json({ error: "botId required" }, { status: 400 });
     if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
 
-    const isJsonBot = botId.startsWith("json-");
+    const isJsonBot = botId.startsWith("mem_");
 
     if (isJsonBot) {
       const conversations = loadJson(CONV_PATH);
@@ -48,7 +48,7 @@ export async function GET(req: Request, context: any) {
     const botId = searchParams.get("botId");
     if (!botId) return NextResponse.json({ error: "botId required" }, { status: 400 });
 
-    const isJsonBot = botId.startsWith("json-");
+    const isJsonBot = botId.startsWith("mem_");
 
     if (isJsonBot) {
       const conversations = loadJson(CONV_PATH);
@@ -78,7 +78,7 @@ export async function DELETE(req: Request, context: any) {
 
     if (!botId) return NextResponse.json({ error: "botId required" }, { status: 400 });
 
-    const isJsonBot = botId.startsWith("json-");
+    const isJsonBot = botId.startsWith("mem_");
 
     if (isJsonBot) {
       let conversations = loadJson(CONV_PATH);

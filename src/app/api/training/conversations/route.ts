@@ -6,13 +6,17 @@ import { loadJson } from "@/lib/jsonDb";
 
 const CONV_PATH = path.join(process.cwd(), "data", "conversations.json");
 
+function isValidObjectId(id: string) {
+  return /^[0-9a-fA-F]{24}$/.test(id);
+}
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const botId = searchParams.get("botId");
     if (!botId) return NextResponse.json({ error: "botId required" }, { status: 400 });
 
-    const isJsonBot = botId.startsWith("json-");
+    const isJsonBot = botId.startsWith("mem_");
 
     if (isJsonBot) {
       const conversations = loadJson(CONV_PATH);
@@ -28,10 +32,15 @@ export async function GET(req: Request) {
       return NextResponse.json(filtered);
     } else {
       const collection = await getCollection("conversations");
+      const query = isValidObjectId(botId)
+        ? { botId: new ObjectId(botId) }
+        : { botId }; // 👈 fallback for string botIds
+
       const conversations = await collection
-        .find({ botId: new ObjectId(botId) })
+        .find(query)
         .project({ messages: 0 }) // exclude messages for list view
         .toArray();
+
       return NextResponse.json(conversations);
     }
   } catch (err: any) {

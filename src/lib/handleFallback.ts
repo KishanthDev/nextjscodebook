@@ -1,15 +1,16 @@
 import { getCollection } from "@/lib/mongodbHelper";
 import { loadJson, saveJson } from "@/lib/jsonDb";
 import { ObjectId } from "mongodb";
+import path from "path";
 
-const CONV_PATH = process.env.CONV_PATH || "conversations.json";
+const CONV_PATH = path.join(process.cwd(), "data", "conversations.json");
 const MAX_CONSECUTIVE_FALLBACKS = 5;
 
 // Reset fallback count on successful responses
 
 // Reset fallback count on successful responses
 export async function resetFallbackCount(botId: string, convId: string): Promise<boolean> {
-  const isJsonBot = botId.startsWith("json-");
+  const isJsonBot = botId.startsWith("mem_");
   console.log(`Attempting to reset fallback count for botId: ${botId}, convId: ${convId}`);
 
   try {
@@ -47,7 +48,7 @@ export async function resetFallbackCount(botId: string, convId: string): Promise
 
 // Handle fallback responses and increment count
 export async function handleFallback(botId: string, convId: string) {
-  const isJsonBot = botId.startsWith("json-");
+  const isJsonBot = botId.startsWith("mem_");
   console.log(`Handling fallback for botId: ${botId}, convId: ${convId}`);
 
   try {

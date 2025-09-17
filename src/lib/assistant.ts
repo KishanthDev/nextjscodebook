@@ -53,7 +53,7 @@ export async function pollRunStatus(openai: OpenAI, threadId: string, runId: str
   do {
     result = await openai.beta.threads.runs.retrieve(runId, { thread_id: threadId });
     status = result.status;
-    if (status !== "completed") await new Promise((res) => setTimeout(res, 1000));
+    if (status !== "completed") await new Promise((resolve) => setTimeout(resolve, 1000));
   } while (status !== "completed" && status !== "failed");
   return result;
 }

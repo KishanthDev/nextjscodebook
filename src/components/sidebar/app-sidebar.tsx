@@ -68,12 +68,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/ai-agent', icon: Bot, label: 'AI Agent Training' },
     { href: '/agent-bots', icon: Bot, label: 'Agent Bots' },
     { href: '/modifier', icon: Settings2, label: 'Chat Widget' },
-    { href: '/archived-chats', icon: MessageCircle, label: 'Archived Chats' },
+    // { href: '/archived-chats', icon: MessageCircle, label: 'Archived Chats' },
     { href: '/billing', icon: BadgeDollarSign, label: 'Billing' },
     { href: '/ai', icon: Bot, label: 'AI' },
     { href: '/custom-ai', icon: Bot, label: 'Custom - AI' },
     { href: '/angular-ai', icon: Bot, label: 'Angular-AI' },
     { href: '/pdf-chat', icon: ChartGanttIcon, label: 'PDF Chat' },
+    { href: '/openai-assistant-chat', icon: Bot, label: 'OpenAI Assistant Chat' },
   ];
 
   return (

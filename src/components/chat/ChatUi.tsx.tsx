@@ -68,7 +68,7 @@ export default function ChatUI() {
     };
   }, []);
 
-  let suggestedReply = "";
+  const suggestedReply = "";
 
 
   const handleSendMessage = (text: string) => {

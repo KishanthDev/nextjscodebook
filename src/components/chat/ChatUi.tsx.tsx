@@ -47,6 +47,9 @@ export default function ChatUI() {
     ...contact,
     status: contact.status as "online" | "offline",
   }));
+  const [contacts, setContacts] = useState<Contact[]>(
+    sampleContacts
+  );
 
   const userStatus = acceptChats ? "online" : "offline";
 
@@ -60,7 +63,26 @@ export default function ChatUI() {
     });
 
     client.on("message", (_, payload) => {
-      setMessages((prev) => [...prev, { fromUser: false, text: payload.toString() }]);
+      const text = payload.toString();
+      setMessages((prev) => [...prev, { fromUser: false, text: text }]);
+      setContacts(prevContacts =>
+        prevContacts.map(c => {
+          if (c.id === selectedContact?.id) {
+            
+            // Current chat open → reset unread
+            return { ...c, unread: 0, recentMsg: text, time: "now" };
+          } else {
+            // Not open → increment unread
+        
+            return {
+              ...c,
+              unread: (c.unread || 0) + 1,
+              recentMsg: text,
+              time: "now",
+            };
+          }
+        })
+      );
     });
 
     return () => {
@@ -80,6 +102,17 @@ export default function ChatUI() {
       ]);
     }, 1000);
   };
+
+  const handleSelectContact = (contact: Contact) => {
+    setSelectedContact(contact);
+
+    setContacts(prev =>
+      prev.map(c =>
+        c.id === contact.id ? { ...c, unread: 0 } : c
+      )
+    );
+  };
+
 
   /*   useEffect(() => {
       const timer = setTimeout(() => {
@@ -107,8 +140,6 @@ export default function ChatUI() {
       }
     }; */
 
-
-
   useEffect(() => {
     const timer = setTimeout(() => setIsLoadingContacts(false), 100);
     return () => clearTimeout(timer);
@@ -122,9 +153,9 @@ export default function ChatUI() {
           <ContactListSkeleton />
         ) : (
           <ContactList
-            contacts={sampleContacts}
+            contacts={contacts}
             selectedContact={selectedContact}
-            onSelect={setSelectedContact}
+            onSelect={handleSelectContact}
             userStatus={userStatus}
           />
         )}

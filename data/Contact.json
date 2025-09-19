@@ -5,30 +5,6 @@
     "status": "online",
     "recentMsg": "I'll call you in 5 mins!",
     "time": "2 min ago",
-    "unread": 2
-  },
-  {
-    "id": 2,
-    "name": "Bob",
-    "status": "offline",
-    "recentMsg": "Got it, thanks!",
-    "time": "10 min ago",
     "unread": 0
-  },
-  {
-    "id": 3,
-    "name": "Charlie",
-    "status": "busy",
-    "recentMsg": "Let's reschedule our meeting.",
-    "time": "1 hour ago",
-    "unread": 5
-  },
-  {
-    "id": 4,
-    "name": "Diana",
-    "status": "online",
-    "recentMsg": "See you tomorrow!",
-    "time": "5 min ago",
-    "unread": 1
   }
 ]

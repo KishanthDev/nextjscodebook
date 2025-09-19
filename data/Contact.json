@@ -3,8 +3,8 @@
     "id": 1,
     "name": "Alice",
     "status": "online",
-    "recentMsg": "I'll call you in 5 mins!",
-    "time": "2 min ago",
+    "recentMsg": "",
+    "time": "",
     "unread": 0
   }
 ]

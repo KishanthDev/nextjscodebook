@@ -88,7 +88,7 @@ export default function ChatUI() {
     return () => {
       client.end();
     };
-  }, [selectedContact]);
+  }, []);
 
   const suggestedReply = "";
 

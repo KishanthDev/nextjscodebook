@@ -1,42 +1,34 @@
-"use client";
-import { useState, useEffect } from "react";
-import mqtt from "mqtt";
+// HiveProducer.tsx
+'use client';
+import { useState } from "react";
+import useMqtt from "@/hooks/useMqtt";
 
 export default function HiveProducer() {
-    const [client, setClient] = useState<mqtt.MqttClient | null>(null);
+    const [clientId] = useState(() => "user1");
+    const { messages, sendMessage } = useMqtt("nextjs/poc/new", clientId);
     const [input, setInput] = useState("");
 
-    useEffect(() => {
-        const mqttClient = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
-        setClient(mqttClient);
-
-        mqttClient.on("connect", () => {
-            console.log("✅ Producer connected to HiveMQ");
-        });
-
-        return () => {
-            mqttClient.end();
-        };
-    }, []);
-
-    const sendMessage = () => {
-        if (client && input) {
-            client.publish("nextjs/poc/test", input, { qos: 1, retain: true });
-            setInput("");
-        }
-    };
-
     return (
-        <div className="p-6">
-            <h2 className="text-xl font-bold mb-4">HiveMQ Producer</h2>
+        <div className="p-6 border rounded w-[400px]">
+            <h2 className="text-xl font-bold mb-4">HiveMQ Producer (User1)</h2>
+
+            <div className="h-48 overflow-y-auto border p-2 mb-4">
+                {messages.map((msg, i) => (
+                    <p key={i} className={msg.sender === clientId ? "text-right" : "text-left"}>
+                        <b>{msg.sender === clientId ? "Me" : msg.sender}:</b> {msg.text}
+                    </p>
+                ))}
+            </div>
+
             <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type message..."
-                className="border p-2 mr-2"
+                className="border p-2 mr-2 w-[70%]"
             />
+
             <button
-                onClick={sendMessage}
+                onClick={() => { sendMessage(input); setInput(""); }}
                 className="bg-blue-500 text-white px-4 py-2 rounded"
             >
                 Send

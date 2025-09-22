@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import mqtt from "mqtt";
 import Contact from "@/types/Contact";
 import ContactData from "../../../data/Contact.json";
 import ContactList from "./ContactList";
@@ -12,8 +11,13 @@ import { useUserStatus } from "@/stores/useUserStatus";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { ChatWidgetSettings } from "@/types/Modifier";
 import ContactListSkeleton from "./ContactListSkeleton";
+import useMqtt from "@/hooks/useMqtt";
 
 export default function ChatUI() {
+  // ✅ stable clientId
+  const [clientId] = useState(() => `user-1`);
+  const { messages: mqttMessages, sendMessage } = useMqtt("nextjs/poc/s", clientId);
+
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [isLoadingContacts, setIsLoadingContacts] = useState(true);
@@ -34,6 +38,7 @@ export default function ChatUI() {
     footerTextColor: "#374151",
     messages: [],
   };
+
   useEffect(() => {
     fetchSettings("chatWidget", defaultSettings);
   }, [fetchSettings]);
@@ -47,61 +52,56 @@ export default function ChatUI() {
     ...contact,
     status: contact.status as "online" | "offline",
   }));
-  const [contacts, setContacts] = useState<Contact[]>(
-    sampleContacts
-  );
+  const [contacts, setContacts] = useState<Contact[]>(sampleContacts);
 
   const userStatus = acceptChats ? "online" : "offline";
 
-  // ✅ Consumer hook
+  // ✅ Correctly append MQTT messages
   useEffect(() => {
-    const client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+    if (mqttMessages.length === 0) return;
 
-    client.on("connect", () => {
-      console.log("✅ Consumer connected to HiveMQ");
-      client.subscribe("nextjs/poc/test");
-    });
+    setMessages(prev => {
+      const alreadyCount = prev.length;
+      const newOnes = mqttMessages.slice(alreadyCount); // only unseen msgs
 
-    client.on("message", (_, payload) => {
-      const text = payload.toString();
-      setMessages((prev) => [...prev, { fromUser: false, text: text }]);
+      // Update contacts with unread & recentMsg
       setContacts(prevContacts =>
         prevContacts.map(c => {
+          const lastMsg = newOnes[newOnes.length - 1];
+          if (!lastMsg) return c;
+
           if (c.id === selectedContact?.id) {
-            
-            // Current chat open → reset unread
-            return { ...c, unread: 0, recentMsg: text, time: "now" };
+            // Chat open → reset unread
+            return { ...c, unread: 0, recentMsg: lastMsg.text, time: "now" };
           } else {
-            // Not open → increment unread
-        
+            // Chat closed → increment unread
             return {
               ...c,
-              unread: (c.unread || 0) + 1,
-              recentMsg: text,
+              unread: (c.unread || 0) + newOnes.length,
+              recentMsg: lastMsg.text,
               time: "now",
             };
           }
         })
       );
+
+      return [
+        ...prev,
+        ...newOnes.map(m => ({
+          text: m.text,
+          fromUser: m.sender === clientId,
+        })),
+      ];
     });
+  }, [mqttMessages, clientId, selectedContact]);
 
-    return () => {
-      client.end();
-    };
-  }, []);
-
-  const suggestedReply = "";
 
 
   const handleSendMessage = (text: string) => {
-    setMessages((prev) => [...prev, { fromUser: true, text }]);
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { fromUser: false, text: 'Got it! I\'ll reply soon.' },
-      ]);
-    }, 1000);
+    sendMessage(text);
   };
+
+  const suggestedReply = "";
 
   const handleSelectContact = (contact: Contact) => {
     setSelectedContact(contact);

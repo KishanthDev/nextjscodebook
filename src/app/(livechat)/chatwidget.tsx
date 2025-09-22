@@ -7,80 +7,76 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { Message, ChatWidgetSettings } from '@/types/Modifier';
 import defaultConfig from '../../../data/modifier.json';
 import ChatPreview from '@/components/modifier/chat-widget/ChatPreview';
+import useMqtt from '@/hooks/useMqtt';
 
 export default function ChatWidgetPreview() {
-  const { settings, loading, fetchSettings } = useSettingsStore();
-  const [newMessage, setNewMessage] = useState('');
-  const [soundsEnabled, setSoundsEnabled] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const [isSaving, setIsSaving] = useState(false);
+    const [clientId] = useState(() => `user-2`);
+    const { messages, sendMessage } = useMqtt("nextjs/poc/s", clientId);
 
-  const defaultSettings: ChatWidgetSettings = defaultConfig.chatWidget;
+    const { settings, loading, fetchSettings } = useSettingsStore();
+    const [newMessage, setNewMessage] = useState('');
+    const [soundsEnabled, setSoundsEnabled] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [mounted, setMounted] = useState(false);
+    const { resolvedTheme } = useTheme();
+    const [isSaving, setIsSaving] = useState(false);
 
-  // ✅ keep preview messages in local state only
-  const [previewMessages, setPreviewMessages] = useState<Message[]>([]);
+    const defaultSettings: ChatWidgetSettings = defaultConfig.chatWidget;
 
-  useEffect(() => {
-    setMounted(true);
-    console.log('Fetching chatWidget settings...');
-    fetchSettings('chatWidget', defaultSettings);
-  }, [fetchSettings]);
+    // ✅ local preview messages
+    const [previewMessages, setPreviewMessages] = useState<Message[]>([]);
 
-  useEffect(() => {
-    if (mounted) {
-      setIsDarkMode(resolvedTheme === 'dark');
-    }
-  }, [mounted, resolvedTheme]);
+    useEffect(() => {
+        setMounted(true);
+        fetchSettings('chatWidget', defaultSettings);
+    }, [fetchSettings]);
 
-  useEffect(() => {
-    if (settings.chatWidget?.messages?.length > 0) {
-      setPreviewMessages(settings.chatWidget.messages);
-    } else {
-      setPreviewMessages([
-        {
-          text: 'What would you like to do?',
-          isUser: false,
-          tags: ['View Products', 'Support', 'Pricing'],
-        },
-      ]);
-    }
-  }, [settings.chatWidget]);
+    useEffect(() => {
+        if (mounted) {
+            setIsDarkMode(resolvedTheme === 'dark');
+        }
+    }, [mounted, resolvedTheme]);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;
-    const newMsg: Message = { text: newMessage, isUser: true };
-    setPreviewMessages((prev) => [...prev, newMsg]); // ✅ local only
-    setNewMessage('');
-    setTimeout(() => {
-      const messagesContainer = document.getElementById('messagesContainer');
-      if (messagesContainer) {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      }
-    }, 10);
-  };
+    useEffect(() => {
+        if (settings.chatWidget?.messages?.length > 0) {
+            setPreviewMessages(settings.chatWidget.messages);
+        } else {
+            setPreviewMessages([
+                {
+                    text: 'What would you like to do?',
+                    isUser: false,
+                    tags: ['View Products', 'Support', 'Pricing'],
+                },
+            ]);
+        }
+    }, [settings.chatWidget]);
 
-  const handleTagClick = (tag: string, msgIndex: number) => {
-    const newMsg: Message = { text: tag, isUser: true };
-    setPreviewMessages((prev) => [
-      ...prev.map((m, i) => (i === msgIndex ? { ...m, tags: [] } : m)),
-      newMsg,
-    ]); // ✅ local only
-  };
+    // ✅ when MQTT receives a new message, push it properly
 
-  const toggleSounds = () => {
-    setSoundsEnabled((prev) => !prev);
-  };
+    const handleSendMessage = () => {
+        if (!newMessage) return;
+        sendMessage(newMessage); // publish to MQTT
+        setNewMessage("");
+    };
 
-  if (!mounted) return null;
+    const handleTagClick = (tag: string, msgIndex: number) => {
+        const newMsg: Message = { text: tag, isUser: true };
+        setPreviewMessages(prev => [
+            ...prev.map((m, i) => (i === msgIndex ? { ...m, tags: [] } : m)),
+            newMsg,
+        ]);
+    };
 
-  if (loading) {
-    return (
-      <SkeletonTheme
-        baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
-        highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
-      >
+    const toggleSounds = () => setSoundsEnabled(prev => !prev);
+
+    if (!mounted) return null;
+
+    if (loading) {
+        return (
+            <SkeletonTheme
+                baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
+                highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
+            >
         <div className="flex justify-center items-start p-6">
           <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden">
             <div className="p-3 border-b flex justify-between items-center">
@@ -113,29 +109,33 @@ export default function ChatWidgetPreview() {
             </div>
           </div>
         </div>
-      </SkeletonTheme>
+            </SkeletonTheme>
+        );
+    }
+
+    const chatSettings: ChatWidgetSettings = {
+        ...defaultSettings,
+        ...settings.chatWidget,
+        messages: messages.map(m => ({
+            text: m.text,
+            isUser: m.sender === clientId
+        })),
+    };
+
+
+    return (
+        <div className="flex justify-center items-start p-6">
+            <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden shadow-lg flex flex-col">
+                <ChatPreview
+                    settings={chatSettings}
+                    messages={chatSettings.messages}
+                    newMessage={newMessage}
+                    setNewMessage={setNewMessage}
+                    onSendMessage={handleSendMessage}
+                    isSaving={isSaving}
+                    onTagClick={handleTagClick}
+                />
+            </div>
+        </div>
     );
-  }
-
-  const chatSettings: ChatWidgetSettings = {
-    ...defaultSettings,
-    ...settings.chatWidget,
-    messages: previewMessages, // ✅ use local previewMessages
-  };
-
-  return (
-    <div className="flex justify-center items-start p-6">
-      <div className="w-[370px] h-[700px] border rounded-lg overflow-hidden shadow-lg flex flex-col">
-        <ChatPreview
-          settings={chatSettings}
-          messages={chatSettings.messages}
-          newMessage={newMessage}
-          setNewMessage={setNewMessage}
-          onSendMessage={handleSendMessage}
-          isSaving={isSaving}
-          onTagClick={handleTagClick}
-        />
-      </div>
-    </div>
-  );
 }

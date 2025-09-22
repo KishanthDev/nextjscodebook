@@ -75,8 +75,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/angular-ai', icon: Bot, label: 'Angular-AI' },
     { href: '/pdf-chat', icon: ChartGanttIcon, label: 'PDF Chat' },
     { href: '/openai-assistant-chat', icon: Bot, label: 'OpenAI Assistant Chat' },
-    { href: '/hive-producer', icon: Bot, label: 'HiveMQ Producer' },
-    { href: '/hive-consumer', icon: Bot, label: 'HiveMQ Consumer' },
+    // { href: '/hive-producer', icon: Bot, label: 'HiveMQ Producer' },
+    { href: '/hive-consumer', icon: Bot, label: 'User' },
   ];
 
   return (

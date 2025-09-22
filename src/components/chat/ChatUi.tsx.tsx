@@ -25,7 +25,7 @@ export default function ChatUI() {
   const [suggestedReply, setSuggestedReply] = useState(""); // ✅ state instead of const
   const { acceptChats } = useUserStatus();
   const { settings, fetchSettings } = useSettingsStore();
-  const { openaiGenerate } = useAIConfig(); // ✅ access store
+  const { openaiGenerate,openaiReply } = useAIConfig(); // ✅ access store
 
   const processedLenRef = useRef(0);
 
@@ -72,7 +72,15 @@ export default function ChatUI() {
       });
       const data = await res.json();
       const aiSuggestion = data.reply || "";
-      setSuggestedReply(aiSuggestion);
+       if (openaiGenerate) {
+        // show in input box
+        setSuggestedReply(aiSuggestion);
+      }
+
+      if (openaiReply && aiSuggestion) {
+        sendMessage(aiSuggestion);
+        setSuggestedReply("");
+      }
     } catch (err) {
       console.error("AI suggestion failed:", err);
       setSuggestedReply("");

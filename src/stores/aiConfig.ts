@@ -13,7 +13,7 @@ interface AIConfigState {
   setFeature: (key: keyof Omit<AIConfigState, "toggleFeature">, value: boolean) => void;
 }
 
-export const useAIConfig = create<AIConfigState>((set) => ({
+export const useAIConfig = create<AIConfigState>((set, get) => ({
   spellingCorrection: true,
   smartReply: false,
   textFormatter: false,
@@ -22,9 +22,49 @@ export const useAIConfig = create<AIConfigState>((set) => ({
   openaiGenerate: false,
   humanTakeOver: false,
 
-  toggleFeature: (key) =>
-    set((state) => ({ [key]: !state[key] })),
+  toggleFeature: (key) => {
+    const state = get();
+    const newValue = !state[key];
 
-  setFeature: (key, value) =>
-    set(() => ({ [key]: value })),
+    // Apply dependencies
+    const newState: Partial<AIConfigState> = { [key]: newValue };
+
+    if (key === "openaiReply" && newValue) {
+      newState.openaiGenerate = true; // Reply requires Generate
+      newState.humanTakeOver = false; // disable human takeover
+    }
+
+    if (key === "openaiGenerate" && newValue) {
+      newState.humanTakeOver = false; // disable human takeover
+      // no need to enable reply automatically
+    }
+
+    if (key === "humanTakeOver" && newValue) {
+      newState.openaiReply = false;
+      newState.openaiGenerate = false;
+    }
+
+    set(newState);
+  },
+
+  setFeature: (key, value) => {
+    const state = get();
+    const newState: Partial<AIConfigState> = { [key]: value };
+
+    if (key === "openaiReply" && value) {
+      newState.openaiGenerate = true;
+      newState.humanTakeOver = false;
+    }
+
+    if (key === "openaiGenerate" && value) {
+      newState.humanTakeOver = false;
+    }
+
+    if (key === "humanTakeOver" && value) {
+      newState.openaiReply = false;
+      newState.openaiGenerate = false;
+    }
+
+    set(newState);
+  },
 }));

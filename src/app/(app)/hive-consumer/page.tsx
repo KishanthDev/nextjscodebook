@@ -1,12 +1,11 @@
-
 // HiveConsumer.tsx
 'use client';
 import { useState } from "react";
 import useMqtt from "@/hooks/useMqtt";
 
 export default function HiveConsumer() {
-    const [clientId] = useState(() => "user2");
-    const { messages, sendMessage } = useMqtt("nextjs/poc/new", clientId);
+    const [clientId] = useState(() => "user-2");
+    const { messages, sendMessage } = useMqtt("nextjs/poc/s", clientId);
     const [input, setInput] = useState("");
 
     return (
@@ -15,7 +14,7 @@ export default function HiveConsumer() {
 
             <div className="h-48 overflow-y-auto border p-2 mb-4">
                 {messages.map((msg, i) => (
-                    <p key={i} className={msg.sender === clientId ? "text-right" : "text-left"}>
+                    <p key={msg.id || i} className={msg.sender === clientId ? "text-right" : "text-left"}>
                         <b>{msg.sender === clientId ? "Me" : msg.sender}:</b> {msg.text}
                     </p>
                 ))}

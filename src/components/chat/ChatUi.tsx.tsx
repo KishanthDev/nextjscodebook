@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Contact from "@/types/Contact";
 import ContactData from "../../../data/Contact.json";
 import ContactList from "./ContactList";
@@ -14,16 +14,17 @@ import ContactListSkeleton from "./ContactListSkeleton";
 import useMqtt from "@/hooks/useMqtt";
 
 export default function ChatUI() {
-  // ✅ stable clientId
   const [clientId] = useState(() => `user-1`);
   const { messages: mqttMessages, sendMessage } = useMqtt("nextjs/poc/s", clientId);
 
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [isLoadingContacts, setIsLoadingContacts] = useState(true);
-  const [messages, setMessages] = useState<{ fromUser: boolean; text: string }[]>([]);
+  const [messages, setMessages] = useState<{ fromUser: boolean; text: string; id: string }[]>([]);
   const { acceptChats } = useUserStatus();
   const { settings, fetchSettings } = useSettingsStore();
+
+  const processedLenRef = useRef(0);
 
   const defaultSettings: ChatWidgetSettings = {
     chatTitle: "LiveChat",
@@ -51,51 +52,65 @@ export default function ChatUI() {
   const sampleContacts: Contact[] = ContactData.map((contact) => ({
     ...contact,
     status: contact.status as "online" | "offline",
+    unread: 0, // Initialize unread count
+    recentMsg: contact.recentMsg || "", // Ensure recentMsg is defined
   }));
   const [contacts, setContacts] = useState<Contact[]>(sampleContacts);
 
   const userStatus = acceptChats ? "online" : "offline";
 
-  // ✅ Correctly append MQTT messages
+  // Handle new MQTT messages
   useEffect(() => {
-    if (mqttMessages.length === 0) return;
+    const newLen = mqttMessages.length;
+    if (newLen <= processedLenRef.current) return;
 
-    setMessages(prev => {
-      const alreadyCount = prev.length;
-      const newOnes = mqttMessages.slice(alreadyCount); // only unseen msgs
+    const start = processedLenRef.current;
+    const newOnes = mqttMessages.slice(start);
+    processedLenRef.current = newLen;
 
-      // Update contacts with unread & recentMsg
-      setContacts(prevContacts =>
-        prevContacts.map(c => {
-          const lastMsg = newOnes[newOnes.length - 1];
-          if (!lastMsg) return c;
+    // Update messages for the UI
+    setMessages(prev => [
+      ...prev,
+      ...newOnes.map(m => ({
+        text: m.text,
+        fromUser: m.sender === clientId,
+        id: m.id,
+      })),
+    ]);
 
-          if (c.id === selectedContact?.id) {
-            // Chat open → reset unread
-            return { ...c, unread: 0, recentMsg: lastMsg.text, time: "now" };
-          } else {
-            // Chat closed → increment unread
-            return {
-              ...c,
-              unread: (c.unread || 0) + newOnes.length,
-              recentMsg: lastMsg.text,
-              time: "now",
-            };
-          }
-        })
-      );
+    // Update contacts' unread counts and recentMsg
+    setContacts(prevContacts =>
+      prevContacts.map(c => {
+        // For POC, assume messages from other senders are from the contact
+        // In a real app, you'd use contact-specific topics or a sender ID mapping
+        const contactMessages = newOnes.filter(
+          m => m.sender !== clientId // Messages not from this user
+        );
 
-      return [
-        ...prev,
-        ...newOnes.map(m => ({
-          text: m.text,
-          fromUser: m.sender === clientId,
-        })),
-      ];
-    });
+        if (contactMessages.length === 0) return c;
+
+        const lastMsg = contactMessages[contactMessages.length - 1];
+        if (!lastMsg) return c;
+
+        // If this contact is selected, reset unread; otherwise, increment
+        if (c.id === selectedContact?.id) {
+          return {
+            ...c,
+            unread: 0,
+            recentMsg: lastMsg.text,
+            time: "now",
+          };
+        } else {
+          return {
+            ...c,
+            unread: (c.unread || 0) + contactMessages.length,
+            recentMsg: lastMsg.text,
+            time: "now",
+          };
+        }
+      })
+    );
   }, [mqttMessages, clientId, selectedContact]);
-
-
 
   const handleSendMessage = (text: string) => {
     sendMessage(text);
@@ -106,39 +121,23 @@ export default function ChatUI() {
   const handleSelectContact = (contact: Contact) => {
     setSelectedContact(contact);
 
+    // Reset unread count for the selected contact
     setContacts(prev =>
       prev.map(c =>
         c.id === contact.id ? { ...c, unread: 0 } : c
       )
     );
+
+    // Filter messages for the selected contact (for POC, show all messages)
+    // In a real app, filter by contact-specific topic or sender ID
+    setMessages(
+      mqttMessages.map(m => ({
+        text: m.text,
+        fromUser: m.sender === clientId,
+        id: m.id,
+      }))
+    );
   };
-
-
-  /*   useEffect(() => {
-      const timer = setTimeout(() => {
-        handleIncomingMessage("hello where is my location");
-      }, 2000);
-  
-      return () => clearTimeout(timer);
-    }, []);
-  
-    const handleIncomingMessage = async (text: string) => {
-      setMessages((prev) => [...prev, { fromUser: false, text }]); 
-      try {
-        const res = await fetch('/api/ai-reply', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text }),
-        });
-        const data = await res.json();
-        const aiSuggestion = data.reply || '';
-  
-        setSuggestedReply(aiSuggestion);
-      } catch (err) {
-        console.error('AI suggestion failed:', err);
-        setSuggestedReply('');
-      }
-    }; */
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoadingContacts(false), 100);

@@ -5,8 +5,8 @@ interface AIConfigState {
   smartReply: boolean;
   textFormatter: boolean;
   userExpression: boolean;
-  openaiReply: boolean;
   openaiGenerate: boolean;
+  openaiReply: boolean;
   humanTakeOver: boolean;
 
   toggleFeature: (key: keyof Omit<AIConfigState, "toggleFeature">) => void;
@@ -18,8 +18,8 @@ export const useAIConfig = create<AIConfigState>((set, get) => ({
   smartReply: false,
   textFormatter: false,
   userExpression: false,
-  openaiReply: false,
   openaiGenerate: false,
+  openaiReply: false,
   humanTakeOver: false,
 
   toggleFeature: (key) => {

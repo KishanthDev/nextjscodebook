@@ -16,8 +16,8 @@ export default function AISettingsDropdown() {
     smartReply,
     textFormatter,
     userExpression,
-    openaiReply,
     openaiGenerate,
+    openaiReply,
     humanTakeOver,
   };
 

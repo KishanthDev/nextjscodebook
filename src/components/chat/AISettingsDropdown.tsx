@@ -6,7 +6,9 @@ import { Switch } from "@/ui/switch";
 
 export default function AISettingsDropdown() {
   const [open, setOpen] = useState(false);
-  const { spellingCorrection, smartReply, textFormatter, userExpression, AIReply, toggleFeature } =
+  const { spellingCorrection, smartReply, textFormatter, userExpression, openaiReply,
+    openaiGenerate,
+    humanTakeOver, toggleFeature } =
     useAIConfig();
 
   const features = {
@@ -14,7 +16,9 @@ export default function AISettingsDropdown() {
     smartReply,
     textFormatter,
     userExpression,
-    AIReply,
+    openaiReply,
+    openaiGenerate,
+    humanTakeOver,
   };
 
   return (

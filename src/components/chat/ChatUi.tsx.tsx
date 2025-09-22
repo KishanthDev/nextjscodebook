@@ -12,6 +12,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { ChatWidgetSettings } from "@/types/Modifier";
 import ContactListSkeleton from "./ContactListSkeleton";
 import useMqtt from "@/hooks/useMqtt";
+import { useAIConfig } from "@/stores/aiConfig"; // ✅ import AI config
 
 export default function ChatUI() {
   const [clientId] = useState(() => `user-1`);
@@ -21,8 +22,10 @@ export default function ChatUI() {
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [isLoadingContacts, setIsLoadingContacts] = useState(true);
   const [messages, setMessages] = useState<{ fromUser: boolean; text: string; id: string }[]>([]);
+  const [suggestedReply, setSuggestedReply] = useState(""); // ✅ state instead of const
   const { acceptChats } = useUserStatus();
   const { settings, fetchSettings } = useSettingsStore();
+  const { openaiGenerate } = useAIConfig(); // ✅ access store
 
   const processedLenRef = useRef(0);
 
@@ -52,14 +55,31 @@ export default function ChatUI() {
   const sampleContacts: Contact[] = ContactData.map((contact) => ({
     ...contact,
     status: contact.status as "online" | "offline",
-    unread: 0, // Initialize unread count
-    recentMsg: contact.recentMsg || "", // Ensure recentMsg is defined
+    unread: 0,
+    recentMsg: contact.recentMsg || "",
   }));
   const [contacts, setContacts] = useState<Contact[]>(sampleContacts);
 
   const userStatus = acceptChats ? "online" : "offline";
 
-  // Handle new MQTT messages
+  // 🔹 Function to ask AI for a suggested reply
+  const handleIncomingMessage = async (text: string) => {
+    try {
+      const res = await fetch("/api/ai-reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      const aiSuggestion = data.reply || "";
+      setSuggestedReply(aiSuggestion);
+    } catch (err) {
+      console.error("AI suggestion failed:", err);
+      setSuggestedReply("");
+    }
+  };
+
+  // 🔹 Handle new MQTT messages
   useEffect(() => {
     const newLen = mqttMessages.length;
     if (newLen <= processedLenRef.current) return;
@@ -68,38 +88,26 @@ export default function ChatUI() {
     const newOnes = mqttMessages.slice(start);
     processedLenRef.current = newLen;
 
-    // Update messages for the UI
-    setMessages(prev => [
+    setMessages((prev) => [
       ...prev,
-      ...newOnes.map(m => ({
+      ...newOnes.map((m) => ({
         text: m.text,
         fromUser: m.sender === clientId,
         id: m.id,
       })),
     ]);
 
-    // Update contacts' unread counts and recentMsg
-    setContacts(prevContacts =>
-      prevContacts.map(c => {
-        // For POC, assume messages from other senders are from the contact
-        // In a real app, you'd use contact-specific topics or a sender ID mapping
-        const contactMessages = newOnes.filter(
-          m => m.sender !== clientId // Messages not from this user
-        );
-
+    // Update contacts
+    setContacts((prevContacts) =>
+      prevContacts.map((c) => {
+        const contactMessages = newOnes.filter((m) => m.sender !== clientId);
         if (contactMessages.length === 0) return c;
 
         const lastMsg = contactMessages[contactMessages.length - 1];
         if (!lastMsg) return c;
 
-        // If this contact is selected, reset unread; otherwise, increment
         if (c.id === selectedContact?.id) {
-          return {
-            ...c,
-            unread: 0,
-            recentMsg: lastMsg.text,
-            time: "now",
-          };
+          return { ...c, unread: 0, recentMsg: lastMsg.text, time: "now" };
         } else {
           return {
             ...c,
@@ -110,28 +118,25 @@ export default function ChatUI() {
         }
       })
     );
-  }, [mqttMessages, clientId, selectedContact]);
+
+    // 🔹 If OpenAI generate is enabled, run AI on the **last incoming message**
+    const lastIncoming = newOnes.find((m) => m.sender !== clientId);
+    if (lastIncoming && openaiGenerate) {
+      handleIncomingMessage(lastIncoming.text);
+    }
+  }, [mqttMessages, clientId, selectedContact, openaiGenerate]);
 
   const handleSendMessage = (text: string) => {
     sendMessage(text);
   };
 
-  const suggestedReply = "";
-
   const handleSelectContact = (contact: Contact) => {
     setSelectedContact(contact);
-
-    // Reset unread count for the selected contact
-    setContacts(prev =>
-      prev.map(c =>
-        c.id === contact.id ? { ...c, unread: 0 } : c
-      )
+    setContacts((prev) =>
+      prev.map((c) => (c.id === contact.id ? { ...c, unread: 0 } : c))
     );
-
-    // Filter messages for the selected contact (for POC, show all messages)
-    // In a real app, filter by contact-specific topic or sender ID
     setMessages(
-      mqttMessages.map(m => ({
+      mqttMessages.map((m) => ({
         text: m.text,
         fromUser: m.sender === clientId,
         id: m.id,
@@ -161,7 +166,11 @@ export default function ChatUI() {
       </div>
 
       {/* Chat Area */}
-      <div className={`flex flex-col min-h-0 transition-all duration-300 ${profileExpanded ? "w-[40%]" : "w-[70%]"}`}>
+      <div
+        className={`flex flex-col min-h-0 transition-all duration-300 ${
+          profileExpanded ? "w-[40%]" : "w-[70%]"
+        }`}
+      >
         <ChatHeader contact={selectedContact} />
         <ChatMessages
           selected={!!selectedContact}
@@ -172,14 +181,22 @@ export default function ChatUI() {
           <ChatInput
             settings={chatWidgetSettings}
             onSend={handleSendMessage}
-            suggestedReply={suggestedReply}
+            suggestedReply={suggestedReply} // ✅ passes AI reply
           />
         )}
       </div>
 
       {/* Right Sidebar */}
-      <div className={`transition-all duration-300 ${profileExpanded ? "w-[30%]" : "w-12"} border-l border-gray-300 dark:border-gray-700`}>
-        <ContactProfile contact={selectedContact} expanded={profileExpanded} setExpanded={setProfileExpanded} />
+      <div
+        className={`transition-all duration-300 ${
+          profileExpanded ? "w-[30%]" : "w-12"
+        } border-l border-gray-300 dark:border-gray-700`}
+      >
+        <ContactProfile
+          contact={selectedContact}
+          expanded={profileExpanded}
+          setExpanded={setProfileExpanded}
+        />
       </div>
     </div>
   );

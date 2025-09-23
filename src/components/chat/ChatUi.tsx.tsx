@@ -11,21 +11,17 @@ import { useUserStatus } from "@/stores/useUserStatus";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { ChatWidgetSettings } from "@/types/Modifier";
 import ContactListSkeleton from "./ContactListSkeleton";
-import useMqtt from "@/hooks/useMqtt";
-import { useAIConfig } from "@/stores/aiConfig"; // ✅ import AI config
+import { useAIMessageHandler } from "@/stores/aiMessageHandler";
 
 export default function ChatUI() {
   const [clientId] = useState(() => `user-1`);
-  const { messages: mqttMessages, sendMessage } = useMqtt("nextjs/poc/s", clientId);
-
+  const { messages: mqttMessages, sendMessage, suggestedReply } = useAIMessageHandler();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [isLoadingContacts, setIsLoadingContacts] = useState(true);
   const [messages, setMessages] = useState<{ fromUser: boolean; text: string; id: string }[]>([]);
-  const [suggestedReply, setSuggestedReply] = useState(""); // ✅ state instead of const
   const { acceptChats } = useUserStatus();
   const { settings, fetchSettings } = useSettingsStore();
-  const { openaiGenerate,openaiReply } = useAIConfig(); // ✅ access store
 
   const processedLenRef = useRef(0);
 
@@ -62,32 +58,19 @@ export default function ChatUI() {
 
   const userStatus = acceptChats ? "online" : "offline";
 
-  // 🔹 Function to ask AI for a suggested reply
-  const handleIncomingMessage = async (text: string) => {
-    try {
-      const res = await fetch("/api/ai-reply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
-      });
-      const data = await res.json();
-      const aiSuggestion = data.reply || "";
-       if (openaiGenerate) {
-        // show in input box
-        setSuggestedReply(aiSuggestion);
-      }
-
-      if (openaiReply && aiSuggestion) {
-        sendMessage(aiSuggestion);
-        setSuggestedReply("");
-      }
-    } catch (err) {
-      console.error("AI suggestion failed:", err);
-      setSuggestedReply("");
+  // Initialize MQTT connection
+  useEffect(() => {
+    // Ensure connection only if not already connected
+    if (!useAIMessageHandler.getState().client) {
+      useAIMessageHandler.getState().connect("nextjs/poc/s", clientId);
     }
-  };
+    return () => {
+      // Keep connection alive to ensure AI works across routes
+      // Optionally disconnect on app logout: useAIMessageHandler.getState().disconnect();
+    };
+  }, [clientId]);
 
-  // 🔹 Handle new MQTT messages
+  // Handle new MQTT messages for UI
   useEffect(() => {
     const newLen = mqttMessages.length;
     if (newLen <= processedLenRef.current) return;
@@ -105,7 +88,7 @@ export default function ChatUI() {
       })),
     ]);
 
-    // Update contacts
+    // Update contacts (POC: assume all messages apply to all contacts)
     setContacts((prevContacts) =>
       prevContacts.map((c) => {
         const contactMessages = newOnes.filter((m) => m.sender !== clientId);
@@ -114,6 +97,7 @@ export default function ChatUI() {
         const lastMsg = contactMessages[contactMessages.length - 1];
         if (!lastMsg) return c;
 
+        // For production: filter messages by contact ID (e.g., m.sender === c.id)
         if (c.id === selectedContact?.id) {
           return { ...c, unread: 0, recentMsg: lastMsg.text, time: "now" };
         } else {
@@ -126,13 +110,7 @@ export default function ChatUI() {
         }
       })
     );
-
-    // 🔹 If OpenAI generate is enabled, run AI on the **last incoming message**
-    const lastIncoming = newOnes.find((m) => m.sender !== clientId);
-    if (lastIncoming && openaiGenerate) {
-      handleIncomingMessage(lastIncoming.text);
-    }
-  }, [mqttMessages, clientId, selectedContact, openaiGenerate]);
+  }, [mqttMessages, clientId, selectedContact]);
 
   const handleSendMessage = (text: string) => {
     sendMessage(text);
@@ -143,6 +121,8 @@ export default function ChatUI() {
     setContacts((prev) =>
       prev.map((c) => (c.id === contact.id ? { ...c, unread: 0 } : c))
     );
+    // For POC: show all messages (global topic)
+    // For production: filter by contact ID or topic (e.g., mqttMessages.filter(m => m.sender === contact.id))
     setMessages(
       mqttMessages.map((m) => ({
         text: m.text,
@@ -189,7 +169,7 @@ export default function ChatUI() {
           <ChatInput
             settings={chatWidgetSettings}
             onSend={handleSendMessage}
-            suggestedReply={suggestedReply} // ✅ passes AI reply
+            suggestedReply={suggestedReply}
           />
         )}
       </div>

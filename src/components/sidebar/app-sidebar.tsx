@@ -4,6 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUserStatus } from "@/stores/useUserStatus";
+import { useAIMessageHandler } from "@/stores/aiMessageHandler"; // ⬅️ import store
 
 import { NavUser } from './nav-user';
 import { TeamSwitcher } from './team-switcher';
@@ -36,6 +37,7 @@ import {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { acceptChats } = useUserStatus();
+  const { newMsgCount, resetNewMsgCount } = useAIMessageHandler(); // ⬅️ access count + reset
 
   const user = {
     name: 'zoey',
@@ -44,21 +46,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   const teams = [
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-    {
-      name: 'Evil Corp.',
-      logo: Command,
-      plan: 'Free',
-    },
+    { name: 'Acme Inc', logo: GalleryVerticalEnd, plan: 'Enterprise' },
+    { name: 'Acme Corp.', logo: AudioWaveform, plan: 'Startup' },
+    { name: 'Evil Corp.', logo: Command, plan: 'Free' },
   ];
 
   const links = [
@@ -68,14 +58,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/ai-agent', icon: Bot, label: 'AI Agent Training' },
     { href: '/agent-bots', icon: Bot, label: 'Agent Bots' },
     { href: '/modifier', icon: Settings2, label: 'Chat Widget' },
-    // { href: '/archived-chats', icon: MessageCircle, label: 'Archived Chats' },
     { href: '/billing', icon: BadgeDollarSign, label: 'Billing' },
     { href: '/ai', icon: Bot, label: 'AI' },
     { href: '/custom-ai', icon: Bot, label: 'Custom - AI' },
     { href: '/angular-ai', icon: Bot, label: 'Angular-AI' },
     { href: '/pdf-chat', icon: ChartGanttIcon, label: 'PDF Chat' },
     { href: '/openai-assistant-chat', icon: Bot, label: 'OpenAI Assistant Chat' },
-    // { href: '/hive-producer', icon: Bot, label: 'HiveMQ Producer' },
     { href: '/hive-consumer', icon: Bot, label: 'User' },
   ];
 
@@ -94,12 +82,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton
                   asChild
                   data-active={pathname === href}
+                  onClick={() => {
+                    if (href === "/chats") resetNewMsgCount(); // ⬅️ reset on click
+                  }}
                   className="data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-purple-600 data-[active=true]:text-white data-[active=true]:shadow-lg"
                 >
-                  <Link href={href}>
-                    <Icon className="mr-2" />
-                    <span>{label}</span>
+                  <Link href={href} className="flex items-center justify-between w-full">
+                    <div className="flex items-center">
+                      <Icon className="mr-2 w-[18px] h-[18px]" strokeWidth={1.5} />
+                      <span className='truncate'>{label}</span>
+                    </div>
+                    {href === "/chats" && newMsgCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs font-bold p-1 rounded-full">
+                        {newMsgCount}
+                      </span>
+                    )}
                   </Link>
+
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}

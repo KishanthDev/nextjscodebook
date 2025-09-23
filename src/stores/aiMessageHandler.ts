@@ -14,20 +14,24 @@ interface AIHandlerState {
   messages: AIMessage[];
   suggestedReply: string;
   client: MqttClient | null;
-  clientId: string | null; // Store clientId
-  topic: string | null; // Store topic
+  clientId: string | null;
+  topic: string | null;
+  newMsgCount: number; // 🔹 count of new incoming messages
   connect: (topic: string, clientId: string) => void;
   disconnect: () => void;
   sendMessage: (text: string) => void;
   setSuggestedReply: (reply: string) => void;
+  resetNewMsgCount: () => void; // 🔹 reset counter
 }
 
 export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
   messages: [],
   suggestedReply: '',
   client: null,
-  clientId: null, // Initialize clientId
-  topic: null, // Initialize topic
+  clientId: null,
+  topic: null,
+  newMsgCount: 0, // start with 0
+
   connect: (topic: string, clientId: string) => {
     if (get().client) return; // Prevent multiple connections
 
@@ -45,12 +49,15 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
         const parsed = JSON.parse(payload.toString());
         const msgId = parsed.id;
         const messageIds = new Set(get().messages.map((m) => m.id));
-        if (!msgId || messageIds.has(msgId)) return; // Deduplicate
+        if (!msgId || messageIds.has(msgId)) return;
 
         const msg = { sender: parsed.sender, text: parsed.text, id: msgId };
-        set((state) => ({ messages: [...state.messages, msg] }));
+        set((state) => ({
+          messages: [...state.messages, msg],
+          newMsgCount: msg.sender !== clientId ? state.newMsgCount + 1 : state.newMsgCount, // 🔹 increment only for others
+        }));
 
-        // Process AI reply if not from this client
+        // AI auto-processing
         const { openaiGenerate, openaiReply } = useAIConfig.getState();
         if (msg.sender !== clientId && (openaiGenerate || openaiReply)) {
           try {
@@ -85,6 +92,7 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
         const msgId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         set((state) => ({
           messages: [...state.messages, { sender: 'unknown', text: payload.toString(), id: msgId }],
+          newMsgCount: state.newMsgCount + 1, // still count it
         }));
       }
     });
@@ -93,15 +101,24 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
       console.error('MQTT error:', err);
     });
 
-    set({ client: mqttClient, clientId, topic }); // Store clientId and topic
+    set({ client: mqttClient, clientId, topic });
   },
+
   disconnect: () => {
     const client = get().client;
     if (client) {
       client.end();
-      set({ client: null, messages: [], suggestedReply: '', clientId: null, topic: null });
+      set({
+        client: null,
+        messages: [],
+        suggestedReply: '',
+        clientId: null,
+        topic: null,
+        newMsgCount: 0,
+      });
     }
   },
+
   sendMessage: (text: string) => {
     const { client, clientId, topic } = get();
     if (client && clientId && topic && text.trim()) {
@@ -113,5 +130,8 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
       client.publish(topic, payload, { qos: 1, retain: false });
     }
   },
+
   setSuggestedReply: (reply: string) => set({ suggestedReply: reply }),
+
+  resetNewMsgCount: () => set({ newMsgCount: 0 }), // 🔹 manually reset
 }));

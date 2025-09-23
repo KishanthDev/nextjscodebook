@@ -35,7 +35,12 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
   connect: (topic: string, clientId: string) => {
     if (get().client) return; // Prevent multiple connections
 
-    const mqttClient = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', { clientId });
+    const mqttClient = mqtt.connect(process.env.NEXT_PUBLIC_MQTT_HOST!, {
+      clientId,
+      username: process.env.NEXT_PUBLIC_MQTT_USER!,
+      password: process.env.NEXT_PUBLIC_MQTT_PASS!,
+    });
+
 
     mqttClient.on('connect', () => {
       console.log(`✅ AI Handler Connected to HiveMQ as ${clientId}`);

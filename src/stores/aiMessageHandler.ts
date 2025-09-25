@@ -12,7 +12,7 @@ interface AIMessage {
 
 interface AIHandlerState {
   messages: Record<string, AIMessage[]>;
-  suggestedReply: string;
+  suggestedReplies: Record<string, string>; // ✅ per-contact suggested reply
   client: MqttClient | null;
   clientId: string | null;
   topic: string | null;
@@ -20,13 +20,14 @@ interface AIHandlerState {
   connect: (topic: string, clientId: string) => void;
   disconnect: () => void;
   sendMessage: (text: string, target: string) => void;
-  setSuggestedReply: (reply: string) => void;
+  setSuggestedReply: (reply: string, contactId: string) => void; // now per-contact
   resetNewMsgCount: () => void;
 }
 
+
 export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
   messages: {},
-  suggestedReply: '',
+  suggestedReplies: {}, // ✅ initialize per-contact suggestions
   client: null,
   clientId: null,
   topic: null,
@@ -49,125 +50,82 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
       });
     });
 
-    // In the message handler of useAIMessageHandler
     mqttClient.on('message', async (topic, payload) => {
-      console.log(`Received message on topic: ${topic}`, payload.toString());
-      try {
-        const parsed = JSON.parse(payload.toString());
-        const msgId = parsed.id;
+      const parsed = JSON.parse(payload.toString());
+      const msgId = parsed.id;
 
-        // Fix: Extract user from the correct topic format
-        let user = null;
-        if (topic.startsWith('chat/users/')) {
-          user = topic.split('/')[2]; // Extract from chat/users/{user}
-        } else if (topic.startsWith('chat/agent/')) {
-          user = topic.split('/')[2]; // Extract from chat/agent/{user}
-        }
+      let user: string | null = null;
+      if (topic.startsWith('chat/users/')) user = topic.split('/')[2];
+      else if (topic.startsWith('chat/agent/')) user = topic.split('/')[2];
+      if (!user) return;
 
-        if (!user) {
-          console.error('Invalid topic format:', topic);
-          return;
-        }
+      const currentMessages = get().messages[user] || [];
+      if (currentMessages.some((m) => m.id === msgId)) return; // duplicate
 
-        const currentMessages = get().messages[user] || [];
-        if (currentMessages.some((m) => m.id === msgId)) {
-          console.log(`Duplicate message ID ${msgId} for user ${user}, skipping`);
-          return;
-        }
+      const msg: AIMessage = {
+        sender: parsed.sender,
+        text: parsed.text,
+        name: parsed.name || parsed.sender,
+        id: msgId,
+      };
 
-        // Fix: Properly extract and use the name field
-        const msg = {
-          sender: parsed.sender,
-          text: parsed.text,
-          name: parsed.name || parsed.sender, // ✅ Use name if available, fallback to sender
-          id: msgId
-        };
+      set((state) => ({
+        messages: {
+          ...state.messages,
+          [user]: [...currentMessages, msg],
+        },
+        newMsgCount: msg.sender !== clientId ? state.newMsgCount + 1 : state.newMsgCount,
+      }));
 
-        console.log(`Adding message for user ${user}:`, msg);
-        set((state) => ({
-          messages: {
-            ...state.messages,
-            [user]: [...currentMessages, msg],
-          },
-          newMsgCount: msg.sender !== clientId ? state.newMsgCount + 1 : state.newMsgCount,
-        }));
+      // AI auto-processing
+      const { openaiGenerate, openaiReply } = useAIConfig.getState();
+      if (msg.sender !== clientId && (openaiGenerate || openaiReply)) {
+        try {
+          const res = await fetch('/api/ai-reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: msg.text }),
+          });
+          const data = await res.json();
+          const aiSuggestion = data.reply || '';
 
-        // AI auto-processing
-        const { openaiGenerate, openaiReply } = useAIConfig.getState();
-        if (msg.sender !== clientId && (openaiGenerate || openaiReply)) {
-          try {
-            const res = await fetch('/api/ai-reply', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ message: msg.text }),
-            });
-            const data = await res.json();
-            const aiSuggestion = data.reply || '';
-
-            if (openaiGenerate) {
-              set({ suggestedReply: aiSuggestion });
-            }
-
-            if (openaiReply && aiSuggestion) {
-              const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-              const payload = JSON.stringify({
-                sender: clientId,
-                text: aiSuggestion,
-                id,
-                name: "Agent",
-              });
-
-              // ✅ Publish to the correct user's topic
-              mqttClient.publish(`chat/agent/${user}`, payload, { qos: 1, retain: false });
-              console.log(`✅ AI auto-reply sent to ${user}: ${aiSuggestion}`);
-
-              // ✅ Update local state after sending
-              const currentMessages = get().messages[user] || [];
-              set({
-                messages: {
-                  ...get().messages,
-                  [user]: [...currentMessages, { sender: clientId, text: aiSuggestion, id, name: "Agent" }],
-                },
-                suggestedReply: '', // clear the suggested reply
-              });
-            }
-          } catch (err) {
-            console.error('AI suggestion failed:', err);
-            set({ suggestedReply: '' });
+          if (openaiGenerate) {
+            set((state) => ({
+              suggestedReplies: { ...state.suggestedReplies, [user]: aiSuggestion }, // ✅ per-contact
+            }));
           }
+
+          if (openaiReply && aiSuggestion) {
+            const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const payload = JSON.stringify({
+              sender: clientId,
+              text: aiSuggestion,
+              id,
+              name: "Agent",
+            });
+
+            mqttClient.publish(`chat/agent/${user}`, payload, { qos: 1, retain: false });
+
+            // Update local state
+            const currentMessages = get().messages[user] || [];
+            set({
+              messages: {
+                ...get().messages,
+                [user]: [...currentMessages, { sender: clientId, text: aiSuggestion, id, name: "Agent" }],
+              },
+              suggestedReplies: { ...get().suggestedReplies, [user]: '' }, // clear suggestion after sending
+            });
+          }
+        } catch (err) {
+          console.error('AI suggestion failed:', err);
+          set((state) => ({
+            suggestedReplies: { ...state.suggestedReplies, [user]: '' },
+          }));
         }
-
-      } catch (err) {
-        console.error('Message parsing error:', err);
-        // Fix: Also handle user extraction in error case
-        let user = null;
-        if (topic.startsWith('chat/users/')) {
-          user = topic.split('/')[2];
-        } else if (topic.startsWith('chat/agent/')) {
-          user = topic.split('/')[2];
-        }
-
-        if (!user) return;
-
-        const msgId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        set((state) => ({
-          messages: {
-            ...state.messages,
-            [user]: [...(state.messages[user] || []), {
-              sender: 'unknown',
-              text: payload.toString(),
-              id: msgId,
-              name: 'Unknown User'
-            }],
-          },
-          newMsgCount: state.newMsgCount + 1,
-        }));
       }
     });
 
-    mqttClient.on('error', (err) => {
-      console.error('MQTT error:', err);
-    });
+    mqttClient.on('error', (err) => console.error('MQTT error:', err));
 
     set({ client: mqttClient, clientId, topic });
   },
@@ -179,7 +137,7 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
       set({
         client: null,
         messages: {},
-        suggestedReply: '',
+        suggestedReplies: {}, // reset per-contact
         clientId: null,
         topic: null,
         newMsgCount: 0,
@@ -191,28 +149,24 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
     const { client, clientId } = get();
     if (client && clientId && text.trim()) {
       const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      const payload = JSON.stringify({
-        sender: clientId,
-        text,
-        id,
-        name: "Agent" // ✅ Add a display name for the agent
-      });
+      const payload = JSON.stringify({ sender: clientId, text, id, name: "Agent" });
       client.publish(`chat/agent/${target}`, payload, { qos: 1, retain: false });
-      console.log(`Sent message to chat/agent/${target}: ${text}`);
-      set((state) => ({
+
+      const currentMessages = get().messages[target] || [];
+      set({
         messages: {
-          ...state.messages,
-          [target]: [...(state.messages[target] || []), {
-            sender: clientId,
-            text,
-            id,
-            name: "Agent" // ✅ Also store name in local state
-          }],
+          ...get().messages,
+          [target]: [...currentMessages, { sender: clientId, text, id, name: "Agent" }],
         },
-      }));
+        suggestedReplies: { ...get().suggestedReplies, [target]: '' }, // clear suggestion for that contact
+      });
     }
   },
-  setSuggestedReply: (reply: string) => set({ suggestedReply: reply }),
+
+  setSuggestedReply: (reply: string, contactId: string) =>
+    set((state) => ({
+      suggestedReplies: { ...state.suggestedReplies, [contactId]: reply },
+    })),
 
   resetNewMsgCount: () => set({ newMsgCount: 0 }),
 }));

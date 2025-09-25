@@ -13,7 +13,7 @@ import { useAIMessageHandler } from "@/stores/aiMessageHandler";
 
 export default function ChatUI() {
 
-  const { messages: storeMessages, sendMessage, suggestedReply } = useAIMessageHandler();
+  const { messages: storeMessages, sendMessage, suggestedReplies } = useAIMessageHandler();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [messages, setMessages] = useState<{ fromUser: boolean; text: string; id: string }[]>([]);
@@ -138,19 +138,16 @@ export default function ChatUI() {
   };
 
   const handleSelectContact = (contact: Contact) => {
-    console.log(`Selecting contact: ${contact.id}`);
     setSelectedContact(contact);
 
-    // Reset unread count immediately in contacts list
+    // Reset unread count
     setContacts((prev) =>
       prev.map((c) =>
-        c.id === contact.id
-          ? { ...c, unread: 0 } // Reset unread
-          : c
+        c.id === contact.id ? { ...c, unread: 0 } : c
       )
     );
 
-    // Get messages for this contact
+    // Load messages
     const contactMsgs = storeMessages[contact.id] || [];
     setMessages(
       contactMsgs.map((m) => ({
@@ -160,9 +157,13 @@ export default function ChatUI() {
       }))
     );
 
-    // Mark all messages as processed so unread count won't increase
+    // Mark messages as processed
     processedLensRef.current[contact.id] = contactMsgs.length;
+
+    // ✅ Clear suggested reply for previous contact if needed
+    // Optionally, you could keep it, but make sure input box always syncs with the current contact
   };
+
 
   return (
     <div className="flex h-[calc(100vh-3.3rem)] border border-gray-300 bg-white text-black transition-colors dark:border-gray-700 dark:bg-zinc-900 dark:text-white">
@@ -186,11 +187,20 @@ export default function ChatUI() {
         />
         <div ref={chatEndRef} />
         {selectedContact && (
+          // Inside ChatUI
           <ChatInput
+            key={selectedContact?.id} // ✅ force remount when contact changes
             settings={chatWidgetSettings}
-            onSend={handleSendMessage}
-            suggestedReply={suggestedReply}
+            onSend={(text) => {
+              if (selectedContact) {
+                sendMessage(text, selectedContact.id);
+                useAIMessageHandler.getState().setSuggestedReply('', selectedContact.id);
+              }
+            }}
+            suggestedReply={selectedContact ? suggestedReplies[selectedContact.id] || '' : ''}
           />
+
+
         )}
       </div>
       <div

@@ -1,7 +1,6 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import Contact from "@/types/Contact";
-import ContactData from "../../../data/Contact.json";
 import ContactList from "./ContactList";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
@@ -10,20 +9,19 @@ import ContactProfile from "./ContactProfile";
 import { useUserStatus } from "@/stores/useUserStatus";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { ChatWidgetSettings } from "@/types/Modifier";
-import ContactListSkeleton from "./ContactListSkeleton";
 import { useAIMessageHandler } from "@/stores/aiMessageHandler";
 
 export default function ChatUI() {
-  const [clientId] = useState(() => `user-1`);
-  const { messages: mqttMessages, sendMessage, suggestedReply } = useAIMessageHandler();
+
+  const { messages: storeMessages, sendMessage, suggestedReply } = useAIMessageHandler();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [profileExpanded, setProfileExpanded] = useState(false);
-  const [isLoadingContacts, setIsLoadingContacts] = useState(true);
   const [messages, setMessages] = useState<{ fromUser: boolean; text: string; id: string }[]>([]);
   const { acceptChats } = useUserStatus();
   const { settings, fetchSettings } = useSettingsStore();
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const processedLenRef = useRef(0);
+  const processedLensRef = useRef<Record<string, number>>({});
 
   const defaultSettings: ChatWidgetSettings = {
     chatTitle: "LiveChat",
@@ -48,116 +46,126 @@ export default function ChatUI() {
     ...settings.chatWidget,
   };
 
-  const sampleContacts: Contact[] = ContactData.map((contact) => ({
-    ...contact,
-    status: contact.status as "online" | "offline",
-    unread: 0,
-    recentMsg: contact.recentMsg || "",
-  }));
-  const [contacts, setContacts] = useState<Contact[]>(sampleContacts);
+  const [contacts, setContacts] = useState<Contact[]>([]);
 
   const userStatus = acceptChats ? "online" : "offline";
 
-  // Initialize MQTT connection
+  // Initialize MQTT connection for agent
   useEffect(() => {
-    // Ensure connection only if not already connected
     if (!useAIMessageHandler.getState().client) {
-      useAIMessageHandler.getState().connect("nextjs/poc/s", clientId);
+      useAIMessageHandler.getState().connect("chat/users/+", "agent");
     }
     return () => {
-      // Keep connection alive to ensure AI works across routes
-      // Optionally disconnect on app logout: useAIMessageHandler.getState().disconnect();
+      // Keep connection alive
     };
-  }, [clientId]);
+  }, []);
 
-  // Handle new MQTT messages for UI
+  // Handle updates from storeMessages to contacts and messages
   useEffect(() => {
-    const newLen = mqttMessages.length;
-    if (newLen <= processedLenRef.current) return;
+    setContacts((prevContacts) => {
+      let updatedContacts = [...prevContacts];
 
-    const start = processedLenRef.current;
-    const newOnes = mqttMessages.slice(start);
-    processedLenRef.current = newLen;
+      Object.entries(storeMessages).forEach(([user, userMsgs]) => {
+        if (!user || user === 'undefined') return;
 
-    setMessages((prev) => [
-      ...prev,
-      ...newOnes.map((m) => ({
-        text: m.text,
-        fromUser: m.sender === clientId,
-        id: m.id,
-      })),
-    ]);
+        const prevLen = processedLensRef.current[user] || 0;
+        const newLen = userMsgs.length;
 
-    // Update contacts (POC: assume all messages apply to all contacts)
-    setContacts((prevContacts) =>
-      prevContacts.map((c) => {
-        const contactMessages = newOnes.filter((m) => m.sender !== clientId);
-        if (contactMessages.length === 0) return c;
+        const newMessages = userMsgs.slice(prevLen);
 
-        const lastMsg = contactMessages[contactMessages.length - 1];
-        if (!lastMsg) return c;
+        // Count unread messages only if user is not selected
+        const unreadCount =
+          selectedContact?.id === user
+            ? 0
+            : userMsgs.filter((m) => m.sender !== "agent").length;
 
-        // For production: filter messages by contact ID (e.g., m.sender === c.id)
-        if (c.id === selectedContact?.id) {
-          return { ...c, unread: 0, recentMsg: lastMsg.text, time: "now" };
-        } else {
-          return {
-            ...c,
-            unread: (c.unread || 0) + contactMessages.length,
+        // Last message (from user or agent) for recentMsg
+        const lastMsg = userMsgs[newLen - 1];
+
+        const contactIdx = updatedContacts.findIndex((c) => c.id === user);
+        const lastUserMsg = userMsgs.filter((m) => m.sender !== "agent").slice(-1)[0];
+
+        if (contactIdx === -1) {
+          // New contact
+          updatedContacts.push({
+            id: user,
+            name: lastUserMsg?.name || user,
+            status: "online",
             recentMsg: lastMsg.text,
             time: "now",
+            unread: unreadCount,
+          });
+        } else {
+          // Existing contact
+          const currentContact = updatedContacts[contactIdx];
+          updatedContacts[contactIdx] = {
+            ...currentContact,
+            name: lastUserMsg?.name || currentContact.name || user,
+            unread: unreadCount,
+            recentMsg: lastMsg.text,
+            time: "now",
+            status: "online",
           };
         }
-      })
-    );
-  }, [mqttMessages, clientId, selectedContact]);
+
+        // Mark all messages as processed
+        processedLensRef.current[user] = newLen;
+
+        // Update messages if selected contact
+        if (selectedContact?.id === user) {
+          setMessages(
+            userMsgs.map((m) => ({
+              text: m.text,
+              fromUser: m.sender === "agent",
+              id: m.id,
+            }))
+          );
+        }
+      });
+
+      return updatedContacts;
+    });
+
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [storeMessages, selectedContact]);
+
 
   const handleSendMessage = (text: string) => {
-    sendMessage(text);
+    if (selectedContact) {
+      console.log(`Sending message to ${selectedContact.id}: ${text}`);
+      sendMessage(text, selectedContact.id);
+    }
   };
 
   const handleSelectContact = (contact: Contact) => {
+    console.log(`Selecting contact: ${contact.id}`);
     setSelectedContact(contact);
     setContacts((prev) =>
       prev.map((c) => (c.id === contact.id ? { ...c, unread: 0 } : c))
     );
-    // For POC: show all messages (global topic)
-    // For production: filter by contact ID or topic (e.g., mqttMessages.filter(m => m.sender === contact.id))
+    const contactMsgs = storeMessages[contact.id] || [];
     setMessages(
-      mqttMessages.map((m) => ({
+      contactMsgs.map((m) => ({
         text: m.text,
-        fromUser: m.sender === clientId,
+        fromUser: m.sender === "agent",
         id: m.id,
       }))
     );
+    processedLensRef.current[contact.id] = contactMsgs.length; // Mark messages as processed
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoadingContacts(false), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <div className="flex h-[calc(100vh-3.3rem)] border border-gray-300 bg-white text-black transition-colors dark:border-gray-700 dark:bg-zinc-900 dark:text-white">
-      {/* Left Sidebar */}
       <div className="w-[30%] min-w-[30%] max-w-[30%] border-r border-gray-300 dark:border-gray-700">
-        {isLoadingContacts ? (
-          <ContactListSkeleton />
-        ) : (
-          <ContactList
-            contacts={contacts}
-            selectedContact={selectedContact}
-            onSelect={handleSelectContact}
-            userStatus={userStatus}
-          />
-        )}
+        <ContactList
+          contacts={contacts}
+          selectedContact={selectedContact}
+          onSelect={handleSelectContact}
+          userStatus={userStatus}
+        />
       </div>
-
-      {/* Chat Area */}
       <div
-        className={`flex flex-col min-h-0 transition-all duration-300 ${
-          profileExpanded ? "w-[40%]" : "w-[70%]"
-        }`}
+        className={`flex flex-col min-h-0 transition-all duration-300 ${profileExpanded ? "w-[40%]" : "w-[70%]"
+          }`}
       >
         <ChatHeader contact={selectedContact} />
         <ChatMessages
@@ -165,6 +173,7 @@ export default function ChatUI() {
           messages={messages}
           settings={chatWidgetSettings}
         />
+        <div ref={chatEndRef} />
         {selectedContact && (
           <ChatInput
             settings={chatWidgetSettings}
@@ -173,12 +182,9 @@ export default function ChatUI() {
           />
         )}
       </div>
-
-      {/* Right Sidebar */}
       <div
-        className={`transition-all duration-300 ${
-          profileExpanded ? "w-[30%]" : "w-12"
-        } border-l border-gray-300 dark:border-gray-700`}
+        className={`transition-all duration-300 ${profileExpanded ? "w-[30%]" : "w-12"
+          } border-l border-gray-300 dark:border-gray-700`}
       >
         <ContactProfile
           contact={selectedContact}

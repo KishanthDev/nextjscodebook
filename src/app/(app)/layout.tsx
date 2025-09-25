@@ -8,8 +8,6 @@ import { SidebarProvider } from "@/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { Toaster } from '@/ui/sonner';
 import { NavbarWrapper } from '@/components/navbar/navbar';
-import { useAIMessageHandler } from '@/stores/aiMessageHandler';
-import { useUserMessageHandler } from '@/stores/userMessageHandler';
 const geistSans = localFont({
   src: '../fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -23,15 +21,6 @@ const geistMono = localFont({
 });
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    // Initialize MQTT connection for AI handler
-    useAIMessageHandler.getState().connect('nextjs/poc/s', 'user-1');
-    useUserMessageHandler.getState().connect('nextjs/poc/s', 'user-2');
-    return () => {
-      // Keep connection alive across routes
-      // Optionally: useAIMessageHandler.getState().disconnect();
-    };
-  }, []);
   return (
     <ThemeProvider attribute="class">
         <SidebarProvider>

@@ -1,4 +1,3 @@
-// stores/aiMessageHandler.ts
 'use client';
 import { create } from 'zustand';
 import mqtt, { MqttClient } from 'mqtt';
@@ -8,32 +7,33 @@ interface AIMessage {
   sender: string;
   text: string;
   id: string;
+  name?: string;
 }
 
 interface AIHandlerState {
-  messages: AIMessage[];
+  messages: Record<string, AIMessage[]>;
   suggestedReply: string;
   client: MqttClient | null;
   clientId: string | null;
   topic: string | null;
-  newMsgCount: number; // 🔹 count of new incoming messages
+  newMsgCount: number;
   connect: (topic: string, clientId: string) => void;
   disconnect: () => void;
-  sendMessage: (text: string) => void;
+  sendMessage: (text: string, target: string) => void;
   setSuggestedReply: (reply: string) => void;
-  resetNewMsgCount: () => void; // 🔹 reset counter
+  resetNewMsgCount: () => void;
 }
 
 export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
-  messages: [],
+  messages: {},
   suggestedReply: '',
   client: null,
   clientId: null,
   topic: null,
-  newMsgCount: 0, // start with 0
+  newMsgCount: 0,
 
   connect: (topic: string, clientId: string) => {
-    if (get().client) return; // Prevent multiple connections
+    if (get().client) return;
 
     const mqttClient = mqtt.connect(process.env.NEXT_PUBLIC_MQTT_HOST!, {
       clientId,
@@ -41,25 +41,55 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
       password: process.env.NEXT_PUBLIC_MQTT_PASS!,
     });
 
-
     mqttClient.on('connect', () => {
       console.log(`✅ AI Handler Connected to HiveMQ as ${clientId}`);
       mqttClient.subscribe(topic, (err) => {
         if (err) console.error('Subscription error:', err);
+        else console.log(`Subscribed to ${topic}`);
       });
     });
 
-    mqttClient.on('message', async (_, payload) => {
+    // In the message handler of useAIMessageHandler
+    mqttClient.on('message', async (topic, payload) => {
+      console.log(`Received message on topic: ${topic}`, payload.toString());
       try {
         const parsed = JSON.parse(payload.toString());
         const msgId = parsed.id;
-        const messageIds = new Set(get().messages.map((m) => m.id));
-        if (!msgId || messageIds.has(msgId)) return;
 
-        const msg = { sender: parsed.sender, text: parsed.text, id: msgId };
+        // Fix: Extract user from the correct topic format
+        let user = null;
+        if (topic.startsWith('chat/users/')) {
+          user = topic.split('/')[2]; // Extract from chat/users/{user}
+        } else if (topic.startsWith('chat/agent/')) {
+          user = topic.split('/')[2]; // Extract from chat/agent/{user}
+        }
+
+        if (!user) {
+          console.error('Invalid topic format:', topic);
+          return;
+        }
+
+        const currentMessages = get().messages[user] || [];
+        if (currentMessages.some((m) => m.id === msgId)) {
+          console.log(`Duplicate message ID ${msgId} for user ${user}, skipping`);
+          return;
+        }
+
+        // Fix: Properly extract and use the name field
+        const msg = {
+          sender: parsed.sender,
+          text: parsed.text,
+          name: parsed.name || parsed.sender, // ✅ Use name if available, fallback to sender
+          id: msgId
+        };
+
+        console.log(`Adding message for user ${user}:`, msg);
         set((state) => ({
-          messages: [...state.messages, msg],
-          newMsgCount: msg.sender !== clientId ? state.newMsgCount + 1 : state.newMsgCount, // 🔹 increment only for others
+          messages: {
+            ...state.messages,
+            [user]: [...currentMessages, msg],
+          },
+          newMsgCount: msg.sender !== clientId ? state.newMsgCount + 1 : state.newMsgCount,
         }));
 
         // AI auto-processing
@@ -94,10 +124,28 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
         }
       } catch (err) {
         console.error('Message parsing error:', err);
+        // Fix: Also handle user extraction in error case
+        let user = null;
+        if (topic.startsWith('chat/users/')) {
+          user = topic.split('/')[2];
+        } else if (topic.startsWith('chat/agent/')) {
+          user = topic.split('/')[2];
+        }
+
+        if (!user) return;
+
         const msgId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         set((state) => ({
-          messages: [...state.messages, { sender: 'unknown', text: payload.toString(), id: msgId }],
-          newMsgCount: state.newMsgCount + 1, // still count it
+          messages: {
+            ...state.messages,
+            [user]: [...(state.messages[user] || []), {
+              sender: 'unknown',
+              text: payload.toString(),
+              id: msgId,
+              name: 'Unknown User'
+            }],
+          },
+          newMsgCount: state.newMsgCount + 1,
         }));
       }
     });
@@ -115,7 +163,7 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
       client.end();
       set({
         client: null,
-        messages: [],
+        messages: {},
         suggestedReply: '',
         clientId: null,
         topic: null,
@@ -124,19 +172,32 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
     }
   },
 
-  sendMessage: (text: string) => {
-    const { client, clientId, topic } = get();
-    if (client && clientId && topic && text.trim()) {
+  sendMessage: (text: string, target: string) => {
+    const { client, clientId } = get();
+    if (client && clientId && text.trim()) {
+      const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       const payload = JSON.stringify({
         sender: clientId,
         text,
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id,
+        name: "Agent" // ✅ Add a display name for the agent
       });
-      client.publish(topic, payload, { qos: 1, retain: false });
+      client.publish(`chat/agent/${target}`, payload, { qos: 1, retain: false });
+      console.log(`Sent message to chat/agent/${target}: ${text}`);
+      set((state) => ({
+        messages: {
+          ...state.messages,
+          [target]: [...(state.messages[target] || []), {
+            sender: clientId,
+            text,
+            id,
+            name: "Agent" // ✅ Also store name in local state
+          }],
+        },
+      }));
     }
   },
-
   setSuggestedReply: (reply: string) => set({ suggestedReply: reply }),
 
-  resetNewMsgCount: () => set({ newMsgCount: 0 }), // 🔹 manually reset
+  resetNewMsgCount: () => set({ newMsgCount: 0 }),
 }));

@@ -1,85 +1,101 @@
-// stores/userMessageHandler.ts
 'use client';
 import { create } from 'zustand';
 import mqtt, { MqttClient } from 'mqtt';
 
-interface UserMessage {
-  sender: string;
-  text: string;
-  id: string;
-}
+export type Message = { sender: "agent" | "user"; text: string; id: string; name?: string };
+
+export type UserBox = {
+  username: string;
+  client: MqttClient | null;
+  messages: Message[];
+  input: string;
+  connected: boolean;
+};
 
 interface UserMessageHandlerState {
-  messages: UserMessage[];
-  client: MqttClient | null;
-  clientId: string | null; // Store clientId
-  topic: string | null; // Store topic
-  connect: (topic: string, clientId: string) => void;
-  disconnect: () => void;
-  sendMessage: (text: string) => void;
+  users: UserBox[];
+  setUsername: (index: number, username: string) => void;
+  connectUser: (index: number) => void;
+  sendMessage: (index: number) => void;
+  updateUser: (index: number, updates: Partial<UserBox> | ((prev: UserBox) => Partial<UserBox>)) => void;
 }
 
 export const useUserMessageHandler = create<UserMessageHandlerState>((set, get) => ({
-  messages: [],
-  client: null,
-  clientId: null, // Initialize clientId
-  topic: null, // Initialize topic
-  connect: (topic: string, clientId: string) => {
-    if (get().client) return; // Prevent multiple connections
+  users: Array(4).fill(null).map(() => ({
+    username: '',
+    client: null,
+    messages: [],
+    input: '',
+    connected: false,
+  })),
 
-    const mqttClient = mqtt.connect(process.env.NEXT_PUBLIC_MQTT_HOST!, {
-      clientId,
+  setUsername: (index, username) => {
+    get().updateUser(index, { username });
+  },
+
+  updateUser: (index, updates) => {
+    set((prev) => {
+      const newArr = [...prev.users];
+      const current = newArr[index];
+      const newUpdates = typeof updates === "function" ? updates(current) : updates;
+      newArr[index] = { ...current, ...newUpdates };
+      return { users: newArr };
+    });
+  },
+
+  connectUser: (index) => {
+    const user = get().users[index];
+    if (!user.username.trim()) return;
+
+    const client = mqtt.connect(process.env.NEXT_PUBLIC_MQTT_HOST!, {
+      clientId: user.username + "-" + Math.random().toString(16).slice(2),
       username: process.env.NEXT_PUBLIC_MQTT_USER!,
       password: process.env.NEXT_PUBLIC_MQTT_PASS!,
     });
 
-    mqttClient.on('connect', () => {
-      console.log(`✅ User Handler Connected to HiveMQ as ${clientId}`);
-      mqttClient.subscribe(topic, (err) => {
-        if (err) console.error('Subscription error:', err);
-      });
+    client.on("connect", () => {
+      console.log(user.username, "connected");
+      client.subscribe(`chat/agent/${user.username}`);
+      get().updateUser(index, { client, connected: true });
     });
 
-    mqttClient.on('message', (_, payload) => {
+    client.on("message", (_, payload) => {
+      let msg: Message;
       try {
         const parsed = JSON.parse(payload.toString());
-        const msgId = parsed.id;
-        const messageIds = new Set(get().messages.map((m) => m.id));
-        if (!msgId || messageIds.has(msgId)) return; // Deduplicate
-
-        const msg = { sender: parsed.sender, text: parsed.text, id: msgId };
-        set((state) => ({ messages: [...state.messages, msg] }));
+        msg = {
+          sender: "agent",
+          text: parsed.text,
+          id: parsed.id || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          name: parsed.name || "Agent",
+        };
       } catch (err) {
-        console.error('Message parsing error:', err);
-        const msgId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        set((state) => ({
-          messages: [...state.messages, { sender: 'unknown', text: payload.toString(), id: msgId }],
-        }));
+        console.error("Parse error:", err);
+        msg = { sender: "agent", text: payload.toString(), id: `${Date.now()}-${Math.random().toString(36).slice(2)}` };
       }
+      get().updateUser(index, (prev) => ({
+        messages: [...prev.messages, msg],
+      }));
+    });
+  },
+
+  sendMessage: (index) => {
+    const user = get().users[index];
+    if (!user.client || !user.input.trim()) return;
+
+    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const payload = JSON.stringify({
+      sender: user.username,
+      text: user.input,
+      id,
+      name: user.username,
     });
 
-    mqttClient.on('error', (err) => {
-      console.error('MQTT error:', err);
-    });
+    user.client.publish(`chat/users/${user.username}`, payload, { qos: 1, retain: false });
 
-    set({ client: mqttClient, clientId, topic }); // Store clientId and topic
-  },
-  disconnect: () => {
-    const client = get().client;
-    if (client) {
-      client.end();
-      set({ client: null, messages: [], clientId: null, topic: null });
-    }
-  },
-  sendMessage: (text: string) => {
-    const { client, clientId, topic } = get();
-    if (client && clientId && topic && text.trim()) {
-      const payload = JSON.stringify({
-        sender: clientId,
-        text,
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      });
-      client.publish(topic, payload, { qos: 1, retain: false });
-    }
+    get().updateUser(index, (prev) => ({
+      messages: [...prev.messages, { sender: "user", text: user.input, id, name: user.username }],
+      input: "",
+    }));
   },
 }));

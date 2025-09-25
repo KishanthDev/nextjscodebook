@@ -63,7 +63,7 @@ export default function ChatUI() {
   // Handle updates from storeMessages to contacts and messages
   useEffect(() => {
     setContacts((prevContacts) => {
-      let updatedContacts = [...prevContacts];
+      const updatedContacts = [...prevContacts];
 
       Object.entries(storeMessages).forEach(([user, userMsgs]) => {
         if (!user || user === 'undefined') return;
@@ -140,9 +140,17 @@ export default function ChatUI() {
   const handleSelectContact = (contact: Contact) => {
     console.log(`Selecting contact: ${contact.id}`);
     setSelectedContact(contact);
+
+    // Reset unread count immediately in contacts list
     setContacts((prev) =>
-      prev.map((c) => (c.id === contact.id ? { ...c, unread: 0 } : c))
+      prev.map((c) =>
+        c.id === contact.id
+          ? { ...c, unread: 0 } // Reset unread
+          : c
+      )
     );
+
+    // Get messages for this contact
     const contactMsgs = storeMessages[contact.id] || [];
     setMessages(
       contactMsgs.map((m) => ({
@@ -151,8 +159,11 @@ export default function ChatUI() {
         id: m.id,
       }))
     );
-    processedLensRef.current[contact.id] = contactMsgs.length; // Mark messages as processed
+
+    // Mark all messages as processed so unread count won't increase
+    processedLensRef.current[contact.id] = contactMsgs.length;
   };
+
   return (
     <div className="flex h-[calc(100vh-3.3rem)] border border-gray-300 bg-white text-black transition-colors dark:border-gray-700 dark:bg-zinc-900 dark:text-white">
       <div className="w-[30%] min-w-[30%] max-w-[30%] border-r border-gray-300 dark:border-gray-700">

@@ -109,19 +109,34 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
             }
 
             if (openaiReply && aiSuggestion) {
+              const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
               const payload = JSON.stringify({
                 sender: clientId,
                 text: aiSuggestion,
-                id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id,
+                name: "Agent",
               });
-              mqttClient.publish(topic, payload, { qos: 1, retain: false });
-              set({ suggestedReply: '' });
+
+              // ✅ Publish to the correct user's topic
+              mqttClient.publish(`chat/agent/${user}`, payload, { qos: 1, retain: false });
+              console.log(`✅ AI auto-reply sent to ${user}: ${aiSuggestion}`);
+
+              // ✅ Update local state after sending
+              const currentMessages = get().messages[user] || [];
+              set({
+                messages: {
+                  ...get().messages,
+                  [user]: [...currentMessages, { sender: clientId, text: aiSuggestion, id, name: "Agent" }],
+                },
+                suggestedReply: '', // clear the suggested reply
+              });
             }
           } catch (err) {
             console.error('AI suggestion failed:', err);
             set({ suggestedReply: '' });
           }
         }
+
       } catch (err) {
         console.error('Message parsing error:', err);
         // Fix: Also handle user extraction in error case

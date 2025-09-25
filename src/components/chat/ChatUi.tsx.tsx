@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useState, useRef } from "react";
 import Contact from "@/types/Contact";
 import ContactList from "./ContactList";
@@ -12,16 +12,18 @@ import { ChatWidgetSettings } from "@/types/Modifier";
 import { useAIMessageHandler } from "@/stores/aiMessageHandler";
 
 export default function ChatUI() {
-
   const { messages: storeMessages, sendMessage, suggestedReplies } = useAIMessageHandler();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [profileExpanded, setProfileExpanded] = useState(false);
-  const [messages, setMessages] = useState<{ fromUser: boolean; text: string; id: string }[]>([]);
+  const [messages, setMessages] = useState<{ fromUser: boolean; text: string; id: string; name?: string }[]>([]);
   const { acceptChats } = useUserStatus();
   const { settings, fetchSettings } = useSettingsStore();
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Track processed messages per contact
   const processedLensRef = useRef<Record<string, number>>({});
+  // Track unread counts per contact
+  const unreadCountsRef = useRef<Record<string, number>>({});
 
   const defaultSettings: ChatWidgetSettings = {
     chatTitle: "LiveChat",
@@ -47,14 +49,15 @@ export default function ChatUI() {
   };
 
   const [contacts, setContacts] = useState<Contact[]>([]);
-
   const userStatus = acceptChats ? "online" : "offline";
 
   // Initialize MQTT connection for agent
   useEffect(() => {
     if (!useAIMessageHandler.getState().client) {
-      useAIMessageHandler.getState().connect('chat/users/+', `agent-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`);
-
+      useAIMessageHandler.getState().connect(
+        'chat/users/+',
+        `agent-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`
+      );
     }
     return () => {
       // Keep connection alive
@@ -63,70 +66,63 @@ export default function ChatUI() {
 
   // Handle updates from storeMessages to contacts and messages
   useEffect(() => {
-    setContacts((prevContacts) => {
+    setContacts(prevContacts => {
       const updatedContacts = [...prevContacts];
+      const clientId = useAIMessageHandler.getState().clientId;
 
       Object.entries(storeMessages).forEach(([user, userMsgs]) => {
-        if (!user || user === 'undefined') return;
+        if (!user || user === "undefined") return;
 
         const prevLen = processedLensRef.current[user] || 0;
         const newLen = userMsgs.length;
-
         const newMessages = userMsgs.slice(prevLen);
 
-        // Count unread messages only if user is not selected
-        const unreadCount =
-          selectedContact?.id === user
-            ? 0
-            : userMsgs.filter((m) => m.sender !== "agent").length;
+        // Update unread counts only for non-selected contacts
+        if (selectedContact?.id !== user) {
+          unreadCountsRef.current[user] = (unreadCountsRef.current[user] || 0) +
+            newMessages.filter(m => m.sender !== clientId).length;
+        } else {
+          unreadCountsRef.current[user] = 0; // reset for selected contact
+        }
 
-        // Last message (from user or agent) for recentMsg
+        const unreadCount = unreadCountsRef.current[user];
+
         const lastMsg = userMsgs[newLen - 1];
-
-        const contactIdx = updatedContacts.findIndex((c) => c.id === user);
-        const clientId = useAIMessageHandler.getState().clientId;
         const lastUserMsg = userMsgs.slice().reverse().find(m => m.sender !== clientId);
 
+        const contactIdx = updatedContacts.findIndex(c => c.id === user);
+
         if (contactIdx === -1) {
-          // New contact
           updatedContacts.push({
             id: user,
             name: lastUserMsg?.name || user,
             status: "online",
-            recentMsg: lastMsg.text,
+            recentMsg: lastMsg?.text || "",
             time: "now",
             unread: unreadCount,
           });
         } else {
-          // Existing contact
           const currentContact = updatedContacts[contactIdx];
           updatedContacts[contactIdx] = {
             ...currentContact,
             name: lastUserMsg?.name || currentContact.name || user,
             unread: unreadCount,
-            recentMsg: lastMsg.text,
+            recentMsg: lastMsg?.text || "",
             time: "now",
             status: "online",
           };
         }
 
-        // Mark all messages as processed
         processedLensRef.current[user] = newLen;
 
         // Update messages if selected contact
         if (selectedContact?.id === user) {
-          const clientId = useAIMessageHandler.getState().clientId;
-
-          setMessages(
-            userMsgs.map((m) => ({
-              text: m.text,
-              fromUser: m.sender === clientId, // true → right (sent by me), false → left (from user)
-              id: m.id,
-              name: m.name || m.sender, // ✅ always keep the actual sender name
-            }))
-          );
-
-
+          setMessages(userMsgs.map(m => ({
+            text: m.text,
+            fromUser: m.sender === clientId,
+            id: m.id,
+            name: m.name || m.sender,
+          })));
         }
       });
 
@@ -136,10 +132,8 @@ export default function ChatUI() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [storeMessages, selectedContact]);
 
-
   const handleSendMessage = (text: string) => {
     if (selectedContact) {
-      console.log(`Sending message to ${selectedContact.id}: ${text}`);
       sendMessage(text, selectedContact.id);
     }
   };
@@ -148,32 +142,23 @@ export default function ChatUI() {
     setSelectedContact(contact);
 
     // Reset unread count
-    setContacts((prev) =>
-      prev.map((c) =>
-        c.id === contact.id ? { ...c, unread: 0 } : c
-      )
+    unreadCountsRef.current[contact.id] = 0;
+    setContacts(prev =>
+      prev.map(c => c.id === contact.id ? { ...c, unread: 0 } : c)
     );
 
     // Load messages
     const contactMsgs = storeMessages[contact.id] || [];
     const clientId = useAIMessageHandler.getState().clientId;
+    setMessages(contactMsgs.map(m => ({
+      text: m.text,
+      fromUser: m.sender === clientId,
+      id: m.id,
+      name: m.name || m.sender,
+    })));
 
-    setMessages(
-      contactMsgs.map((m) => ({
-        text: m.text,
-        fromUser: m.sender === clientId, // ✅ true if message is from the user, false if it's from this agent
-        id: m.id,
-      }))
-    );
-
-
-    // Mark messages as processed
     processedLensRef.current[contact.id] = contactMsgs.length;
-
-    // ✅ Clear suggested reply for previous contact if needed
-    // Optionally, you could keep it, but make sure input box always syncs with the current contact
   };
-
 
   return (
     <div className="flex h-[calc(100vh-3.3rem)] border border-gray-300 bg-white text-black transition-colors dark:border-gray-700 dark:bg-zinc-900 dark:text-white">
@@ -185,10 +170,8 @@ export default function ChatUI() {
           userStatus={userStatus}
         />
       </div>
-      <div
-        className={`flex flex-col min-h-0 transition-all duration-300 ${profileExpanded ? "w-[40%]" : "w-[70%]"
-          }`}
-      >
+
+      <div className={`flex flex-col min-h-0 transition-all duration-300 ${profileExpanded ? "w-[40%]" : "w-[70%]"}`}>
         <ChatHeader contact={selectedContact} />
         <ChatMessages
           selected={!!selectedContact}
@@ -197,26 +180,19 @@ export default function ChatUI() {
         />
         <div ref={chatEndRef} />
         {selectedContact && (
-          // Inside ChatUI
           <ChatInput
-            key={selectedContact?.id} // ✅ force remount when contact changes
+            key={selectedContact.id}
             settings={chatWidgetSettings}
             onSend={(text) => {
-              if (selectedContact) {
-                sendMessage(text, selectedContact.id);
-                useAIMessageHandler.getState().setSuggestedReply('', selectedContact.id);
-              }
+              sendMessage(text, selectedContact.id);
+              useAIMessageHandler.getState().setSuggestedReply('', selectedContact.id);
             }}
-            suggestedReply={selectedContact ? suggestedReplies[selectedContact.id] || '' : ''}
+            suggestedReply={suggestedReplies[selectedContact.id] || ''}
           />
-
-
         )}
       </div>
-      <div
-        className={`transition-all duration-300 ${profileExpanded ? "w-[30%]" : "w-12"
-          } border-l border-gray-300 dark:border-gray-700`}
-      >
+
+      <div className={`transition-all duration-300 ${profileExpanded ? "w-[30%]" : "w-12"} border-l border-gray-300 dark:border-gray-700`}>
         <ContactProfile
           contact={selectedContact}
           expanded={profileExpanded}

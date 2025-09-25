@@ -84,7 +84,8 @@ export default function ChatUI() {
         const lastMsg = userMsgs[newLen - 1];
 
         const contactIdx = updatedContacts.findIndex((c) => c.id === user);
-        const lastUserMsg = userMsgs.filter((m) => m.sender !== "agent").slice(-1)[0];
+        const clientId = useAIMessageHandler.getState().clientId;
+        const lastUserMsg = userMsgs.slice().reverse().find(m => m.sender !== clientId);
 
         if (contactIdx === -1) {
           // New contact
@@ -114,13 +115,18 @@ export default function ChatUI() {
 
         // Update messages if selected contact
         if (selectedContact?.id === user) {
+          const clientId = useAIMessageHandler.getState().clientId;
+
           setMessages(
             userMsgs.map((m) => ({
               text: m.text,
-              fromUser: m.sender === "agent",
+              fromUser: m.sender === clientId, // true → right (sent by me), false → left (from user)
               id: m.id,
+              name: m.name || m.sender, // ✅ always keep the actual sender name
             }))
           );
+
+
         }
       });
 
@@ -150,13 +156,16 @@ export default function ChatUI() {
 
     // Load messages
     const contactMsgs = storeMessages[contact.id] || [];
+    const clientId = useAIMessageHandler.getState().clientId;
+
     setMessages(
       contactMsgs.map((m) => ({
         text: m.text,
-        fromUser: m.sender === "agent",
+        fromUser: m.sender === clientId, // ✅ true if message is from the user, false if it's from this agent
         id: m.id,
       }))
     );
+
 
     // Mark messages as processed
     processedLensRef.current[contact.id] = contactMsgs.length;

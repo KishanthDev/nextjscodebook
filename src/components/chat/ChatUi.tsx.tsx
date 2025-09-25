@@ -53,7 +53,8 @@ export default function ChatUI() {
   // Initialize MQTT connection for agent
   useEffect(() => {
     if (!useAIMessageHandler.getState().client) {
-      useAIMessageHandler.getState().connect("chat/users/+", "agent");
+      useAIMessageHandler.getState().connect('chat/users/+', `agent-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`);
+
     }
     return () => {
       // Keep connection alive

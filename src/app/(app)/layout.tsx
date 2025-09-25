@@ -22,13 +22,13 @@ const geistMono = localFont({
 });
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  
+
   // Connect MQTT once globally
   useEffect(() => {
     const handler = useAIMessageHandler.getState();
     if (!handler.client) {
       // Subscribe to all chat topics
-      handler.connect('chat/users/+', 'agent');
+      handler.connect('chat/users/+', `agent-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`);
     }
 
     return () => {

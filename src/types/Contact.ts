@@ -1,5 +1,5 @@
 type Contact = {
-  id: number;
+  id: string;
   name: string;
   status: "online" | "offline";
   recentMsg: string;

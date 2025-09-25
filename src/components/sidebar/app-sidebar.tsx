@@ -69,6 +69,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
+      <style>
+        {`
+          @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+          }
+          .animate-breathe {
+            animation: breathe 1.5s ease-in-out infinite;
+          }
+        `}
+      </style>
       <SidebarHeader>
         <TeamSwitcher teams={teams} />
         <SidebarGroup className="py-0 group-data-[collapsible=icon]:hidden" />
@@ -93,10 +104,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <span className='truncate'>{label}</span>
                     </div>
                     {href === "/chats" && newMsgCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs font-bold p-1 rounded-full">
-                        {newMsgCount}
+                      <span className="relative flex items-center justify-center w-3 h-3">
+                        {/* breathing background */}
+                        <span className="absolute w-full h-full rounded-full bg-red-500 animate-breathe origin-center"></span>
+                        {/* solid dot */}
+                        <span className="relative w-2 h-2 rounded-full bg-red-500"></span>
                       </span>
                     )}
+
+
                   </Link>
 
                 </SidebarMenuButton>

@@ -11,16 +11,39 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { ChatWidgetSettings } from "@/types/Modifier";
 import { useAIMessageHandler } from "@/stores/aiMessageHandler";
 
-function formatTimeAgo(timestamp: number): string {
-  const now = Date.now();
-  const diff = Math.floor((now - timestamp) / 1000);
-  if (diff < 5) return "now";
-  if (diff < 60) return `${diff} sec ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} hr ago`;
-  if (diff < 172800) return "yesterday";
-  return new Date(timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+function formatTimeDisplay(timestamp: number): string {
+  const date = new Date(timestamp);
+  const now = new Date();
+
+  const isToday =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear();
+
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday =
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear();
+
+  if (isToday) {
+    // ✅ Format as HH:MM AM/PM
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  } else if (isYesterday) {
+    return "Yesterday";
+  } else {
+    // ✅ Show as dd-mm
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${day}-${month}`;
+  }
 }
+
 
 export default function ChatUI() {
   const { messages: storeMessages, sendMessage, suggestedReplies, connect, clientId, lastViewed, setLastViewed } = useAIMessageHandler();
@@ -80,7 +103,7 @@ export default function ChatUI() {
         name: lastUserMsg?.name || user,
         status: "online",
         recentMsg: lastMsg?.text || "",
-        time: lastMsg?.timestamp ? formatTimeAgo(lastMsg.timestamp) : "",
+        time: lastMsg?.timestamp ? formatTimeDisplay(lastMsg.timestamp) : "",
         unread,
       });
 

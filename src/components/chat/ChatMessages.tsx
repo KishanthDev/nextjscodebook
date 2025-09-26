@@ -2,7 +2,8 @@ import { MessageSquare, MoreVertical, X } from "lucide-react";
 import clsx from "clsx";
 import styles from "./ChatMessages.module.css";
 import { ChatWidgetSettings } from "@/types/Modifier";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
 
 type Props = {
   selected: boolean;
@@ -12,12 +13,16 @@ type Props = {
 
 export default function ChatMessages({ selected, messages, settings }: Props) {
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
+  const [popupData, setPopupData] = useState<{ message: string; reply: string | null } | null>(null);
 
-  // For popup
-  const [popupData, setPopupData] = useState<{
-    message: string;
-    reply: string | null;
-  } | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (selected) {
+      chatEndRef.current?.scrollIntoView({ behavior: "auto" }); // or "smooth" if you want
+    }
+  }, [messages, selected]);
 
   if (!selected) {
     return (
@@ -49,24 +54,21 @@ export default function ChatMessages({ selected, messages, settings }: Props) {
             >
               {msg.text}
 
-              {/* 3-dot icon */}
-              {/* 3-dot icon */}
               <button
                 className={clsx(
                   "absolute top-1 opacity-0 group-hover:opacity-100 transition",
-                  msg.fromUser ? "right-2" : "left-2" // ✅ dynamic placement
+                  msg.fromUser ? "right-2" : "left-2"
                 )}
                 onClick={() => setOpenMenuIndex(openMenuIndex === idx ? null : idx)}
               >
                 <MoreVertical className="w-4 h-4 text-gray-500" />
               </button>
 
-              {/* Dropdown */}
               {openMenuIndex === idx && (
                 <div
                   className={clsx(
                     "absolute top-6 z-10 bg-white dark:bg-gray-800 border rounded-md shadow-lg",
-                    msg.fromUser ? "right-2" : "left-2" // ✅ dropdown aligned accordingly
+                    msg.fromUser ? "right-2" : "left-2"
                   )}
                 >
                   <button
@@ -98,6 +100,9 @@ export default function ChatMessages({ selected, messages, settings }: Props) {
             </div>
           </div>
         ))}
+
+        {/* 🔹 Scroll target */}
+        <div ref={chatEndRef} />
       </div>
 
       {/* Popup Modal */}
@@ -188,3 +193,4 @@ export default function ChatMessages({ selected, messages, settings }: Props) {
     </>
   );
 }
+

@@ -5,6 +5,7 @@ type Contact = {
   recentMsg: string;
   time: number | string;
   unread: number;
+  lastMsgTime?: number; // For sorting contacts by last message time
 };
 
 export default Contact;

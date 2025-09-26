@@ -94,7 +94,6 @@ export default function ChatUI() {
       const lastMsg = msgs[msgs.length - 1];
       const lastUserMsg = [...msgs].reverse().find((m) => m.sender !== clientId);
 
-      // ✅ Use lastViewed from store
       const lastViewedTime = lastViewed[user] || 0;
       const unread = msgs.filter((m) => m.sender !== clientId && m.timestamp > lastViewedTime).length;
 
@@ -105,7 +104,7 @@ export default function ChatUI() {
         recentMsg: lastMsg?.text || "",
         time: lastMsg?.timestamp ? formatTimeDisplay(lastMsg.timestamp) : "",
         unread,
-      });
+        lastMsgTime: lastMsg?.timestamp || 0,});
 
       if (selectedContact?.id === user) {
         setMessages(
@@ -119,9 +118,13 @@ export default function ChatUI() {
       }
     });
 
+    // Sort contacts by last message timestamp (descending)
+    updated.sort((a, b) => (b.lastMsgTime || 0) - (a.lastMsgTime || 0));
+
     setContacts(updated);
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [storeMessages, selectedContact, clientId, lastViewed]);
+
 
   const handleSelectContact = (contact: Contact) => {
     setSelectedContact(contact);

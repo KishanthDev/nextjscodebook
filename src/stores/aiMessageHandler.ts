@@ -8,30 +8,36 @@ interface AIMessage {
   text: string;
   id: string;
   name?: string;
+  timestamp: number;
 }
 
 interface AIHandlerState {
   messages: Record<string, AIMessage[]>;
-  suggestedReplies: Record<string, string>; // ✅ per-contact suggested reply
+  suggestedReplies: Record<string, string>;
   client: MqttClient | null;
   clientId: string | null;
   topic: string | null;
   newMsgCount: number;
+  unreadCounts: Record<string, number>;
+  lastViewed: Record<string, number>; // ✅ Add lastViewed to store
   connect: (topic: string, clientId: string) => void;
   disconnect: () => void;
   sendMessage: (text: string, target: string) => void;
-  setSuggestedReply: (reply: string, contactId: string) => void; // now per-contact
+  setSuggestedReply: (reply: string, contactId: string) => void;
   resetNewMsgCount: () => void;
+  resetUnread: (contactId: string) => void;
+  setLastViewed: (contactId: string, timestamp: number) => void; // ✅ Add setter for lastViewed
 }
-
 
 export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
   messages: {},
-  suggestedReplies: {}, // ✅ initialize per-contact suggestions
+  suggestedReplies: {},
   client: null,
   clientId: null,
   topic: null,
   newMsgCount: 0,
+  unreadCounts: {},
+  lastViewed: {}, // ✅ Initialize lastViewed
 
   connect: (topic: string, clientId: string) => {
     if (get().client) return;
@@ -67,17 +73,28 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
         text: parsed.text,
         name: parsed.name || parsed.sender,
         id: msgId,
+        timestamp: parsed.timestamp || Date.now(),
       };
+
+      // ✅ Calculate unread count based on lastViewed
+      const lastViewed = get().lastViewed[user] || 0;
+      const isUnread = msg.sender !== clientId && msg.timestamp > lastViewed;
 
       set((state) => ({
         messages: {
           ...state.messages,
           [user]: [...currentMessages, msg],
         },
-        newMsgCount: msg.sender !== clientId ? state.newMsgCount + 1 : state.newMsgCount,
+        unreadCounts: {
+          ...state.unreadCounts,
+          [user]: isUnread
+            ? (state.unreadCounts[user] || 0) + 1
+            : state.unreadCounts[user] || 0,
+        },
+        newMsgCount: isUnread ? state.newMsgCount + 1 : state.newMsgCount,
       }));
 
-      // AI auto-processing
+      // AI auto-processing (unchanged)
       const { openaiGenerate, openaiReply } = useAIConfig.getState();
       if (msg.sender !== clientId && (openaiGenerate || openaiReply)) {
         try {
@@ -91,7 +108,10 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
 
           if (openaiGenerate) {
             set((state) => ({
-              suggestedReplies: { ...state.suggestedReplies, [user]: aiSuggestion }, // ✅ per-contact
+              suggestedReplies: {
+                ...state.suggestedReplies,
+                [user]: aiSuggestion,
+              },
             }));
           }
 
@@ -101,19 +121,34 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
               sender: clientId,
               text: aiSuggestion,
               id,
-              name: "Agent",
+              name: 'Agent',
+              timestamp: Date.now(),
             });
 
-            mqttClient.publish(`chat/agent/${user}`, payload, { qos: 1, retain: false });
+            mqttClient.publish(`chat/agent/${user}`, payload, {
+              qos: 1,
+              retain: false,
+            });
 
-            // Update local state
             const currentMessages = get().messages[user] || [];
             set({
               messages: {
                 ...get().messages,
-                [user]: [...currentMessages, { sender: clientId, text: aiSuggestion, id, name: "Agent" }],
+                [user]: [
+                  ...currentMessages,
+                  {
+                    sender: clientId,
+                    text: aiSuggestion,
+                    id,
+                    name: 'Agent',
+                    timestamp: Date.now(),
+                  },
+                ],
               },
-              suggestedReplies: { ...get().suggestedReplies, [user]: '' }, // clear suggestion after sending
+              suggestedReplies: {
+                ...get().suggestedReplies,
+                [user]: '',
+              },
             });
           }
         } catch (err) {
@@ -137,10 +172,12 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
       set({
         client: null,
         messages: {},
-        suggestedReplies: {}, // reset per-contact
+        suggestedReplies: {},
         clientId: null,
         topic: null,
         newMsgCount: 0,
+        unreadCounts: {},
+        lastViewed: {}, // ✅ Clear lastViewed on disconnect
       });
     }
   },
@@ -149,16 +186,29 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
     const { client, clientId } = get();
     if (client && clientId && text.trim()) {
       const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      const payload = JSON.stringify({ sender: clientId, text, id, name: "Agent" });
-      client.publish(`chat/agent/${target}`, payload, { qos: 1, retain: false });
+      const timestamp = Date.now();
+      const payload = JSON.stringify({
+        sender: clientId,
+        text,
+        id,
+        name: 'Agent',
+        timestamp,
+      });
+      client.publish(`chat/agent/${target}`, payload, {
+        qos: 1,
+        retain: false,
+      });
 
       const currentMessages = get().messages[target] || [];
       set({
         messages: {
           ...get().messages,
-          [target]: [...currentMessages, { sender: clientId, text, id, name: "Agent" }],
+          [target]: [
+            ...currentMessages,
+            { sender: clientId, text, id, name: 'Agent', timestamp },
+          ],
         },
-        suggestedReplies: { ...get().suggestedReplies, [target]: '' }, // clear suggestion for that contact
+        suggestedReplies: { ...get().suggestedReplies, [target]: '' },
       });
     }
   },
@@ -169,4 +219,15 @@ export const useAIMessageHandler = create<AIHandlerState>((set, get) => ({
     })),
 
   resetNewMsgCount: () => set({ newMsgCount: 0 }),
+
+  resetUnread: (contactId: string) =>
+    set((state) => ({
+      unreadCounts: { ...state.unreadCounts, [contactId]: 0 },
+    })),
+
+  setLastViewed: (contactId: string, timestamp: number) =>
+    set((state) => ({
+      lastViewed: { ...state.lastViewed, [contactId]: timestamp },
+      unreadCounts: { ...state.unreadCounts, [contactId]: 0 }, // ✅ Reset unread count when lastViewed is updated
+    })),
 }));

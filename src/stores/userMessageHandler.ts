@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import mqtt, { MqttClient } from 'mqtt';
 
-export type Message = { sender: "agent" | "user"; text: string; id: string; name?: string };
+export type Message = { sender: "agent" | "user"; text: string; id: string; name?: string; timestamp: number; };
 
 export type UserBox = {
   username: string;
@@ -68,10 +68,11 @@ export const useUserMessageHandler = create<UserMessageHandlerState>((set, get) 
           text: parsed.text,
           id: parsed.id || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
           name: parsed.name || "Agent",
+          timestamp: parsed.timestamp || Date.now(),
         };
       } catch (err) {
         console.error("Parse error:", err);
-        msg = { sender: "agent", text: payload.toString(), id: `${Date.now()}-${Math.random().toString(36).slice(2)}` };
+        msg = { sender: "agent", text: payload.toString(), id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, timestamp: Date.now() };
       }
       get().updateUser(index, (prev) => ({
         messages: [...prev.messages, msg],
@@ -89,12 +90,13 @@ export const useUserMessageHandler = create<UserMessageHandlerState>((set, get) 
       text: user.input,
       id,
       name: user.username,
+      timestamp: Date.now(),
     });
 
     user.client.publish(`chat/users/${user.username}`, payload, { qos: 1, retain: false });
 
     get().updateUser(index, (prev) => ({
-      messages: [...prev.messages, { sender: "user", text: user.input, id, name: user.username }],
+      messages: [...prev.messages, { sender: "user", text: user.input, id, name: user.username, timestamp:Date.now(), }],
       input: "",
     }));
   },

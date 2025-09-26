@@ -3,7 +3,7 @@ type Contact = {
   name: string;
   status: "online" | "offline";
   recentMsg: string;
-  time: string;
+  time: number | string;
   unread: number;
 };
 

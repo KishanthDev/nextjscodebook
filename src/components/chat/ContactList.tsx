@@ -1,3 +1,4 @@
+'use client';
 import { CircleUser, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/dropdown-menu";
 import { Button } from "@/ui/button";

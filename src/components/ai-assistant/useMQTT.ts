@@ -39,7 +39,7 @@ export function useMQTTChat(
             client.on("message", async (topic, msg) => {
                 const text = msg.toString();
                 let sender = "";
-                let messageKey = keyBy === "user" ? user : ai;
+                const messageKey = keyBy === "user" ? user : ai;
 
                 if (topic === `${ai}/agent`) {
                     // User sent a message → call API

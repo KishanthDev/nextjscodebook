@@ -67,6 +67,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/pdf-chat', icon: ChartGanttIcon, label: 'PDF Chat' },
     { href: '/openai-assistant-chat', icon: Bot, label: 'OpenAI Assistant Chat' },
     { href: '/hive-consumer', icon: Bot, label: 'User' },
+    { href: '/ai-assistants', icon: Bot, label: 'AI Assistants' },
+    { href: '/ai-assistants-users', icon: Bot, label: 'AI Assistant Users' },
   ];
 
   return (

@@ -1,0 +1,14 @@
+{
+  "assistants": {
+    "Nexa": "asst_ZhhKk2Y2qqJvlkuHsI4exc8e",
+    "Luma": "asst_CeQLfI0jbtkNnkY9Mwasx6hq",
+    "AssistIQ": "asst_itITAIjRA7f0GnGWdDNzI07j",
+    "Milo": "asst_AVwdbg1ISbLFdmJIr7QNG5EA"
+  },
+  "threads": {
+    "Nexa": "thread_t3CLOIjSSqBl9pRO9jJhe4FI",
+    "Luma": "thread_UCqbVAjewbHpCtk2LWMu27jh",
+    "AssistIQ": "thread_W1wZniS38madqI1cLFPBdoJP",
+    "Milo": "thread_MbeMcLRUj0dCjhTB6M18r0MA"
+  }
+}

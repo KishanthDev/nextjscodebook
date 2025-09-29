@@ -1,7 +1,7 @@
 // stores/chatStore.ts
 import { create } from "zustand";
 
-export type Message = { sender: string; text: string };
+export type Message = { sender: string; text: string; senderType: "user" | "ai" | "agent"; };
 
 interface ChatState {
     messages: Record<string, Message[]>;

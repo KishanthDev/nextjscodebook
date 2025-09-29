@@ -15,7 +15,6 @@ const users = ["user1", "user2", "user3", "user4"];
 const pairs: UserPair[] = assistants.map((ai, i) => ({ user: users[i], ai }));
 
 export default function AIAssistantPage() {
-    // Use the same MQTT hook but keyBy = "ai" so AI page controls AI messages
     const { messages, inputs, setInputs, sendMessage } = useMQTTChat(pairs, brokerUrl, false);
 
     return (
@@ -39,10 +38,10 @@ export default function AIAssistantPage() {
                                         className="border p-1 flex-1 rounded"
                                     />
                                     <button
-                                        onClick={() => sendMessage(user, ai)}
+                                        onClick={() => sendMessage(user, ai, "agent")}
                                         className="bg-green-500 text-white p-1 ml-2 rounded"
                                     >
-                                        Send
+                                        Send as Agent
                                     </button>
                                 </div>
                             </AccordionContent>

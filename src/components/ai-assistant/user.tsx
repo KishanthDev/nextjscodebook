@@ -41,7 +41,7 @@ export default function UserPage() {
                                         className="border p-1 flex-1 rounded"
                                     />
                                     <button
-                                        onClick={() => sendMessage(user, ai)}
+                                        onClick={() => sendMessage(user, ai, "user")}
                                         className="bg-blue-500 text-white p-1 ml-2 rounded"
                                     >
                                         Send

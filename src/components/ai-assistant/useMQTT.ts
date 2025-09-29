@@ -8,6 +8,12 @@ export interface UserPair {
   ai: string;
 }
 
+export interface ChatMessage {
+  sender: string;
+  text: string;
+  senderType: "user" | "ai" | "agent";
+}
+
 export function useMQTTChat(
   pairs: UserPair[],
   brokerUrl: string,
@@ -28,8 +34,8 @@ export function useMQTTChat(
 
       client.on("connect", () => {
         console.log(`MQTT connected for ${key}`);
-        client.subscribe(`${ai}/agent`);   // user → AI
-        client.subscribe(`${ai}/${user}`); // AI → user
+        client.subscribe(`${ai}/agent`);   // user or agent → AI
+        client.subscribe(`${ai}/${user}`); // AI or agent → user
       });
 
       client.on("message", (topic, msg) => {
@@ -37,11 +43,13 @@ export function useMQTTChat(
         if (!text) return;
 
         if (topic === `${ai}/agent` && !triggerAI) {
-          // Ignore this on AI page
-          return;
+          // Agent message on AI page
+          addMessage(key, { sender: "Agent", text, senderType: "agent" });
         } else if (topic === `${ai}/${user}`) {
-          // Incoming AI message → store only
-          addMessage(key, { sender: ai, text });
+          // Incoming AI or agent message
+          const senderType = triggerAI ? "ai" : "agent";
+          const sender = senderType === "ai" ? ai : "Agent";
+          addMessage(key, { sender, text, senderType });
         }
       });
     });
@@ -51,20 +59,22 @@ export function useMQTTChat(
     };
   }, [pairs, brokerUrl, addMessage, triggerAI]);
 
-  const sendMessage = async (user: string, ai: string) => {
+  const sendMessage = async (user: string, ai: string, senderType: "user" | "agent") => {
     const key = `${user}_${ai}`;
     const client = clientsRef.current[key];
     const text = inputs[key]?.trim();
     if (!client || !text) return;
 
-    // Add user message locally
-    addMessage(key, { sender: user, text });
+    // Add message locally
+    const sender = senderType === "user" ? user : "Agent";
+    addMessage(key, { sender, text, senderType });
 
     // Publish via MQTT
-    client.publish(`${ai}/agent`, text);
+    const topic = senderType === "user" ? `${ai}/agent` : `${ai}/${user}`;
+    client.publish(topic, text, { retain: true });
 
-    // Call AI API only if triggerAI is true (user page)
-    if (triggerAI) {
+    // Call AI API only if triggerAI is true and sender is user
+    if (triggerAI && senderType === "user") {
       try {
         const res = await fetch("/api/multi-assistant", {
           method: "POST",
@@ -78,7 +88,7 @@ export function useMQTTChat(
             data?.messages?.find((m: any) => m.role === "assistant")?.content || "No reply";
 
           // Add AI reply locally
-          addMessage(key, { sender: ai, text: reply });
+          addMessage(key, { sender: ai, text: reply, senderType: "ai" });
 
           // Publish AI reply via MQTT
           client.publish(`${ai}/${user}`, reply, { retain: true });

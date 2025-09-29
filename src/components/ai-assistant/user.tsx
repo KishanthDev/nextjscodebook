@@ -21,28 +21,34 @@ export default function UserPage() {
     const { messages, inputs, setInputs, sendMessage } = useMQTTChat(userPairs, brokerUrl, "user");
 
     return (
-        <Accordion type="single" collapsible className="w-full">
-            {userPairs.map(({ user }) => (
-                <AccordionItem key={user} value={user}>
-                    <AccordionTrigger>{user}</AccordionTrigger>
-                    <AccordionContent className="flex flex-col gap-2">
-                        <ChatWindow messages={messages[user] || []} />
-                        <div className="flex mt-2">
-                            <input
-                                value={inputs[user] || ""}
-                                onChange={(e) => setInputs((prev) => ({ ...prev, [user]: e.target.value }))}
-                                className="border p-1 flex-1"
-                            />
-                            <button
-                                onClick={() => sendMessage(user)}
-                                className="bg-blue-500 text-white p-1 ml-2 rounded"
-                            >
-                                Send
-                            </button>
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
+        <div className="grid grid-cols-2 gap-4 p-4 items-start">
+            {userPairs.map(({ user, ai }) => (
+                <Accordion key={user} type="multiple" className="border rounded p-2 h-full">
+                    <AccordionItem value={user} className="flex flex-col h-full">
+                        <AccordionTrigger className="flex justify-between items-center">
+                            {user}
+                        </AccordionTrigger>
+                        <AccordionContent className="flex flex-col gap-2 mt-2 h-[350px]">
+                            <ChatWindow messages={messages[user] || []} />
+                            <div className="flex mt-2">
+                                <input
+                                    value={inputs[user] || ""}
+                                    onChange={(e) =>
+                                        setInputs((prev) => ({ ...prev, [user]: e.target.value }))
+                                    }
+                                    className="border p-1 flex-1 rounded"
+                                />
+                                <button
+                                    onClick={() => sendMessage(user)}
+                                    className="bg-blue-500 text-white p-1 ml-2 rounded"
+                                >
+                                    Send
+                                </button>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             ))}
-        </Accordion>
+        </div>
     );
 }

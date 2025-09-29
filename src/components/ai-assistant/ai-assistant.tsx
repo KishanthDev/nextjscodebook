@@ -18,28 +18,35 @@ export default function AIAssistantPage() {
     const { messages, inputs, setInputs, sendMessage } = useMQTTChat(pairs, brokerUrl, "ai");
 
     return (
-        <Accordion type="single" collapsible className="w-full">
+        <div className="grid grid-cols-2 gap-4 p-4 items-start">
             {pairs.map(({ ai }) => (
-                <AccordionItem key={ai} value={ai}>
-                    <AccordionTrigger>{ai}</AccordionTrigger>
-                    <AccordionContent className="flex flex-col gap-2">
-                        <ChatWindow messages={messages[ai] || []} />
-                        <div className="flex mt-2">
-                            <input
-                                value={inputs[ai] || ""}
-                                onChange={(e) => setInputs((prev) => ({ ...prev, [ai]: e.target.value }))}
-                                className="border p-1 flex-1"
-                            />
-                            <button
-                                onClick={() => sendMessage(ai)}
-                                className="bg-green-500 text-white p-1 ml-2 rounded"
-                            >
-                                Send
-                            </button>
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
+                <Accordion key={ai} type="multiple" className="border rounded p-2 h-full">
+                    <AccordionItem value={ai} className="flex flex-col h-full">
+                        <AccordionTrigger className="flex justify-between items-center">
+                            {ai}
+                        </AccordionTrigger>
+                        <AccordionContent className="flex flex-col gap-2 mt-2 h-[350px]">
+                            <ChatWindow messages={messages[ai] || []} />
+                            <div className="flex mt-2">
+                                <input
+                                    value={inputs[ai] || ""}
+                                    onChange={(e) =>
+                                        setInputs((prev) => ({ ...prev, [ai]: e.target.value }))
+                                    }
+                                    className="border p-1 flex-1 rounded"
+                                />
+                                <button
+                                    onClick={() => sendMessage(ai)}
+                                    className="bg-green-500 text-white p-1 ml-2 rounded"
+                                >
+                                    Send
+                                </button>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             ))}
-        </Accordion>
+        </div>
+
     );
 }

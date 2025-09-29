@@ -12,7 +12,6 @@ import {
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Predefine mapping: user → assistant
 const USER_TO_AI: Record<string, string> = {
   user1: "Nexa",
   user2: "Luma",
@@ -20,41 +19,61 @@ const USER_TO_AI: Record<string, string> = {
   user4: "Milo",
 };
 
-// Memory (you might move this into DB/Redis in production)
-const assistants: Record<string, { id: string; threadId: string }> = {};
+// Keep track of assistants + threads
+const assistants: Record<
+  string,
+  { id: string; threadId: string; queue: string[]; running: boolean }
+> = {};
 
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     const user = data.user as string;
     const message = (data.message as string) || "Hello!";
-    const file = null; // you can add file support later
+    const reset = !!data.reset; // optional reset flag
 
     const aiName = USER_TO_AI[user];
-    if (!aiName) {
-      return NextResponse.json({ error: "Unknown user" }, { status: 400 });
-    }
+    if (!aiName) return NextResponse.json({ error: "Unknown user" }, { status: 400 });
 
-    // Initialize assistant + thread if not yet created
+    // Initialize assistant if needed
     if (!assistants[aiName]) {
-      const fileId = file ? await uploadFile(file, openai) : undefined;
-      const assistantId = await createAssistant(openai, fileId ? [fileId] : [], aiName);
+      const assistantId = await createAssistant(openai, [], aiName);
       const threadId = await createThread(openai, "", "Conversation started");
-      assistants[aiName] = { id: assistantId, threadId };
+      assistants[aiName] = { id: assistantId, threadId, queue: [], running: false };
     }
 
-    const { id: assistantId, threadId } = assistants[aiName];
+    const assistant = assistants[aiName];
 
-    // Add user message to thread
-    await addMessage(openai, threadId, message);
+    // Reset if requested
+    /* if (reset) {
+      await resetThread(openai, assistant.threadId);
+      assistant.queue = [];
+      assistant.running = false;
+      return NextResponse.json({ success: true, message: "Assistant reset" });
+    } */
 
-    // Run the thread
-    const runId = await runThread(openai, threadId, assistantId);
-    await pollRunStatus(openai, threadId, runId);
+    // Queue the message
+    assistant.queue.push(message);
 
-    // Fetch responses
-    const messages = await getMessages(openai, threadId);
-    const simplified = messages.data.map((m) => ({
+    // If already running a thread, just wait
+    if (assistant.running) return NextResponse.json({ success: true, message: "Queued" });
+
+    // Process the queue
+    assistant.running = true;
+    const results: any[] = [];
+
+    while (assistant.queue.length > 0) {
+      const msg = assistant.queue.shift()!;
+      await addMessage(openai, assistant.threadId, msg);
+      const runId = await runThread(openai, assistant.threadId, assistant.id);
+      await pollRunStatus(openai, assistant.threadId, runId);
+      const msgs = await getMessages(openai, assistant.threadId);
+      results.push(...msgs.data);
+    }
+
+    assistant.running = false;
+
+    const simplified = results.map((m: any) => ({
       id: m.id,
       role: m.role,
       content: Array.isArray(m.content)

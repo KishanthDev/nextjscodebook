@@ -7,6 +7,8 @@ import { useUserStatus } from "@/stores/useUserStatus";
 import { useAIMessageHandler } from "@/stores/aiMessageHandler";
 import Lottie from 'lottie-react';
 import dotNotificationAnim from "../../../data/icon.json"
+import { AIIcon } from "@/components/icons/AIIcon";  // adjust path as needed
+
 
 import { NavUser } from './nav-user';
 import { TeamSwitcher } from './team-switcher';
@@ -67,8 +69,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/pdf-chat', icon: ChartGanttIcon, label: 'PDF Chat' },
     { href: '/openai-assistant-chat', icon: Bot, label: 'OpenAI Assistant Chat' },
     { href: '/hive-consumer', icon: Bot, label: 'User' },
-    { href: '/ai-assistants', icon: Bot, label: 'AI Assistants' },
-    { href: '/ai-assistants-users', icon: Bot, label: 'AI Assistant Users' },
+    { href: '/ai-assistants', icon: AIIcon, label: 'AI Assistants' },
+    { href: '/ai-assistants-users', icon: AIIcon, label: 'AI Assistant Users' },
   ];
 
   return (
@@ -96,9 +98,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {/* Always show Lucide chat icon */}
                       {href === "/chats" ? (
                         <MessageCircle className="mr-2 w-[18px] h-[18px]" strokeWidth={1.5} />
+                      ) : href === "/ai-assistants" || href === "/ai-assistants-users" ? (
+                        <AIIcon
+                          className="mr-2 w-[18px] h-[18px]"
+                          active={pathname === href}
+                        />
                       ) : (
                         <Icon className="mr-2 w-[18px] h-[18px]" strokeWidth={1.5} />
                       )}
+
                       <span className="truncate">{label}</span>
                     </div>
 

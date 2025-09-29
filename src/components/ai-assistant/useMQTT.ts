@@ -37,56 +37,55 @@ export function useMQTTChat(
             });
 
             client.on("message", async (topic, msg) => {
-  const text = msg.toString();
-  let sender = "";
-  let messageKey = key;
+                const text = msg.toString();
+                let sender = "";
+                let messageKey = keyBy === "user" ? user : ai;
 
-  if (topic === `${ai}/agent`) {
-    // User sent a message
-    sender = user;
+                if (topic === `${ai}/agent`) {
+                    // User sent a message → call API
+                    sender = user;
 
-    setMessages((prev) => ({
-      ...prev,
-      [messageKey]: [...(prev[messageKey] || []), { sender, text }],
-    }));
+                    setMessages((prev) => ({
+                        ...prev,
+                        [messageKey]: [...(prev[messageKey] || []), { sender, text }],
+                    }));
 
-    // Call Assistant API
-    const res = await fetch("/api/multi-assistant", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user, message: text }),
-    });
+                    try {
+                        const res = await fetch("/api/multi-assistant", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ user, message: text }),
+                        });
 
-    if (res.ok) {
-      const data = await res.json();
-      const reply =
-        data?.messages?.find((m: any) => m.role === "assistant")?.content ||
-        "No reply";
+                        if (res.ok) {
+                            const data = await res.json();
+                            const reply =
+                                data?.messages?.find((m: any) => m.role === "assistant")?.content ||
+                                "No reply";
 
-      // Push reply into messages state
-      setMessages((prev) => ({
-        ...prev,
-        [messageKey]: [
-          ...(prev[messageKey] || []),
-          { sender: ai, text: reply },
-        ],
-      }));
+                            // Push reply into state
+                            setMessages((prev) => ({
+                                ...prev,
+                                [messageKey]: [...(prev[messageKey] || []), { sender: ai, text: reply }],
+                            }));
 
-      // (Optional) publish reply back via MQTT so other clients see it
-      client.publish(`${ai}/${user}`, reply);
-    }
-  } else if (topic === `${ai}/${user}`) {
-    // Assistant message from broker
-    sender = ai;
-    if (keyBy === "ai") messageKey = ai;
-    else messageKey = user;
+                            // Publish only if other clients need it
+                            // client.publish(`${ai}/${user}`, reply); // optional
+                        }
+                    } catch (err) {
+                        console.error("Assistant API error:", err);
+                    }
+                } else if (topic === `${ai}/${user}`) {
+                    // Incoming assistant message from MQTT → don't call API again
+                    sender = ai;
 
-    setMessages((prev) => ({
-      ...prev,
-      [messageKey]: [...(prev[messageKey] || []), { sender, text }],
-    }));
-  }
-});
+                    setMessages((prev) => ({
+                        ...prev,
+                        [messageKey]: [...(prev[messageKey] || []), { sender, text }],
+                    }));
+                }
+            });
+
 
 
         });
@@ -115,15 +114,6 @@ export function useMQTTChat(
         } else {
             client.publish(`${pair.ai}/${pair.user}`, msg);
         }
-
-        setMessages((prev) => ({
-            ...prev,
-            [key]: [
-                ...(prev[key] || []),
-                { sender: keyBy === "user" ? pair.user : pair.ai, text: msg },
-            ],
-        }));
-
         setInputs((prev) => ({ ...prev, [key]: "" }));
     };
 

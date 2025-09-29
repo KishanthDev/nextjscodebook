@@ -18,7 +18,7 @@ const userPairs: UserPair[] = [
 ];
 
 export default function UserPage() {
-    const { messages, inputs, setInputs, sendMessage } = useMQTTChat(userPairs, brokerUrl, true);
+    const { messages, inputs, setInputs, sendMessage, loading } = useMQTTChat(userPairs, brokerUrl, true);
 
     return (
         <div className="grid grid-cols-2 gap-4 p-4 items-start">
@@ -32,20 +32,32 @@ export default function UserPage() {
                             </AccordionTrigger>
                             <AccordionContent className="flex flex-col gap-2 mt-2 h-[350px]">
                                 <ChatWindow messages={messages[key] || []} />
-                                <div className="flex mt-2">
-                                    <input
-                                        value={inputs[key] || ""}
-                                        onChange={(e) =>
-                                            setInputs((prev) => ({ ...prev, [key]: e.target.value }))
-                                        }
-                                        className="border p-1 flex-1 rounded"
-                                    />
-                                    <button
-                                        onClick={() => sendMessage(user, ai, "user")}
-                                        className="bg-blue-500 text-white p-1 ml-2 rounded"
-                                    >
-                                        Send
-                                    </button>
+                                <div className="flex flex-col gap-2 mt-2">
+                                    {loading[key] && (
+                                        <div className="text-gray-500 text-sm">
+                                            Waiting for {ai}'s response...
+                                        </div>
+                                    )}
+                                    <div className="flex">
+                                        <input
+                                            value={inputs[key] || ""}
+                                            onChange={(e) =>
+                                                setInputs((prev) => ({ ...prev, [key]: e.target.value }))
+                                            }
+                                            className="border p-1 flex-1 rounded"
+                                            disabled={loading[key]}
+                                        />
+                                        <button
+                                            onClick={() => sendMessage(user, ai, "user")}
+                                            className={`p-1 ml-2 rounded text-white ${loading[key]
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-blue-500 hover:bg-blue-600"
+                                                }`}
+                                            disabled={loading[key]}
+                                        >
+                                            Send
+                                        </button>
+                                    </div>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>

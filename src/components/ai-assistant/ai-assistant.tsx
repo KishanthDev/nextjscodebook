@@ -28,7 +28,7 @@ export default function AIAssistantPage() {
                                 {ai} ↔ {user}
                             </AccordionTrigger>
                             <AccordionContent className="flex flex-col gap-2 mt-2 h-[350px]">
-                                <ChatWindow messages={messages[key] || []} />
+                                <ChatWindow messages={messages[key] || []} perspective="assistant" />
                                 <div className="flex mt-2">
                                     <input
                                         value={inputs[key] || ""}

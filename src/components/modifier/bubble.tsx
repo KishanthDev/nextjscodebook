@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -10,7 +11,7 @@ import { BubbleSettings } from '@/types/Modifier';
 import BubbleIcon from '../icons/BubbleIcon';
 
 type BubbleComponentProps = {
-  defaultSettings: BubbleSettings;
+  defaultSettings: BubbleSettings; // comes from SSR (ModifierPage)
 };
 
 export default function BubbleComponent({ defaultSettings }: BubbleComponentProps) {
@@ -19,26 +20,28 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
   const [mounted, setMounted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [localSettings, setLocalSettings] = useState<BubbleSettings>(defaultSettings);
-  const { resolvedTheme } = useTheme();
-  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
 
+  const { resolvedTheme } = useTheme();
+  const { settings, loading, updateSettings } = useSettingsStore();
+
+  // ✅ Mark mounted to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
-    fetchSettings('bubble', defaultSettings);
-  }, [fetchSettings, defaultSettings]);
+  }, []);
 
+  // ✅ Update dark mode based on theme
   useEffect(() => {
-    if (mounted) {
-      setIsDarkMode(resolvedTheme === 'dark');
-    }
+    if (mounted) setIsDarkMode(resolvedTheme === 'dark');
   }, [mounted, resolvedTheme]);
 
+  // ✅ Sync store state with SSR defaults (only first render or when store updates)
   useEffect(() => {
-    setLocalSettings((prev) => ({
-      ...prev,
-      ...settings.bubble,
-    }));
-  }, [settings.bubble]);
+    if (settings?.bubble) {
+      setLocalSettings(settings.bubble as BubbleSettings);
+    } else {
+      setLocalSettings(defaultSettings);
+    }
+  }, [settings, defaultSettings]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -114,6 +117,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
           </button>
         </div>
         <div className="flex flex-col md:flex-row gap-8">
+          {/* Input Section */}
           <div className="flex-1 space-y-4 border-r pr-4">
             {['bgColor', 'iconColor', 'dotsColor'].map((key) => (
               <div key={key}>
@@ -147,6 +151,8 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
               </div>
             ))}
           </div>
+
+          {/* Preview Section */}
           <div className="flex-1 flex justify-center items-center">
             <div
               className="relative flex items-center justify-center rounded-full w-16 h-16 transition-colors duration-300 cursor-pointer"
@@ -160,7 +166,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                 dotsColor={localSettings.dotsColor}
                 hovered={isHovered}
               />
-           </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,42 +1,40 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { Message, ChatWidgetSettings } from '@/types/Modifier';
-import defaultConfig from '../../../data/modifier.json';
+import { ChatWidgetSettings, Message } from '@/types/Modifier';
 import ChatPreview from '../modifier/chat-widget/ChatPreview';
 
-export default function ChatWidgetPreview() {
-  const { settings, loading, fetchSettings } = useSettingsStore();
+type Props = {
+  defaultSettings: ChatWidgetSettings; // SSR-injected
+};
+
+export default function ChatWidgetPreview({ defaultSettings }: Props) {
+  const { settings, loading } = useSettingsStore();
+  const [previewMessages, setPreviewMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [soundsEnabled, setSoundsEnabled] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { resolvedTheme } = useTheme();
   const [isSaving, setIsSaving] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const [soundsEnabled, setSoundsEnabled] = useState(true);
 
-  const defaultSettings: ChatWidgetSettings = defaultConfig.chatWidget;
+  // mark mounted to avoid hydration mismatch
+  useEffect(() => setMounted(true), []);
 
-  // ✅ keep preview messages in local state only
-  const [previewMessages, setPreviewMessages] = useState<Message[]>([]);
-
+  // detect dark mode
   useEffect(() => {
-    setMounted(true);
-    console.log('Fetching chatWidget settings...');
-    fetchSettings('chatWidget', defaultSettings);
-  }, [fetchSettings]);
-
-  useEffect(() => {
-    if (mounted) {
-      setIsDarkMode(resolvedTheme === 'dark');
-    }
+    if (mounted) setIsDarkMode(resolvedTheme === 'dark');
   }, [mounted, resolvedTheme]);
 
+  // initialize previewMessages from SSR or store
   useEffect(() => {
-    if (settings.chatWidget?.messages?.length > 0) {
-      setPreviewMessages(settings.chatWidget.messages);
+    const messagesFromStore = settings?.chatWidget?.messages;
+    if (Array.isArray(messagesFromStore) && messagesFromStore.length > 0) {
+      setPreviewMessages(messagesFromStore);
     } else {
       setPreviewMessages([
         {
@@ -46,13 +44,21 @@ export default function ChatWidgetPreview() {
         },
       ]);
     }
-  }, [settings.chatWidget]);
+  }, [settings, defaultSettings]);
+
+  const chatSettings: ChatWidgetSettings = {
+    ...defaultSettings,
+    ...settings?.chatWidget,
+    messages: previewMessages,
+  };
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;
+    if (!newMessage.trim()) return;
+
     const newMsg: Message = { text: newMessage, isUser: true };
-    setPreviewMessages((prev) => [...prev, newMsg]); // ✅ local only
+    setPreviewMessages((prev) => [...prev, newMsg]);
     setNewMessage('');
+
     setTimeout(() => {
       const messagesContainer = document.getElementById('messagesContainer');
       if (messagesContainer) {
@@ -66,16 +72,14 @@ export default function ChatWidgetPreview() {
     setPreviewMessages((prev) => [
       ...prev.map((m, i) => (i === msgIndex ? { ...m, tags: [] } : m)),
       newMsg,
-    ]); // ✅ local only
+    ]);
   };
 
-  const toggleSounds = () => {
-    setSoundsEnabled((prev) => !prev);
-  };
+  const toggleSounds = () => setSoundsEnabled((prev) => !prev);
 
   if (!mounted) return null;
 
-  if (loading) {
+  if (loading || !chatSettings) {
     return (
       <SkeletonTheme
         baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
@@ -116,12 +120,6 @@ export default function ChatWidgetPreview() {
       </SkeletonTheme>
     );
   }
-
-  const chatSettings: ChatWidgetSettings = {
-    ...defaultSettings,
-    ...settings.chatWidget,
-    messages: previewMessages, // ✅ use local previewMessages
-  };
 
   return (
     <div className="flex justify-center items-start p-6">

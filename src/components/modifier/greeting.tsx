@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
@@ -10,7 +11,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { GreetingSettings } from '@/types/Modifier';
 
 type LiveChatWidgetProps = {
-  defaultSettings: GreetingSettings;
+  defaultSettings: GreetingSettings; // from SSR
 };
 
 const CloseIcon = () => (
@@ -60,48 +61,34 @@ const GreetingImage = ({ src, alt, fallbackSrc }: { src: string; alt: string; fa
 );
 
 export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  const { resolvedTheme } = useTheme();
+    const [isHovered, setIsHovered] = useState(false);
+
+  const [mounted, setMounted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const { settings, fetchSettings, updateSettings, loading } = useSettingsStore();
+  const { settings, updateSettings, loading } = useSettingsStore();
 
-  const [localSettings, setLocalSettings] = useState<GreetingSettings>(() => ({
-    headingColor: defaultSettings.headingColor || '#000000',
-    paraColor: defaultSettings.paraColor || '#333333',
-    primaryBtnColor: defaultSettings.primaryBtnColor || '#007bff',
-    secondaryBtnColor: defaultSettings.secondaryBtnColor || '#28a745',
-    headingText: defaultSettings.headingText || 'Welcome to LiveChat!',
-    paraText: defaultSettings.paraText || 'Sign up free or talk with our product experts',
-    imageUrl: defaultSettings.imageUrl || '/landingpage/hello01.png',
-    primaryBtnText: defaultSettings.primaryBtnText || 'Primary',
-    secondaryBtnText: defaultSettings.secondaryBtnText || 'Secondary',
-    showPrimaryBtn: defaultSettings.showPrimaryBtn ?? true,
-    showSecondaryBtn: defaultSettings.showSecondaryBtn ?? true,
-  }));
+  // ✅ Local state initialized from SSR
+  const [localSettings, setLocalSettings] = useState<GreetingSettings>(defaultSettings);
 
+  // ✅ mounted flag for hydration
   useEffect(() => {
     setMounted(true);
-    fetchSettings('greeting', localSettings);
-  }, [fetchSettings]);
+  }, []);
 
+  // ✅ Dark mode detection
   useEffect(() => {
-    if (mounted) {
-      setIsDarkMode(resolvedTheme === 'dark');
-    }
+    if (mounted) setIsDarkMode(resolvedTheme === 'dark');
   }, [mounted, resolvedTheme]);
 
+  // ✅ Sync store state with local state
   useEffect(() => {
-    if (settings.greeting && !hasLocalChanges) {
-      setLocalSettings((prev) => ({
-        ...prev,
-        ...settings.greeting,
-      }));
-      console.log('Synced localSettings with store:', settings.greeting);
+    if (settings?.greeting && !hasLocalChanges) {
+      setLocalSettings(settings.greeting as GreetingSettings);
     }
-  }, [settings.greeting, hasLocalChanges]);
+  }, [settings, hasLocalChanges]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -110,7 +97,6 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
       [name]: type === 'checkbox' ? checked : value,
     }));
     setHasLocalChanges(true);
-    console.log(`Updated localSettings[${name}]:`, type === 'checkbox' ? checked : value);
   };
 
   const handleSave = async () => {
@@ -135,12 +121,11 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
     setIsSaving(true);
     try {
       await updateSettings('greeting', localSettings);
-      setHasLocalChanges(false); // Allow store sync after save
+      setHasLocalChanges(false);
       toast.success('Settings saved!');
-      console.log('Saved to database:', localSettings);
     } catch (err) {
       toast.error('Error saving settings');
-      console.error('Save error:', err);
+      console.error(err);
     } finally {
       setIsSaving(false);
     }
@@ -156,7 +141,7 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
       >
         <div className="p-6 max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-10">
-            <Skeleton width={200} height={32} />
+          <Skeleton width={200} height={32} />
             <Skeleton width={80} height={40} borderRadius={6} />
           </div>
           <div className="flex flex-col md:flex-row gap-8">
@@ -201,84 +186,55 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
 
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 space-y-4 border-r pr-4">
-            {[
-              { key: 'headingText', label: 'Heading Text', type: 'text', placeholder: 'Enter heading', maxLength: 19 },
-              { key: 'paraText', label: 'Paragraph Text', type: 'text', placeholder: 'Enter paragraph', maxLength: 38 },
-              { key: 'imageUrl', label: 'Image URL', type: 'text', placeholder: 'Enter image URL' },
-              { key: 'headingColor', label: 'Heading Color', type: 'color' },
-              { key: 'paraColor', label: 'Paragraph Color', type: 'color' },
-              {
-                key: 'primaryBtnText',
-                label: 'Primary Button Text',
-                type: 'text',
-                placeholder: 'Enter primary button text',
-                maxLength: 20,
-                checkboxKey: 'showPrimaryBtn',
-                checkboxLabel: 'Show',
-              },
-              {
-                key: 'secondaryBtnText',
-                label: 'Secondary Button Text',
-                type: 'text',
-                placeholder: 'Enter secondary button text',
-                maxLength: 20,
-                checkboxKey: 'showSecondaryBtn',
-                checkboxLabel: 'Show',
-              },
-              { key: 'primaryBtnColor', label: 'Primary Button Color', type: 'color' },
-              { key: 'secondaryBtnColor', label: 'Secondary Button Color', type: 'color' },
-            ].map(({ key, label, type, placeholder, maxLength, checkboxKey, checkboxLabel }) => (
-              <div key={key}>
-                <div className="flex items-center flex-wrap gap-2 mb-2">
-                  <label className="block text-sm font-medium text-primary">{label}:</label>
-                  {checkboxKey && (
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        name={checkboxKey}
-                        checked={localSettings[checkboxKey as keyof GreetingSettings] as boolean}
-                        onChange={handleInputChange}
-                        disabled={isSaving}
-                        className="mr-1"
-                        aria-label={checkboxLabel}
-                      />
-                      <span className="text-sm">{checkboxLabel}</span>
-                    </label>
-                  )}
-                </div>
-                {type !== 'checkbox' && (
-                  <div className="flex items-center border rounded-md overflow-hidden">
+            {Object.entries(localSettings).map(([key, value]) => {
+              if (typeof value === 'boolean') {
+                return (
+                  <label key={key} className="flex items-center gap-2">
                     <input
-                      type={type === 'color' ? 'text' : type}
+                      type="checkbox"
                       name={key}
-                      placeholder={type === 'color' ? '#hex' : placeholder}
-                      maxLength={maxLength}
-                      className="w-full px-2 py-2 text-sm focus:outline-none"
-                      value={localSettings[key as keyof GreetingSettings] as string}
+                      checked={value}
                       onChange={handleInputChange}
                       disabled={isSaving}
                     />
-                    {type === 'color' && (
+                    {key}
+                  </label>
+                );
+              }
+
+              const isColor = key.includes('Color');
+              return (
+                <div key={key}>
+                  <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">
+                    {key}
+                  </label>
+                  <div className="flex items-center border rounded-md overflow-hidden">
+                    <input
+                      type="text"
+                      name={key}
+                      value={value as string}
+                      onChange={handleInputChange}
+                      disabled={isSaving}
+                      className="w-full px-2 py-2 text-sm focus:outline-none"
+                    />
+                    {isColor && (
                       <input
                         type="color"
                         name={key}
-                        className="w-12 h-12 cursor-pointer border-l"
-                        value={localSettings[key as keyof GreetingSettings] as string}
+                        value={value as string}
                         onChange={handleInputChange}
                         disabled={isSaving}
+                        className="w-12 h-12 cursor-pointer border-l"
                       />
                     )}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
+
           <div className="flex-1 flex justify-center items-center">
-            <div
-              className="relative w-[230px] mx-auto group"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
+            <div className="relative w-[230px] mx-auto group">
               <div
                 className={`absolute -top-7 right-0 z-20 transition-opacity duration-300 ${
                   isHovered ? 'opacity-100' : 'opacity-0'
@@ -295,22 +251,12 @@ export default function Greeting({ defaultSettings }: LiveChatWidgetProps) {
                   alt="Greeting image"
                   fallbackSrc="/landingpage/hello01.png"
                 />
-
                 <div className="p-3.5">
-                  <h2
-                    className="mb-2 break-words max-w-full box-border"
-                    style={{ color: localSettings.headingColor }}
-                  >
+                  <h2 className="mb-2" style={{ color: localSettings.headingColor }}>
                     {localSettings.headingText}
                   </h2>
-                  <p
-                    className="break-words max-w-full box-border"
-                    style={{ color: localSettings.paraColor }}
-                  >
-                    {localSettings.paraText}
-                  </p>
+                  <p style={{ color: localSettings.paraColor }}>{localSettings.paraText}</p>
                 </div>
-
                 <ul className="flex flex-col gap-2 px-2 pb-2 pt-[7px] mt-auto">
                   <CustomButton
                     text={localSettings.primaryBtnText}

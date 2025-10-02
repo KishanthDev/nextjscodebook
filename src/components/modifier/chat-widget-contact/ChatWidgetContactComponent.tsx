@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -37,42 +38,38 @@ const INPUT_FIELDS = [
 ];
 
 export default function ChatWidgetContactComponent({ defaultSettings, initialMessages }: Props) {
+  const { resolvedTheme } = useTheme();
+  const { settings, loading, updateSettings } = useSettingsStore();
+  const [mounted, setMounted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [hasLocalChanges, setHasLocalChanges] = useState(false);
+
+  const [localSettings, setLocalSettings] = useState<ChatWidgetContactSettings>(defaultSettings);
   const [messages, setMessages] = useState<Message[]>(initialMessages.length > 0 ? initialMessages : [
     { text: 'Hi, I have a question!', isUser: true },
     { text: 'How can I assist you?', isUser: false }
   ]);
   const [newMessage, setNewMessage] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
 
-  const [localSettings, setLocalSettings] = useState<ChatWidgetContactSettings>(defaultSettings);
+  // ✅ Mount for hydration
+  useEffect(() => setMounted(true), []);
 
+  // ✅ Dark mode
   useEffect(() => {
-    setMounted(true);
-    fetchSettings('chatWidgetContact', defaultSettings);
-  }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      setIsDarkMode(resolvedTheme === 'dark');
-    }
+    if (mounted) setIsDarkMode(resolvedTheme === 'dark');
   }, [mounted, resolvedTheme]);
 
+  // ✅ Sync store to localSettings if no local changes
   useEffect(() => {
-    setLocalSettings(prev => ({
-      ...prev,
-      ...settings.chatWidgetContact
-    }));
-  }, [settings.chatWidgetContact]);
+    if (settings?.chatWidgetContact && !hasLocalChanges) {
+      setLocalSettings(settings.chatWidgetContact as ChatWidgetContactSettings);
+    }
+  }, [settings, hasLocalChanges]);
 
   const handleInputChange = (fieldName: keyof ChatWidgetContactSettings, value: string) => {
-    setLocalSettings((prev) => ({
-      ...prev,
-      [fieldName]: value,
-    }));
+    setLocalSettings((prev) => ({ ...prev, [fieldName]: value }));
+    setHasLocalChanges(true);
   };
 
   const handleSendMessage = () => {
@@ -81,9 +78,7 @@ export default function ChatWidgetContactComponent({ defaultSettings, initialMes
     setNewMessage('');
     setTimeout(() => {
       const messagesContainer = document.getElementById('messagesContainer');
-      if (messagesContainer) {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      }
+      if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }, 10);
   };
 
@@ -91,6 +86,7 @@ export default function ChatWidgetContactComponent({ defaultSettings, initialMes
     setIsSaving(true);
     try {
       await updateSettings('chatWidgetContact', localSettings);
+      setHasLocalChanges(false);
       toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
@@ -107,7 +103,7 @@ export default function ChatWidgetContactComponent({ defaultSettings, initialMes
       <SkeletonTheme baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'} highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}>
         <div className="p-6 max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-10">
-            <Skeleton width={240} height={32} />
+          <Skeleton width={240} height={32} />
             <Skeleton width={80} height={40} borderRadius={6} />
           </div>
           <div className="flex flex-col md:flex-row gap-8">

@@ -12,10 +12,9 @@ import ChatBarPreview from './chatBarPreview';
 import defaultConfig from '../../../../data/modifier.json';
 
 interface ChatBarModifierProps {
-  defaultSettings?: ChatbarSettings;
+  defaultSettings?: ChatbarSettings; // SSR
 }
 
-// 🔹 Reusable Text Input
 const TextInputField = ({
   label,
   name,
@@ -45,7 +44,6 @@ const TextInputField = ({
   </div>
 );
 
-// 🔹 Reusable Color Input
 const ColorInputField = ({
   label,
   name,
@@ -86,9 +84,13 @@ const ColorInputField = ({
 );
 
 export default function ChatBarModifier({ defaultSettings }: ChatBarModifierProps) {
+  const { resolvedTheme } = useTheme();
+  const { settings, updateSettings, loading } = useSettingsStore();
+  const [mounted, setMounted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [hasLocalChanges, setHasLocalChanges] = useState(false);
+
   const [localSettings, setLocalSettings] = useState<ChatbarSettings>(
     defaultSettings ?? {
       text: defaultConfig.chatBar.text || 'Chat with us',
@@ -100,33 +102,34 @@ export default function ChatBarModifier({ defaultSettings }: ChatBarModifierProp
     }
   );
 
-  const { resolvedTheme } = useTheme();
-  const { settings, fetchSettings, updateSettings, loading } = useSettingsStore();
-
+  // ✅ Mount for hydration
   useEffect(() => {
     setMounted(true);
-    fetchSettings('chatBar', localSettings);
-  }, [defaultSettings]);
+  }, []);
 
+  // ✅ Dark mode
   useEffect(() => {
     if (mounted) setIsDarkMode(resolvedTheme === 'dark');
   }, [mounted, resolvedTheme]);
 
+  // ✅ Sync store to local settings if no local changes
   useEffect(() => {
-    if (settings.chatBar) {
-      setLocalSettings((prev) => ({ ...prev, ...settings.chatBar }));
+    if (settings?.chatBar && !hasLocalChanges) {
+      setLocalSettings(settings.chatBar as ChatbarSettings);
     }
-  }, [settings.chatBar]);
+  }, [settings, hasLocalChanges]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLocalSettings((prev) => ({ ...prev, [name]: value }));
+    setHasLocalChanges(true);
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
       await updateSettings('chatBar', localSettings);
+      setHasLocalChanges(false);
       toast.success('Settings saved!');
     } catch (err) {
       toast.error('Error saving settings');
@@ -146,7 +149,7 @@ export default function ChatBarModifier({ defaultSettings }: ChatBarModifierProp
       >
         <div className="p-6 max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-10">
-            <Skeleton width={200} height={32} />
+          <Skeleton width={200} height={32} />
             <Skeleton width={80} height={40} borderRadius={6} />
           </div>
           <div className="flex flex-col md:flex-row gap-8">
@@ -228,7 +231,7 @@ export default function ChatBarModifier({ defaultSettings }: ChatBarModifierProp
               disabled={isSaving}
             />
             <ColorInputField
-              label="Background Color"
+              label="Bubble Background Color"
               name="bubbleBgColor"
               value={localSettings.bubbleBgColor}
               onChange={handleInputChange}
@@ -246,7 +249,7 @@ export default function ChatBarModifier({ defaultSettings }: ChatBarModifierProp
           </div>
 
           <div className="flex-1 flex justify-center items-start">
-            <ChatBarPreview settings={localSettings} />
+            <ChatBarPreview defaultSettings={localSettings} />
           </div>
         </div>
       </div>

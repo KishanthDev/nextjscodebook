@@ -1,10 +1,10 @@
 import ChatBarPreview from '@/components/modifier/chatBar/chatBarPreview'
 import React from 'react'
 
-function page() {
+function page({ defaultSettings }: any) {
   return (
     <div>
-      <ChatBarPreview/>
+      <ChatBarPreview defaultSettings={defaultSettings} />
     </div>
   )
 }

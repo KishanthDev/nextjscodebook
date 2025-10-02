@@ -7,7 +7,7 @@ import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import ContactProfile from "./ContactProfile";
 import { useUserStatus } from "@/stores/useUserStatus";
-import { useSettingsStore } from "@/stores/settingsStore";
+import { useSettingsStore } from "@/stores/chatuiclone";
 import { ChatWidgetSettings } from "@/types/Modifier";
 import { useAIMessageHandler } from "@/stores/aiMessageHandler";
 

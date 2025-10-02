@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useTheme } from 'next-themes';
@@ -8,45 +9,37 @@ import Loader from '../loader/Loader';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { EyecatcherSettings } from '@/types/Modifier';
 
-export default function EyecatcherComponent({ defaultSettings }: { defaultSettings?: EyecatcherSettings }) {
+type EyecatcherComponentProps = {
+  defaultSettings: EyecatcherSettings; // comes from SSR
+};
+
+export default function EyecatcherComponent({ defaultSettings }: EyecatcherComponentProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [localSettings, setLocalSettings] = useState<EyecatcherSettings>(
-    defaultSettings ?? {
-      title: 'Hello',
-      text: 'Click to chat with us',
-      bgColor: '#007bff',
-      textColor: '#ffffff',
-    }
-  );
-  const { settings, fetchSettings, updateSettings, loading } = useSettingsStore();
+  const [localSettings, setLocalSettings] = useState<EyecatcherSettings>(defaultSettings);
 
+  const { settings, updateSettings, loading } = useSettingsStore();
+
+  // ✅ Mounted flag to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
-    fetchSettings('eyeCatcher', defaultSettings ?? {
-      title: 'Hello',
-      text: 'Click to chat with us',
-      bgColor: '#007bff',
-      textColor: '#ffffff',
-    });
-  }, [defaultSettings, fetchSettings]);
+  }, []);
 
+  // ✅ Dark mode detection
   useEffect(() => {
-    if (mounted) {
-      setIsDarkMode(resolvedTheme === 'dark');
-    }
+    if (mounted) setIsDarkMode(resolvedTheme === 'dark');
   }, [mounted, resolvedTheme]);
 
+  // ✅ Sync store state with SSR defaults
   useEffect(() => {
-    if (settings.eyeCatcher) {
-      setLocalSettings((prev) => ({
-        ...prev,
-        ...settings.eyeCatcher,
-      }));
+    if (settings?.eyeCatcher) {
+      setLocalSettings(settings.eyeCatcher as EyecatcherSettings);
+    } else {
+      setLocalSettings(defaultSettings);
     }
-  }, [settings.eyeCatcher]);
+  }, [settings, defaultSettings]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -128,77 +121,52 @@ export default function EyecatcherComponent({ defaultSettings }: { defaultSettin
 
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 space-y-4 border-r pr-4">
-            <div>
-              <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">Welcome Message:</label>
-              <input
-                type="text"
-                name="title"
-                placeholder="Hello"
-                maxLength={20}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={localSettings.title}
-                onChange={handleInputChange}
-                disabled={isSaving}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">Invitation Text:</label>
-              <input
-                type="text"
-                name="text"
-                placeholder="Click to chat with us"
-                maxLength={36}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={localSettings.text}
-                onChange={handleInputChange}
-                disabled={isSaving}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">Background Color:</label>
-              <div className="flex items-center border rounded-md overflow-hidden">
-                <input
-                  type="text"
-                  name="bgColor"
-                  placeholder="#007bff"
-                  className="w-full px-3 py-3 text-sm focus:outline-none"
-                  value={localSettings.bgColor}
-                  onChange={handleInputChange}
-                  disabled={isSaving}
-                />
-                <input
-                  type="color"
-                  name="bgColor"
-                  className="w-12 h-12 cursor-pointer border-l"
-                  value={localSettings.bgColor}
-                  onChange={handleInputChange}
-                  disabled={isSaving}
-                />
+            {['title', 'text', 'bgColor', 'textColor'].map((key) => (
+              <div key={key}>
+                <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">
+                  {key === 'title'
+                    ? 'Welcome Message'
+                    : key === 'text'
+                      ? 'Invitation Text'
+                      : key === 'bgColor'
+                        ? 'Background Color'
+                        : 'Text Color'}
+                  :
+                </label>
+
+                {key === 'bgColor' || key === 'textColor' ? (
+                  <div className="flex items-center border rounded-md overflow-hidden">
+                    <input
+                      type="text"
+                      name={key}
+                      className="w-full px-2 py-2 text-sm focus:outline-none"
+                      value={localSettings[key as keyof EyecatcherSettings]}
+                      onChange={handleInputChange}
+                      disabled={isSaving}
+                    />
+                    <input
+                      type="color"
+                      name={key}
+                      className="w-12 h-12 cursor-pointer border-l"
+                      value={localSettings[key as keyof EyecatcherSettings]}
+                      onChange={handleInputChange}
+                      disabled={isSaving}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    name={key}
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={localSettings[key as keyof EyecatcherSettings]}
+                    onChange={handleInputChange}
+                    disabled={isSaving}
+                  />
+                )}
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-primary dark:text-gray-200 mb-2">Text Color:</label>
-              <div className="flex items-center border rounded-md overflow-hidden">
-                <input
-                  type="text"
-                  name="textColor"
-                  placeholder="#ffffff"
-                  className="w-full px-2 py-2 text-sm focus:outline-none"
-                  value={localSettings.textColor}
-                  onChange={handleInputChange}
-                  disabled={isSaving}
-                />
-                <input
-                  type="color"
-                  name="textColor"
-                  className="w-12 h-12 cursor-pointer border-l"
-                  value={localSettings.textColor}
-                  onChange={handleInputChange}
-                  disabled={isSaving}
-                />
-              </div>
-            </div>
+            ))}
           </div>
+
           <div className="flex-1 flex justify-center items-start">
             <div
               className="flex w-[13rem] p-4 rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md"

@@ -8,7 +8,6 @@ import Preview from '@/components/landingpage/Preview';
 import Hero2 from '@/components/landingpage/Hero2';
 import EngageSection from '@/components/landingpage/EngageSection';
 import Bubble from '@/app/(app)/bubble/page';
-import ChatWidgetPreview from '../chatwidget';
 
 function Page() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -27,15 +26,6 @@ function Page() {
       <Footer />
       {/* Floating Chat UI */}
       <div>
-        {/* Chat Widget - centered */}
-        {isChatOpen && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="w-[370px] h-[600px] max-h-[80vh]  dark:bg-neutral-900  flex flex-col overflow-y-auto">
-              <ChatWidgetPreview />
-            </div>
-          </div>
-        )}
-
         {/* Bubble toggle button - bottom right */}
         <div
           onClick={() => setIsChatOpen(!isChatOpen)}

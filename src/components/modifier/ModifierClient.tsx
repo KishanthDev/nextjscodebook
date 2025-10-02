@@ -16,6 +16,7 @@ import ChatBarPreview from "@/app/(app)/chat-bar/page";
 import ChatWidgetPreview from "@/app/(app)/chat-widget-open/page";
 import ChatWidgetContactPreview from "@/app/(app)/chat-contact-preview/page";
 import GreetingPreview from "@/app/(app)/greeting/page";
+import { AppSettings } from "@/types/Modifier";
 
 const TABS = [
   { label: "All", value: "all" },
@@ -27,43 +28,45 @@ const TABS = [
   { value: "chat-widget-contact", label: "Chat Widget Contact" },
 ];
 
-export default function ModifierClient({
-  eyecatcherdata,
-  bubbledata,
-  chatbardata,
-  chatwidgetdata,
-  chatwidgetmessage,
-  chatwidgetcontact,
-  chatwidgetcontactmessage,
-  greeting,
-}: any) {
+type Props = {
+  initialSettings: AppSettings;
+};
+
+export default function ModifierClient({ initialSettings }: Props) {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedOption, setSelectedOption] = useState("eyecatcher");
+
+  // Directly use the initialSettings prop for SSR-friendly display
+  const settings = initialSettings;
+
+  if (!settings) {
+    return <div className="p-6">Loading settings...</div>;
+  }
 
   const renderSelectedComponent = () => {
     switch (selectedOption) {
       case "eyecatcher":
-        return <Eyecatcher defaultSettings={eyecatcherdata} />;
+        return <Eyecatcher defaultSettings={settings.eyeCatcher} />;
       case "bubble":
-        return <Bubble defaultSettings={bubbledata} />;
+        return <Bubble defaultSettings={settings.bubble} />;
       case "chat-bar":
-        return <ChatBar defaultSettings={chatbardata} />;
+        return <ChatBar defaultSettings={settings.chatBar} />;
       case "chat-widget-open":
         return (
           <ChatWidgetOpen
-            defaultSettings={chatwidgetdata}
-            initialMessages={chatwidgetmessage}
+            defaultSettings={settings.chatWidget}
+            initialMessages={settings.chatWidget.messages}
           />
         );
       case "chat-widget-contact":
         return (
           <ChatWidgetContactComponent
-            defaultSettings={chatwidgetcontact}
-            initialMessages={chatwidgetcontactmessage}
+            defaultSettings={settings.chatWidgetContact}
+            initialMessages={settings.chatWidgetContact.messages}
           />
         );
       case "chat-widget-greeting":
-        return <Greeting defaultSettings={greeting} />;
+        return <Greeting defaultSettings={settings.greeting} />;
       default:
         return null;
     }
@@ -122,18 +125,16 @@ export default function ModifierClient({
                 ))}
               </div>
             </div>
-
-            {/* Modifier Component */}
             <div>{renderSelectedComponent()}</div>
           </div>
         ) : (
           <div className="text-lg text-gray-600 dark:text-gray-300">
-            {activeTab === "eyecatcher" && <EyecatcherPreview />}
-            {activeTab === "bubble" && <BubblePreview />}
-            {activeTab === "chat-bar" && <ChatBarPreview />}
-            {activeTab === "chat-widget-open" && <ChatWidgetPreview />}
-            {activeTab === "chat-widget-contact" && <ChatWidgetContactPreview />}
-            {activeTab === "chat-widget-greeting" && <GreetingPreview />}
+            {activeTab === "eyecatcher" && <EyecatcherPreview defaultSettings={settings.eyeCatcher} />}
+            {activeTab === "bubble" && <BubblePreview defaultSettings={settings.bubble} />}
+            {activeTab === "chat-bar" && <ChatBarPreview defaultSettings={settings.chatBar} />}
+            {activeTab === "chat-widget-open" && <ChatWidgetPreview defaultSettings={settings.chatWidget} />}
+            {activeTab === "chat-widget-contact" && <ChatWidgetContactPreview defaultSettings={settings.chatWidgetContact} />}
+            {activeTab === "chat-widget-greeting" && <GreetingPreview defaultSettings={settings.greeting} />}
           </div>
         )}
       </main>

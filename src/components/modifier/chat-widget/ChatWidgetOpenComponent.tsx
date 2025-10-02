@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -29,66 +30,46 @@ const INPUT_FIELDS = [
 ];
 
 export default function ChatWidgetOpenComponent({ defaultSettings, initialMessages }: Props) {
+    const { resolvedTheme } = useTheme();
+    const { settings, loading, updateSettings } = useSettingsStore();
+    const [mounted, setMounted] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [hasLocalChanges, setHasLocalChanges] = useState(false);
+
+    const [localSettings, setLocalSettings] = useState<ChatWidgetSettings>(defaultSettings);
     const [messages, setMessages] = useState<Message[]>(
         initialMessages.length > 0
             ? initialMessages
             : [
                 {
-                    text: "What would you like to do?",
+                    text: 'What would you like to do?',
                     isUser: false,
-                    tags: ["View Products", "Support", "Pricing"], // 👈 shows on open
+                    tags: ['View Products', 'Support', 'Pricing'],
                 },
             ]
     );
     const [newMessage, setNewMessage] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(false);
-    const [mounted, setMounted] = useState(false);
-    const { resolvedTheme } = useTheme();
-    const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
 
-    // Initialize local state for settings
-    const [localSettings, setLocalSettings] = useState<ChatWidgetSettings>(defaultSettings);
+    // ✅ Mount for hydration
+    useEffect(() => setMounted(true), []);
 
+    // ✅ Dark mode detection
     useEffect(() => {
-        setMounted(true);
-        console.log('Fetching chat widget settings...');
-        fetchSettings('chatWidget', defaultSettings);
-    }, []);
-    // Sync localSettings with global settings when they change
-    useEffect(() => {
-        setLocalSettings((prev) => ({
-            ...prev,
-            ...settings.chatWidget,
-        }));
-    }, [settings.chatWidget]);
-
-    // ✅ Sync messages with DB when they load
-    useEffect(() => {
-        if (settings.chatWidget?.messages?.length > 0) {
-            setMessages(settings.chatWidget.messages);
-        }
-    }, [settings.chatWidget]);
-
-    useEffect(() => {
-        if (mounted) {
-            setIsDarkMode(resolvedTheme === 'dark');
-        }
+        if (mounted) setIsDarkMode(resolvedTheme === 'dark');
     }, [mounted, resolvedTheme]);
 
-    // Sync localSettings with global settings when they change
+    // ✅ Sync store to localSettings if no local changes
     useEffect(() => {
-        setLocalSettings((prev) => ({
-            ...prev,
-            ...settings.chatWidget,
-        }));
-    }, [settings.chatWidget]);
+        if (settings?.chatWidget && !hasLocalChanges) {
+            setLocalSettings(settings.chatWidget as ChatWidgetSettings);
+            if (settings.chatWidget.messages) setMessages(settings.chatWidget.messages);
+        }
+    }, [settings, hasLocalChanges]);
 
     const handleInputChange = (fieldName: keyof ChatWidgetSettings, value: string) => {
-        setLocalSettings((prev) => ({
-            ...prev,
-            [fieldName]: value,
-        }));
+        setLocalSettings((prev) => ({ ...prev, [fieldName]: value }));
+        setHasLocalChanges(true);
     };
 
     const handleSendMessage = () => {
@@ -96,31 +77,23 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
         setMessages((prev) => [...prev, { text: newMessage, isUser: true }]);
         setNewMessage('');
         setTimeout(() => {
-            const messagesContainer = document.getElementById('messagesContainer');
-            if (messagesContainer) {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
+            const container = document.getElementById('messagesContainer');
+            if (container) container.scrollTop = container.scrollHeight;
         }, 10);
     };
+
     const handleTagClick = (tag: string, msgIndex: number) => {
         setMessages((prev) => {
-            const updated = prev.map((m, i) =>
-                i === msgIndex ? { ...m, tags: [] } : m
-            );
+            const updated = prev.map((m, i) => (i === msgIndex ? { ...m, tags: [] } : m));
             return [...updated, { text: tag, isUser: true }];
         });
-
-        // 👉 you can also call your backend here if needed
     };
-
 
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await updateSettings('chatWidget', {
-                ...localSettings,
-                messages, // ✅ include tag questions
-            });
+            await updateSettings('chatWidget', { ...localSettings, messages });
+            setHasLocalChanges(false);
             toast.success('Settings saved!');
         } catch (err) {
             toast.error('Error saving settings');
@@ -137,7 +110,7 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
             <SkeletonTheme baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'} highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}>
                 <div className="p-6 max-w-4xl mx-auto">
                     <div className="flex justify-between items-center mb-10">
-                        <Skeleton width={240} height={32} />
+                    <Skeleton width={240} height={32} />
                         <Skeleton width={80} height={40} borderRadius={6} />
                     </div>
                     <div className="flex flex-col md:flex-row gap-8">
@@ -218,19 +191,21 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                                 placeholder={field.placeholder}
                                 maxLength={field.maxLength}
                                 isColor={field.isColor}
-                                value={typeof localSettings[field.name as keyof ChatWidgetSettings] === 'string'
-                                    ? (localSettings[field.name as keyof ChatWidgetSettings] as string)
-                                    : ''}
+                                value={
+                                    typeof localSettings[field.name as keyof ChatWidgetSettings] === 'string'
+                                        ? (localSettings[field.name as keyof ChatWidgetSettings] as string)
+                                        : ''
+                                }
                                 onChange={(value) => handleInputChange(field.name as keyof ChatWidgetSettings, value)}
                                 disabled={isSaving}
                             />
                         ))}
+
+                        {/* Tag Questions UI */}
                         <div className="space-y-6 mt-6">
                             <h3 className="text-lg font-semibold">Tag Questions</h3>
-
                             {messages.map((msg, msgIndex) => (
                                 <div key={msgIndex} className="border p-3 rounded-md space-y-3">
-                                    {/* Question text */}
                                     <input
                                         type="text"
                                         value={msg.text}
@@ -242,8 +217,6 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                                         className="w-full border rounded-md p-2"
                                         placeholder="Bot question..."
                                     />
-
-                                    {/* Dynamic tags */}
                                     <div className="space-y-2">
                                         <p className="text-sm font-medium">Tags</p>
                                         {msg.tags?.map((tag, tagIndex) => (
@@ -272,8 +245,6 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                                                 </button>
                                             </div>
                                         ))}
-
-                                        {/* Add new tag */}
                                         <button
                                             type="button"
                                             onClick={() => {
@@ -287,8 +258,6 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                                             + Add Tag
                                         </button>
                                     </div>
-
-                                    {/* Remove whole question */}
                                     <button
                                         type="button"
                                         onClick={() => setMessages(messages.filter((_, i) => i !== msgIndex))}
@@ -298,23 +267,18 @@ export default function ChatWidgetOpenComponent({ defaultSettings, initialMessag
                                     </button>
                                 </div>
                             ))}
-
-                            {/* Add new question */}
                             <button
                                 type="button"
                                 onClick={() =>
-                                    setMessages([
-                                        ...messages,
-                                        { text: 'New question...', isUser: false, tags: ['Option 1'] },
-                                    ])
+                                    setMessages([...messages, { text: 'New question...', isUser: false, tags: ['Option 1'] }])
                                 }
                                 className="px-4 py-2 bg-blue-500 text-white rounded-md"
                             >
                                 + Add Question
                             </button>
                         </div>
-
                     </div>
+
                     <ChatPreview
                         settings={localSettings}
                         messages={messages}

@@ -9,53 +9,47 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { BubbleSettings } from '@/types/Modifier';
 import BubbleIcon from '../icons/BubbleIcon';
 
-type BubbleComponentProps = {
-  defaultSettings: BubbleSettings;
-};
+type BubbleComponentProps = { defaultSettings: BubbleSettings };
 
 export default function BubbleComponent({ defaultSettings }: BubbleComponentProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [localSettings, setLocalSettings] = useState<BubbleSettings>(defaultSettings);
-  const { resolvedTheme } = useTheme();
-  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
+  const [isSaving, setIsSaving] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [localSettings, setLocalSettings] = useState<BubbleSettings>(defaultSettings);
+
+  const { settings,loading, updateSettings } = useSettingsStore();
+
+  // Initialize **once**, do not fetch again
   useEffect(() => {
     setMounted(true);
-    fetchSettings('bubble', defaultSettings);
-  }, [fetchSettings, defaultSettings]);
-
-  useEffect(() => {
-    if (mounted) {
-      setIsDarkMode(resolvedTheme === 'dark');
-    }
-  }, [mounted, resolvedTheme]);
-
-  useEffect(() => {
-    setLocalSettings((prev) => ({
-      ...prev,
-      ...settings.bubble,
+    // Only hydrate store once
+    useSettingsStore.setState((state) => ({
+      settings: {
+        ...state.settings,
+        bubble: { ...defaultSettings },
+      },
     }));
+  }, [defaultSettings]);
+
+  // Keep local state in sync with store
+  useEffect(() => {
+    if (settings.bubble) setLocalSettings(settings.bubble);
   }, [settings.bubble]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setLocalSettings((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setLocalSettings((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateSettings('bubble', localSettings);
-      toast.success('Settings saved!');
+      await updateSettings('bubble', localSettings); // store + server
+      toast.success('Bubble settings saved!');
     } catch (err) {
-      toast.error('Error saving settings');
-      console.error(err);
+      toast.error('Error saving bubble settings');
     } finally {
       setIsSaving(false);
     }
@@ -102,6 +96,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
           <Loader />
         </div>
       )}
+
       <div className={isSaving ? 'blur-sm' : ''}>
         <div className="flex justify-between items-center mb-10">
           <h2 className="text-2xl font-bold">Bubble Customization</h2>
@@ -113,40 +108,39 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
             Save
           </button>
         </div>
+
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 space-y-4 border-r pr-4">
-            {['bgColor', 'iconColor', 'dotsColor'].map((key) => (
+            {(['bgColor', 'iconColor', 'dotsColor'] as const).map((key) => (
               <div key={key}>
                 <label className="block text-sm font-medium text-primary mb-2">
                   {key === 'bgColor'
-                    ? 'Bubble Background Color'
+                    ? 'Bubble Background'
                     : key === 'iconColor'
-                      ? 'Bubble Icon Color'
-                      : 'Bubble Dots Color'}
+                    ? 'Bubble Icon'
+                    : 'Bubble Dots'}
                   :
                 </label>
                 <div className="flex items-center border rounded-md overflow-hidden">
                   <input
                     type="text"
                     name={key}
-                    placeholder="#hex"
-                    className="w-full px-2 py-2 text-sm focus:outline-none"
-                    value={localSettings[key as keyof BubbleSettings]}
+                    value={localSettings[key]}
                     onChange={handleInputChange}
-                    disabled={isSaving}
+                    className="w-full px-2 py-2 text-sm focus:outline-none"
                   />
                   <input
                     type="color"
                     name={key}
-                    className="w-12 h-12 cursor-pointer border-l"
-                    value={localSettings[key as keyof BubbleSettings]}
+                    value={localSettings[key]}
                     onChange={handleInputChange}
-                    disabled={isSaving}
+                    className="w-12 h-12 cursor-pointer border-l"
                   />
                 </div>
               </div>
             ))}
           </div>
+
           <div className="flex-1 flex justify-center items-center">
             <div
               className="relative flex items-center justify-center rounded-full w-16 h-16 transition-colors duration-300 cursor-pointer"
@@ -160,7 +154,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                 dotsColor={localSettings.dotsColor}
                 hovered={isHovered}
               />
-           </div>
+            </div>
           </div>
         </div>
       </div>

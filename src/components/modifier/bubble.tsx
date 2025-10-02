@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import Loader from '../loader/Loader';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -13,29 +12,32 @@ type BubbleComponentProps = { defaultSettings: BubbleSettings };
 
 export default function BubbleComponent({ defaultSettings }: BubbleComponentProps) {
   const [mounted, setMounted] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(false);
-
   const [isSaving, setIsSaving] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [localSettings, setLocalSettings] = useState<BubbleSettings>(defaultSettings);
 
-  const { settings,loading, updateSettings } = useSettingsStore();
+  const { settings, loading, updateSettings } = useSettingsStore();
 
-  // Initialize **once**, do not fetch again
+  // Initialize store and local state
   useEffect(() => {
     setMounted(true);
-    // Only hydrate store once
-    useSettingsStore.setState((state) => ({
-      settings: {
-        ...state.settings,
-        bubble: { ...defaultSettings },
-      },
-    }));
-  }, [defaultSettings]);
+    // Hydrate store with defaultSettings only if store is empty
+    if (!settings.bubble || Object.keys(settings.bubble).length === 0) {
+      useSettingsStore.setState((state) => ({
+        settings: {
+          ...state.settings,
+          bubble: { ...defaultSettings },
+        },
+      }));
+    }
+    setLocalSettings(settings.bubble || defaultSettings);
+  }, [defaultSettings, settings.bubble]);
 
-  // Keep local state in sync with store
+  // Sync localSettings with store changes
   useEffect(() => {
-    if (settings.bubble) setLocalSettings(settings.bubble);
+    if (settings.bubble) {
+      setLocalSettings(settings.bubble);
+    }
   }, [settings.bubble]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +48,7 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateSettings('bubble', localSettings); // store + server
+      await updateSettings('bubble', localSettings);
       toast.success('Bubble settings saved!');
     } catch (err) {
       toast.error('Error saving bubble settings');
@@ -59,17 +61,14 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
 
   if (loading) {
     return (
-      <SkeletonTheme
-        baseColor={isDarkMode ? '#2a2a2a' : '#e0e0e0'}
-        highlightColor={isDarkMode ? '#3a3a3a' : '#f0f0f0'}
-      >
+      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
         <div className="p-6 max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-10">
             <Skeleton width={200} height={32} />
             <Skeleton width={80} height={40} borderRadius={6} />
           </div>
           <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex-1 space-y-4 pr-4 border-r border-gray-300 dark:border-gray-700">
+            <div className="flex-1 space-y-4 pr-4 border-r border-gray-300">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="space-y-2">
                   <Skeleton width={150} height={16} />
@@ -125,14 +124,14 @@ export default function BubbleComponent({ defaultSettings }: BubbleComponentProp
                   <input
                     type="text"
                     name={key}
-                    value={localSettings[key]}
+                    value={localSettings[key] || ''}
                     onChange={handleInputChange}
                     className="w-full px-2 py-2 text-sm focus:outline-none"
                   />
                   <input
                     type="color"
                     name={key}
-                    value={localSettings[key]}
+                    value={localSettings[key] || '#000000'}
                     onChange={handleInputChange}
                     className="w-12 h-12 cursor-pointer border-l"
                   />

@@ -99,14 +99,22 @@ export default function ChatWidgetContactPreview({ defaultSettings }: Props) {
   }
 
   return (
-    <div className="w-[370px] mx-auto mt-5 h-[700px] border rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-900 flex flex-col">
+    <div className="w-[370px] mx-auto mt-5 h-[700px] border rounded-lg shadow-lg bg-white dark:bg-gray-900 flex flex-col">
+      {/* Fixed header */}
       <ChatHeader settings={contactSettings} isSaving={isSaving} />
-      <div className="flex-1 overflow-y-auto flex flex-col">
+
+      {/* Center scrollable area */}
+      <div id="scrollArea" className="flex-1 overflow-y-auto p-2">
+        {/* Messages */}
         <MessagesContainer messages={messages} settings={contactSettings} />
-        <div className="p-4">
+
+        {/* Contact form directly below messages */}
+        <div className="mt-4 border-t pt-4">
           <ContactForm settings={contactSettings} isSaving={isSaving} />
         </div>
       </div>
+
+      {/* Fixed input and footer */}
       <ChatInputArea
         settings={contactSettings}
         newMessage={newMessage}

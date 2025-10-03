@@ -1,5 +1,5 @@
 // page.tsx
-import BubblePreview from './BubblePreview';
+import BubblePreview from '../../../components/preview/BubblePreview';
 
 export default function Page({defaultSettings}: any) {
 

@@ -1,5 +1,5 @@
 // page.tsx
-import ChatContactPreview from './ChatContactPreview';
+import ChatContactPreview from '../../../components/preview/ChatContactPreview';
 
 export default function Page({defaultSettings}: any) {
 

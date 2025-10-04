@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { useCustomerStore } from '@/stores/useCustomerStore';
+import { useCustomerStore } from './useCustomerStore';
 import { Filter, Plus, SlidersHorizontal } from 'lucide-react';
-import ContactProfile from '@/components/chat/ContactProfile';
-import type { Customer } from '@/stores/useCustomerStore';
+import ContactProfile from './ContactProfile';
+import type { Customer } from './useCustomerStore';
 
 export default function TrafficView() {
     const { customerData } = useCustomerStore();

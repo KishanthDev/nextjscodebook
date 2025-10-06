@@ -11,13 +11,14 @@ import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Button } from "@/ui/button";
 import { Textarea } from "@/ui/textarea";
+import { X, Check } from "lucide-react";
 
 interface ContactStatsProps {
   contactName: string;
 }
 
 export default function ContactStats({ contactName }: ContactStatsProps) {
-  const [formData, setFormData] = useState({
+  const [generalData, setGeneralData] = useState({
     chatSubject: '',
     firstName: '',
     lastName: '',
@@ -28,111 +29,156 @@ export default function ContactStats({ contactName }: ContactStatsProps) {
     leadQualified: true,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-    const { name, value, type } = target;
-    const checked = (target as HTMLInputElement).checked;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+  const [chatInfo, setChatInfo] = useState({
+    visitorType: '',
+    chatToken: '',
+    apiToken: '',
+    websiteDomain: '',
+    startedOn: '',
+    visitorStartTime: '',
+    startTime: '',
+  });
 
-  const handleSwitch = (checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      leadQualified: checked,
-    }));
+  const [locationInfo, setLocationInfo] = useState({
+    location: '',
+    isCountryInEU: false,
+    continent: '',
+    country: '',
+    region: '',
+    city: '',
+    postal: '',
+    countryPopulation: '',
+    countryPopulationDensity: '',
+    timezone: '',
+    currency: '',
+    language: '',
+  });
+
+  const [technologyInfo, setTechnologyInfo] = useState({
+    userIP: '',
+    userAgentHeader: '',
+    userAgentName: '',
+    osName: '',
+  });
+
+  const [securityInfo, setSecurityInfo] = useState({
+    isAbuser: false,
+    isAnonymous: false,
+    isAttacker: false,
+    isBogon: false,
+    isCloudProvider: false,
+    isProxy: false,
+    isThreat: false,
+    isTor: false,
+    isTorExit: false,
+  });
+
+  const renderEditableSection = (
+    data: any,
+    setter: any,
+    checkboxKeys: string[] = [],
+    showLabels: boolean = false
+  ) => {
+    return (
+      <div className="space-y-3">
+        {Object.entries(data).map(([key, value]) => (
+          <div key={key} className="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-1 items-center">
+            {checkboxKeys.includes(key) ? (
+              <>
+                {showLabels && (
+                  <div className="font-medium text-gray-600 dark:text-gray-300">
+                    {key.replace(/([A-Z])/g, ' $1')}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setter((prev: any) => ({ ...prev, [key]: !prev[key] }))}
+                  className="ml-4"
+                >
+                  {value ? <Check className="text-green-500 w-5 h-5" /> : <X className="text-red-500 w-5 h-5" />}
+                </button>
+              </>
+            ) : key === 'summary' ? (
+              <Textarea
+                className="w-full"
+                placeholder={key.replace(/([A-Z])/g, ' $1')}
+                name={key}
+                value={value as string}
+                onChange={(e) => setter((prev: any) => ({ ...prev, [key]: e.target.value }))}
+                rows={3}
+              />
+            ) : (
+              <Input
+                className="w-full"
+                placeholder={key.replace(/([A-Z])/g, ' $1')}
+                name={key}
+                value={value as string}
+                onChange={(e) => setter((prev: any) => ({ ...prev, [key]: e.target.value }))}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div className="h-full overflow-hidden">
-      <Accordion 
-        type="single" 
-        collapsible 
-        defaultValue="general-info" 
-        className="h-full flex flex-col"
-      >
-        <AccordionItem value="general-info" className="flex flex-col h-full overflow-hidden border-none">
-          <AccordionTrigger className="flex-shrink-0 px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div className="font-semibold text-base">{contactName || "Contact Details"}</div>
+    <div className="h-full overflow-auto pr-2">
+      <Accordion type="multiple" defaultValue={['general-info']} className="h-full flex flex-col space-y-2">
+
+        {/* General Info */}
+        <AccordionItem value="general-info" className="border-none rounded-md overflow-hidden">
+          <AccordionTrigger className="px-3 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div className="font-semibold text-base">General Info</div>
           </AccordionTrigger>
-          
-          <AccordionContent className="flex-1 overflow-y-auto pt-4">
-            <div className="space-y-4 pr-2">
-              <form className="flex flex-col gap-4">
-                <div className="space-y-3">
-                  <Input 
-                    name="chatSubject" 
-                    value={formData.chatSubject} 
-                    onChange={handleChange} 
-                    placeholder="Subject" 
-                    className="w-full"
-                  />
-                  <Input 
-                    name="firstName" 
-                    value={formData.firstName} 
-                    onChange={handleChange} 
-                    placeholder="First name" 
-                    required 
-                    className="w-full"
-                  />
-                  <Input 
-                    name="lastName" 
-                    value={formData.lastName} 
-                    onChange={handleChange} 
-                    placeholder="Last name" 
-                    className="w-full"
-                  />
-                  <Input 
-                    name="email" 
-                    type="email" 
-                    value={formData.email} 
-                    onChange={handleChange} 
-                    placeholder="Email" 
-                    required 
-                    className="w-full"
-                  />
-                  <Input 
-                    name="phone" 
-                    value={formData.phone} 
-                    onChange={handleChange} 
-                    placeholder="Phone number" 
-                    className="w-full"
-                  />
-                  <Input 
-                    name="preferredContactTime" 
-                    value={formData.preferredContactTime} 
-                    onChange={handleChange} 
-                    placeholder="Preferred contact time" 
-                    className="w-full"
-                  />
-                  <Textarea 
-                    name="summary" 
-                    value={formData.summary} 
-                    onChange={handleChange} 
-                    placeholder="Summary" 
-                    rows={3} 
-                    className="w-full resize-none"
-                  />
-                </div>
-                
-                <div className="flex items-center gap-2 py-2">
-                  <Switch 
-                    checked={formData.leadQualified} 
-                    onCheckedChange={handleSwitch} 
-                    name="leadQualified" 
-                  />
-                  <span className="text-sm">Is this Lead Qualified?</span>
-                </div>
-                
-                <Button type="submit" className="w-full mt-4">
-                  Confirm
-                </Button>
-              </form>
-            </div>
+          <AccordionContent className="pt-4">
+            <form className="flex flex-col gap-4 pr-2">
+              {renderEditableSection(generalData, setGeneralData, ['leadQualified'], true)}
+              <Button type="submit" className="w-full mt-2">Confirm</Button>
+            </form>
           </AccordionContent>
         </AccordionItem>
+
+        {/* Chat Info */}
+        <AccordionItem value="chat-info" className="border-none rounded-md overflow-hidden">
+          <AccordionTrigger className="px-3 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div className="font-semibold text-base">Chat Info</div>
+          </AccordionTrigger>
+          <AccordionContent className="pt-3 pb-4">
+            {renderEditableSection(chatInfo, setChatInfo)}
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Location Info */}
+        <AccordionItem value="location-info" className="border-none rounded-md overflow-hidden">
+          <AccordionTrigger className="px-3 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div className="font-semibold text-base">Location Info</div>
+          </AccordionTrigger>
+          <AccordionContent className="pt-3 pb-4">
+            {renderEditableSection(locationInfo, setLocationInfo, ['isCountryInEU'], true)}
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Technology Info */}
+        <AccordionItem value="technology-info" className="border-none rounded-md overflow-hidden">
+          <AccordionTrigger className="px-3 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div className="font-semibold text-base">Technology Info</div>
+          </AccordionTrigger>
+          <AccordionContent className="pt-3 pb-4">
+            {renderEditableSection(technologyInfo, setTechnologyInfo)}
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Security Info */}
+        <AccordionItem value="security-info" className="border-none rounded-md overflow-hidden">
+          <AccordionTrigger className="px-3 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div className="font-semibold text-base">Security Info</div>
+          </AccordionTrigger>
+          <AccordionContent className="pt-3 pb-4">
+            {renderEditableSection(securityInfo, setSecurityInfo, Object.keys(securityInfo), true)}
+          </AccordionContent>
+        </AccordionItem>
+
       </Accordion>
     </div>
   );

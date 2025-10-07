@@ -73,7 +73,7 @@ export default function ProfileSection({
     const cancelChanges = () => setLocal(data);
 
     return (
-        <div className="p-3 space-y-3 bg-white dark:bg-gray-900 max-w-md mx-auto">
+        <div className="p-3 space-y-1 bg-gray-50 dark:bg-gray-900 max-w-md mx-auto rounded-sm shadow-lg">
             <h2 className="text-center font-medium text-base text-gray-900 dark:text-gray-100">{title}</h2>
             <div className="flex flex-col space-y-2">
                 {fields.map(key =>

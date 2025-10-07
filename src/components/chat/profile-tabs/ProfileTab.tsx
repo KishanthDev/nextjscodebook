@@ -92,7 +92,7 @@ export default function ContactProfile({ contact, expanded, setExpanded }: Conta
       {expanded && (
         <div className="flex flex-col h-full overflow-hidden">
           {/* Header with tab icons */}
-          <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700 flex-shrink-0 bg-white dark:bg-gray-800">
+          <div className="flex items-center justify-between px-4 h-14 border-b dark:border-gray-700 flex-shrink-0 bg-white dark:bg-gray-800">
             <div className="flex gap-3">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -116,7 +116,7 @@ export default function ContactProfile({ contact, expanded, setExpanded }: Conta
 
           {/* Profile Content */}
           <div className="flex-1 flex flex-col overflow-hidden transition-opacity duration-150">
-            <div className="flex-1 overflow-y-auto px-4 py-4">
+            <div className="flex-1 overflow-y-auto px-3 py-3">
               <div className="text-sm text-gray-700 dark:text-gray-300">
                 {renderTabContent()}
               </div>

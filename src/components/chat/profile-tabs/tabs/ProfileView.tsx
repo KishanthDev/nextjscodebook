@@ -19,7 +19,7 @@ const formatLabel = (key: string) => {
 
 // Read-only field
 const ReadOnlyField = ({ label, value }: { label: string; value: any }) => (
-  <div className="flex justify-between border-b border-gray-100 dark:border-gray-700 py-1 text-sm">
+  <div className="flex justify-between border-b border-gray-100 dark:border-gray-700 py-1 text-xs">
     <div className="font-medium text-gray-600 dark:text-gray-300">{label}</div>
     <div className="text-gray-900 dark:text-gray-100">
       {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
@@ -56,10 +56,10 @@ export default function ContactStatsRead() {
             value={id}
             className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-300 data-[state=open]:shadow-md data-[state=open]:bg-gray-50 dark:data-[state=open]:bg-gray-800"
           >
-            <AccordionTrigger className="px-3 py-2 text-sm font-medium text-left bg-gray-100 dark:bg-gray-900 data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-gray-700 transition-colors">
+            <AccordionTrigger className="px-3 py-2 text-xs font-medium text-left bg-gray-100 dark:bg-gray-900 data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-gray-700 transition-colors">
               {label}
             </AccordionTrigger>
-            <AccordionContent className="p-3 bg-white dark:bg-gray-900 text-sm transition-all duration-300">
+            <AccordionContent className="p-3 bg-white dark:bg-gray-900 text-xs transition-all duration-300">
               {renderSection(data)}
             </AccordionContent>
           </AccordionItem>

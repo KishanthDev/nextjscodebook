@@ -5,7 +5,7 @@ import { Textarea } from "@/ui/textarea";
 import { Switch } from "@/ui/switch";
 import { Button } from "@/ui/button";
 import React, { useState } from "react";
-import { toast } from "sonner"; // <-- import Sonner
+import { toast } from "sonner";
 
 export function Field({
     label,
@@ -20,24 +20,26 @@ export function Field({
 }) {
     if (type === "boolean") {
         return (
-            <div className="flex items-center justify-between w-full">
-                <span className="text-gray-700 dark:text-gray-300 text-sm">{label}</span>
+            <div className="flex items-center justify-between w-full text-xs">
+                <span className="text-gray-700 pb-0.5 dark:text-gray-300">{label}</span>
                 <Switch checked={value ?? false} onCheckedChange={onChange} />
             </div>
         );
     }
+
     if (type === "textarea") {
         return (
-            <div className="flex flex-col space-y-1 w-full">
-                <span className="text-gray-700 dark:text-gray-300 text-sm">{label}</span>
-                <Textarea value={value ?? ""} onChange={e => onChange(e.target.value)} rows={3} />
+            <div className="flex flex-col w-full text-xs">
+                <span className="text-gray-700 pb-0.5 dark:text-gray-300">{label}</span>
+                <Textarea value={value ?? ""} onChange={e => onChange(e.target.value)} rows={2} className="text-xs" />
             </div>
         );
     }
+
     return (
-        <div className="flex flex-col space-y-1 w-full">
-            <span className="text-gray-700 dark:text-gray-300 text-sm">{label}</span>
-            <Input type={type} value={value ?? ""} onChange={e => onChange(e.target.value)} />
+        <div className="flex flex-col w-full text-xs">
+            <span className="text-gray-700  pb-0.5  dark:text-gray-300">{label}</span>
+            <Input type={type} value={value ?? ""} onChange={e => onChange(e.target.value)} className="text-xs h-8" />
         </div>
     );
 }
@@ -64,22 +66,16 @@ export default function ProfileSection({
     };
 
     const saveChanges = () => {
-        Object.entries(local).forEach(([key, value]) => {
-            setField(key, value); // updates Zustand
-        });
-
-        toast.success(`${title} saved successfully!`); // <-- notification
+        Object.entries(local).forEach(([key, value]) => setField(key, value));
+        toast.success(`${title} saved successfully!`);
     };
-
 
     const cancelChanges = () => setLocal(data);
 
     return (
-        <div className="p-4 space-y-4 bg-white dark:bg-gray-900 max-w-md mx-auto">
-            <h2 className="text-center font-semibold text-lg text-gray-900 dark:text-gray-100">
-                {title}
-            </h2>
-            <div className="flex flex-col space-y-3">
+        <div className="p-3 space-y-3 bg-white dark:bg-gray-900 max-w-md mx-auto">
+            <h2 className="text-center font-medium text-base text-gray-900 dark:text-gray-100">{title}</h2>
+            <div className="flex flex-col space-y-2">
                 {fields.map(key =>
                     customFields[key] ? customFields[key] : (
                         <Field
@@ -106,9 +102,9 @@ export default function ProfileSection({
                     )
                 )}
 
-                <div className="flex justify-center gap-3 pt-3">
-                    <Button variant="outline" className="px-6" onClick={cancelChanges}>Cancel</Button>
-                    <Button className="px-6" onClick={saveChanges}>Save</Button>
+                <div className="flex justify-center gap-2 pt-2">
+                    <Button variant="outline" size="sm" onClick={cancelChanges}>Cancel</Button>
+                    <Button size="sm" onClick={saveChanges}>Save</Button>
                 </div>
             </div>
         </div>

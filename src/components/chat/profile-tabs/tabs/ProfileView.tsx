@@ -45,7 +45,7 @@ export default function ContactStatsRead() {
 
   return (
     <div className="h-full overflow-auto pr-2">
-      <Accordion type="multiple" defaultValue={['general-info']} className="h-full flex flex-col space-y-2">
+      <Accordion type="multiple" className="h-full flex flex-col space-y-2">
 
         <AccordionItem value="general-info">
           <AccordionTrigger className="px-3 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">

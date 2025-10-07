@@ -1,0 +1,16 @@
+'use client';
+
+import { useContactProfileStore } from '@/stores/contactProfileStore';
+import ProfileSection from '../ProfileSection';
+
+export default function TechnologyInfo() {
+  const { technologyInfo, setTechnologyField } = useContactProfileStore();
+  return (
+    <ProfileSection
+      title="Technology Info"
+      data={technologyInfo}
+      fields={Object.keys(technologyInfo)}
+      setField={setTechnologyField}
+    />
+  );
+}

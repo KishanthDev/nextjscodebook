@@ -5,7 +5,7 @@ import ContactList from "./ContactList";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
-import ContactProfile from "./ContactProfile";
+import ContactProfile from "./profile-tabs/ProfileTab";
 import { useUserStatus } from "@/stores/useUserStatus";
 import { useSettingsStore } from "@/stores/chatuiclone";
 import { ChatWidgetSettings } from "@/types/Modifier";
@@ -104,7 +104,8 @@ export default function ChatUI() {
         recentMsg: lastMsg?.text || "",
         time: lastMsg?.timestamp ? formatTimeDisplay(lastMsg.timestamp) : "",
         unread,
-        lastMsgTime: lastMsg?.timestamp || 0,});
+        lastMsgTime: lastMsg?.timestamp || 0,
+      });
 
       if (selectedContact?.id === user) {
         setMessages(

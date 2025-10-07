@@ -8,6 +8,8 @@ import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { Toaster } from '@/ui/sonner';
 import { NavbarWrapper } from '@/components/navbar/navbar';
 import { useAIMessageHandler } from '@/stores/aiMessageHandler';
+import { useContactProfileStore } from "@/stores/contactProfileStore";
+
 
 const geistSans = localFont({
   src: '../fonts/GeistVF.woff',
@@ -31,6 +33,16 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       );
     }
   }, []);
+
+  const fetchGeneral = useContactProfileStore((state) => state.fetchData);
+
+  useEffect(() => {
+    fetchGeneral('general');
+    fetchGeneral('chat');
+    fetchGeneral('technology');
+    fetchGeneral('security');
+  }, []);
+
 
   return (
     <ThemeProvider attribute="class">

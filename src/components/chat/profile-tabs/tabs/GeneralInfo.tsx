@@ -1,7 +1,8 @@
 'use client';
 
-import { useContactProfileStore } from '@/stores/contactProfileStore';
-import ProfileSection from '../ProfileSection';
+import React, { useEffect } from "react";
+import { useContactProfileStore } from "@/stores/contactProfileStore";
+import ProfileSection from "../ProfileSection"; // your existing section component
 
 export default function GeneralInfo() {
   const { generalData, setGeneralField } = useContactProfileStore();
@@ -10,14 +11,14 @@ export default function GeneralInfo() {
       title="General Info"
       data={generalData}
       fields={[
-        "chatSubject",
+        "subject",
         "firstName",
         "lastName",
         "email",
-        "phone",
+        "phoneNumber",
         "preferredContactTime",
         "summary",
-        "leadQualified"
+        "isLeadQualified"
       ]}
       setField={setGeneralField}
       fieldTypes={{ leadQualified: "boolean", summary: "textarea", email: "email", phone: "tel" }}

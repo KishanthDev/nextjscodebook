@@ -36,6 +36,7 @@ const tabs = [
 ];
 
 export default function ContactProfile({ contact, expanded, setExpanded }: ContactProfileProps) {
+
   const [currentContact, setCurrentContact] = useState<Contact>(
     contact || {
       name: 'Demo User',

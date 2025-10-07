@@ -12,7 +12,6 @@ export type ContactProfile = {
 };
 
 type ContactProfileStore = ContactProfile & {
-  // CRUD-like setters
   setGeneralField: (key: string, value: any) => void;
   setChatField: (key: string, value: any) => void;
   setLocationField: (key: string, value: any) => void;
@@ -20,29 +19,14 @@ type ContactProfileStore = ContactProfile & {
   setSecurityField: (key: string, value: any) => void;
 
   resetProfile: () => void;
+
+  fetchData: (section: 'general' | 'chat' | 'technology' | 'security') => Promise<void>;
 };
 
 export const useContactProfileStore = create<ContactProfileStore>()(
   devtools((set) => ({
-    generalData: {
-      chatSubject: 'Product Inquiry',
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@example.com',
-      phone: '+91 9876543210',
-      preferredContactTime: 'Morning',
-      summary: 'Interested in pricing details.',
-      leadQualified: true,
-    },
-    chatInfo: {
-      visitorType: 'Returning User',
-      chatToken: 'abc123',
-      apiToken: 'xyz456',
-      websiteDomain: 'example.com',
-      startedOn: '2025-10-01',
-      visitorStartTime: '09:30 AM',
-      startTime: '09:31 AM',
-    },
+    generalData: {},
+    chatInfo: {},
     locationInfo: {
       location: 'Bangalore, India',
       isCountryInEU: false,
@@ -57,25 +41,9 @@ export const useContactProfileStore = create<ContactProfileStore>()(
       currency: 'INR',
       language: 'English',
     },
-    technologyInfo: {
-      userIP: '192.168.0.10',
-      userAgentHeader: 'Mozilla/5.0',
-      userAgentName: 'Chrome',
-      osName: 'Windows 10',
-    },
-    securityInfo: {
-      isAbuser: false,
-      isAnonymous: false,
-      isAttacker: false,
-      isBogon: false,
-      isCloudProvider: true,
-      isProxy: false,
-      isThreat: false,
-      isTor: false,
-      isTorExit: false,
-    },
+    technologyInfo: {},
+    securityInfo: {},
 
-    // CRUD setters
     setGeneralField: (key, value) => set((state) => ({
       generalData: { ...state.generalData, [key]: value }
     })),
@@ -99,5 +67,35 @@ export const useContactProfileStore = create<ContactProfileStore>()(
       technologyInfo: {},
       securityInfo: {},
     })),
+
+    fetchData: async (section) => {
+      try {
+        const urlMap = {
+          general: 'general-info',
+          chat: 'chat-info',
+          technology: 'technology-info',
+          security: 'security-info'
+        };
+        const res = await fetch(`https://orchestration-service-o8pna.ondigitalocean.app/api/${urlMap[section]}`);
+        if (!res.ok) throw new Error(`Failed to fetch ${section} info`);
+        const data = await res.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          const firstItem = data[0];
+          const mapFields = {
+            general: 'generalData',
+            chat: 'chatInfo',
+            technology: 'technologyInfo',
+            security: 'securityInfo'
+          } as const;
+
+          set({
+            [mapFields[section]]: firstItem
+          });
+        }
+      } catch (err) {
+        console.error(`Error fetching ${section} info:`, err);
+      }
+    },
   }))
 );

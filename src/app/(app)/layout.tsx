@@ -41,6 +41,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     fetchGeneral('chat');
     fetchGeneral('technology');
     fetchGeneral('security');
+    fetchGeneral('location');
   }, []);
 
 

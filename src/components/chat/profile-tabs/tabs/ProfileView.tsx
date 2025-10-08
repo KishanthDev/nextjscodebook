@@ -8,6 +8,7 @@ import {
   AccordionContent,
 } from "@/registry/new-york-v4/ui/accordion";
 import { useContactProfileStore } from '@/stores/contactProfileStore';
+import { Check, X } from "lucide-react";
 
 // Utility to format camelCase/PascalCase labels
 const formatLabel = (key: string) => {
@@ -22,7 +23,15 @@ const ReadOnlyField = ({ label, value }: { label: string; value: any }) => (
   <div className="flex justify-between border-b border-gray-100 dark:border-gray-700 py-1 text-xs">
     <div className="font-medium text-gray-600 dark:text-gray-300">{label}</div>
     <div className="text-gray-900 dark:text-gray-100">
-      {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
+      {typeof value === "boolean" ? (
+        value ? (
+          <Check className="inline text-green-600" size={16} />
+        ) : (
+          <X className="inline text-red-600" size={16} />
+        )
+      ) : (
+        String(value)
+      )}
     </div>
   </div>
 );

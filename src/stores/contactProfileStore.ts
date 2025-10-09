@@ -77,11 +77,17 @@ export const useContactProfileStore = create<ContactProfileStore>()(
         });
       },
       setTechnologyField: (key, value) => {
-        set((state) => {
-          const newData = { ...state.technologyInfo, [key]: value };
-          updateFieldAPI('technology', newData);
-          return { technologyInfo: newData };
-        });
+        const current = get().technologyInfo;
+        const newData = {
+          userIp: current.userIp || "",
+          userAgentHeader: current.UserAgentHeader || "",
+          userAgentName: current.UserAgentName || "",
+          osName: current.osName || "",
+          ...current,
+          [key]: value,
+        };
+        set({ technologyInfo: newData });
+        updateFieldAPI("technology", newData);
       },
       setSecurityField: (key, value) => {
         set((state) => {

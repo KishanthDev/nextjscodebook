@@ -144,7 +144,7 @@ export const useContactProfileStore = create<ContactProfileStore>()(
               case 'location':
                 return {
                   location: `${item.city}, ${item.country}`,
-                  isCountryInEU: item.isCountryInEu,
+                  isCountryInEu: item.isCountryInEu,
                   continent: item.continent,
                   country: item.country,
                   region: item.region,

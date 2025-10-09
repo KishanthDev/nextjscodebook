@@ -11,7 +11,7 @@ export default function LocationInfo() {
       data={locationInfo}
       fields={Object.keys(locationInfo)}
       setField={setLocationFields}
-      fieldTypes={{ isCountryInEU: "boolean" }}
+      fieldTypes={{ isCountryInEu: "boolean" }}
     />
   );
 }

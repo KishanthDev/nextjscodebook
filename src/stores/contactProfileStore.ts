@@ -1,6 +1,5 @@
 'use client';
 
-import TechnologyInfo from '@/components/chat/profile-tabs/tabs/TechnologyInfo';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
@@ -26,7 +25,6 @@ type ContactProfileStore = ContactProfile & {
 
 export const useContactProfileStore = create<ContactProfileStore>()(
   devtools((set, get) => {
-    // Internal function to update API
     const updateFieldAPI = async (section: Section, data: Record<string, any>, id = 1) => {
       const urlMap = {
         general: 'general-info',
@@ -129,7 +127,31 @@ export const useContactProfileStore = create<ContactProfileStore>()(
           const data = await res.json();
           const item = Array.isArray(data) ? data[0] : data;
 
-          if (section === 'location' && item) {
+          if (section === 'general' && item) {
+            const mapped = {
+              subject: item.subject,
+              firstName: item.firstName,
+              lastName: item.lastName,
+              email: item.email,
+              phoneNumber: item.phoneNumber,
+              preferredContactTime: item.preferredContactTime,
+              summary: item.summary,
+              isLeadQualified: item.isLeadQualified,
+            };
+            set({ generalData: mapped });
+          }
+          else if (section === 'chat' && item) {
+            const mapped = {
+              visitorType: item.visitorType,
+              chatToken: item.chatToken,
+              apiToken: item.apiToken,
+              websiteDomain: item.websiteDomain,
+              startedOn: item.startedOn,
+              visitorStartTime: item.visitorStartTime,
+              startTime: item.startTime,
+            };
+            set({ chatInfo: mapped });
+          } else if (section === 'location' && item) {
             const mapped = {
               location: `${item.city}, ${item.country}`,
               isCountryInEU: item.isCountryInEu,
@@ -155,6 +177,19 @@ export const useContactProfileStore = create<ContactProfileStore>()(
               osName: item.osName,
             };
             set({ technologyInfo: mapped });
+          } else if (section === 'security' && item) {
+            const mapped = {
+              isAbuser: item.isAbuser,
+              isAnonymous: item.isAnonymous,
+              isAttacker: item.isAttacker,
+              isBogon: item.isBogon,
+              isCloudProvider: item.isCloudProvider,
+              isProxy: item.isProxy,
+              isThreat: item.isThreat,
+              isTor: item.isTor,
+              isTorExit: item.isTorExit,
+            };
+            set({ securityInfo: mapped });
           }
 
 

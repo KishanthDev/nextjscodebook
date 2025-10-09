@@ -14,11 +14,13 @@ export type ContactProfile = {
 type Section = 'general' | 'chat' | 'location' | 'technology' | 'security';
 
 type ContactProfileStore = ContactProfile & {
-  setGeneralField: (key: string, value: any) => void;
-  setChatField: (key: string, value: any) => void;
-  setLocationField: (key: string, value: any) => void;
-  setTechnologyField: (key: string, value: any) => void;
-  setSecurityField: (key: string, value: any) => void;
+  // Bulk setters
+  setGeneralFields: (data: Record<string, any>) => void;
+  setChatFields: (data: Record<string, any>) => void;
+  setLocationFields: (data: Record<string, any>) => void;
+  setTechnologyFields: (data: Record<string, any>) => void;
+  setSecurityFields: (data: Record<string, any>) => void;
+
   resetProfile: () => void;
   fetchData: (section: Section) => Promise<void>;
 };
@@ -26,7 +28,7 @@ type ContactProfileStore = ContactProfile & {
 export const useContactProfileStore = create<ContactProfileStore>()(
   devtools((set, get) => {
     const updateFieldAPI = async (section: Section, data: Record<string, any>, id = 1) => {
-      const urlMap = {
+      const urlMap: Record<Section, string> = {
         general: 'general-info',
         chat: 'chat-info',
         location: 'location',
@@ -54,47 +56,26 @@ export const useContactProfileStore = create<ContactProfileStore>()(
       technologyInfo: {},
       securityInfo: {},
 
-      // --- Setters with auto-update
-      setGeneralField: (key, value) => {
-        set((state) => {
-          const newData = { ...state.generalData, [key]: value };
-          updateFieldAPI('general', newData);
-          return { generalData: newData };
-        });
+      // --- Bulk setters
+      setGeneralFields: (data) => {
+        set({ generalData: data });
+        updateFieldAPI('general', data);
       },
-      setChatField: (key, value) => {
-        set((state) => {
-          const newData = { ...state.chatInfo, [key]: value };
-          updateFieldAPI('chat', newData);
-          return { chatInfo: newData };
-        });
+      setChatFields: (data) => {
+        set({ chatInfo: data });
+        updateFieldAPI('chat', data);
       },
-      setLocationField: (key, value) => {
-        set((state) => {
-          const newData = { ...state.locationInfo, [key]: value };
-          updateFieldAPI('location', newData);
-          return { locationInfo: newData };
-        });
+      setLocationFields: (data) => {
+        set({ locationInfo: data });
+        updateFieldAPI('location', data);
       },
-      setTechnologyField: (key, value) => {
-        const current = get().technologyInfo;
-        const newData = {
-          userIp: current.userIp || "",
-          userAgentHeader: current.UserAgentHeader || "",
-          userAgentName: current.UserAgentName || "",
-          osName: current.osName || "",
-          ...current,
-          [key]: value,
-        };
-        set({ technologyInfo: newData });
-        updateFieldAPI("technology", newData);
+      setTechnologyFields: (data) => {
+        set({ technologyInfo: data });
+        updateFieldAPI('technology', data);
       },
-      setSecurityField: (key, value) => {
-        set((state) => {
-          const newData = { ...state.securityInfo, [key]: value };
-          updateFieldAPI('security', newData);
-          return { securityInfo: newData };
-        });
+      setSecurityFields: (data) => {
+        set({ securityInfo: data });
+        updateFieldAPI('security', data);
       },
 
       // --- Reset all
@@ -110,20 +91,21 @@ export const useContactProfileStore = create<ContactProfileStore>()(
       // --- Fetch API Data
       fetchData: async (section) => {
         try {
-          const urlMap = {
+          const urlMap: Record<Section, string> = {
             general: 'general-info',
             chat: 'chat-info',
             location: 'location',
             technology: 'technology-info',
             security: 'security-info',
           };
-          const mapFields = {
+
+          const mapFields: Record<Section, keyof ContactProfile> = {
             general: 'generalData',
             chat: 'chatInfo',
             location: 'locationInfo',
             technology: 'technologyInfo',
             security: 'securityInfo',
-          } as const;
+          };
 
           const res = await fetch(
             `https://orchestration-service-o8pna.ondigitalocean.app/api/${urlMap[section]}`
@@ -133,78 +115,76 @@ export const useContactProfileStore = create<ContactProfileStore>()(
           const data = await res.json();
           const item = Array.isArray(data) ? data[0] : data;
 
-          if (section === 'general' && item) {
-            const mapped = {
-              subject: item.subject,
-              firstName: item.firstName,
-              lastName: item.lastName,
-              email: item.email,
-              phoneNumber: item.phoneNumber,
-              preferredContactTime: item.preferredContactTime,
-              summary: item.summary,
-              isLeadQualified: item.isLeadQualified,
-            };
-            set({ generalData: mapped });
-          }
-          else if (section === 'chat' && item) {
-            const mapped = {
-              visitorType: item.visitorType,
-              chatToken: item.chatToken,
-              apiToken: item.apiToken,
-              websiteDomain: item.websiteDomain,
-              startedOn: item.startedOn,
-              visitorStartTime: item.visitorStartTime,
-              startTime: item.startTime,
-            };
-            set({ chatInfo: mapped });
-          } else if (section === 'location' && item) {
-            const mapped = {
-              location: `${item.city}, ${item.country}`,
-              isCountryInEU: item.isCountryInEu,
-              continent: item.continent,
-              country: item.country,
-              region: item.region,
-              city: item.city,
-              postal: item.postalCode,
-              countryPopulation: item.countryPopulation,
-              countryPopulationDensity: item.countryPopulationDensity,
-              timezone: item.timezone,
-              currency: item.currency,
-              language: item.language,
-              locationLatitude: item.locationLatitude,
-              locationLongitude: item.locationLongitude,
-            };
-            set({ locationInfo: mapped });
-          } else if (section === 'technology' && item) {
-            const mapped = {
-              userIp: item.userIp,
-              userAgentHeader: item.userAgentHeader,
-              userAgentName: item.userAgentName,
-              osName: item.osName,
-            };
-            set({ technologyInfo: mapped });
-          } else if (section === 'security' && item) {
-            const mapped = {
-              isAbuser: item.isAbuser,
-              isAnonymous: item.isAnonymous,
-              isAttacker: item.isAttacker,
-              isBogon: item.isBogon,
-              isCloudProvider: item.isCloudProvider,
-              isProxy: item.isProxy,
-              isThreat: item.isThreat,
-              isTor: item.isTor,
-              isTorExit: item.isTorExit,
-            };
-            set({ securityInfo: mapped });
-          }
+          if (!item) return;
 
+          // Map data per section
+          const mappedData = (() => {
+            switch (section) {
+              case 'general':
+                return {
+                  subject: item.subject,
+                  firstName: item.firstName,
+                  lastName: item.lastName,
+                  email: item.email,
+                  phoneNumber: item.phoneNumber,
+                  preferredContactTime: item.preferredContactTime,
+                  summary: item.summary,
+                  isLeadQualified: item.isLeadQualified,
+                };
+              case 'chat':
+                return {
+                  visitorType: item.visitorType,
+                  chatToken: item.chatToken,
+                  apiToken: item.apiToken,
+                  websiteDomain: item.websiteDomain,
+                  startedOn: item.startedOn,
+                  visitorStartTime: item.visitorStartTime,
+                  startTime: item.startTime,
+                };
+              case 'location':
+                return {
+                  location: `${item.city}, ${item.country}`,
+                  isCountryInEU: item.isCountryInEu,
+                  continent: item.continent,
+                  country: item.country,
+                  region: item.region,
+                  city: item.city,
+                  postal: item.postalCode,
+                  countryPopulation: item.countryPopulation,
+                  countryPopulationDensity: item.countryPopulationDensity,
+                  timezone: item.timezone,
+                  currency: item.currency,
+                  language: item.language,
+                  locationLatitude: item.locationLatitude,
+                  locationLongitude: item.locationLongitude,
+                };
+              case 'technology':
+                return {
+                  userIp: item.userIp,
+                  userAgentHeader: item.userAgentHeader,
+                  userAgentName: item.userAgentName,
+                  osName: item.osName,
+                };
+              case 'security':
+                return {
+                  isAbuser: item.isAbuser,
+                  isAnonymous: item.isAnonymous,
+                  isAttacker: item.isAttacker,
+                  isBogon: item.isBogon,
+                  isCloudProvider: item.isCloudProvider,
+                  isProxy: item.isProxy,
+                  isThreat: item.isThreat,
+                  isTor: item.isTor,
+                  isTorExit: item.isTorExit,
+                };
+            }
+          })();
 
-          else if (item) {
-            set({ [mapFields[section]]: item });
-          }
+          set({ [mapFields[section]]: mappedData });
         } catch (err) {
           console.error(`Error fetching ${section} info:`, err);
         }
       },
     };
-  }))
+  })
+);

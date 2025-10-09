@@ -5,22 +5,13 @@ import { useContactProfileStore } from "@/stores/contactProfileStore";
 import ProfileSection from "../ProfileSection"; // your existing section component
 
 export default function GeneralInfo() {
-  const { generalData, setGeneralField } = useContactProfileStore();
+  const { generalData, setGeneralFields } = useContactProfileStore();
   return (
     <ProfileSection
       title="General Info"
       data={generalData}
-      fields={[
-        "subject",
-        "firstName",
-        "lastName",
-        "email",
-        "phoneNumber",
-        "preferredContactTime",
-        "summary",
-        "isLeadQualified"
-      ]}
-      setField={setGeneralField}
+      fields={Object.keys(generalData)}
+      setField={setGeneralFields}
       fieldTypes={{ leadQualified: "boolean", summary: "textarea", email: "email", phone: "tel" }}
     />
   );

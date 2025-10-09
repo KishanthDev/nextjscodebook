@@ -4,7 +4,7 @@ import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 import { Switch } from "@/ui/switch";
 import { Button } from "@/ui/button";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export function Field({
@@ -38,7 +38,7 @@ export function Field({
 
     return (
         <div className="flex flex-col w-full text-xs">
-            <span className="text-gray-700  pb-0.5  dark:text-gray-300">{label}</span>
+            <span className="text-gray-700 pb-0.5 dark:text-gray-300">{label}</span>
             <Input type={type} value={value ?? ""} onChange={e => onChange(e.target.value)} className="text-xs h-8" />
         </div>
     );
@@ -55,18 +55,23 @@ export default function ProfileSection({
     title: string,
     data: Record<string, any>,
     fields: string[],
-    setField: (key: string, value: any) => void,
+    setField: (data: Record<string, any>) => void, // <-- expects full object now
     fieldTypes?: Record<string, string>,
     customFields?: Record<string, React.ReactNode>
 }) {
     const [local, setLocal] = useState(data);
 
+    // Keep local in sync if `data` prop changes
+    useEffect(() => {
+        setLocal(data);
+    }, [data]);
+
     const handleFieldChange = (key: string, value: any) => {
-        setLocal({ ...local, [key]: value });
+        setLocal(prev => ({ ...prev, [key]: value }));
     };
 
     const saveChanges = () => {
-        Object.entries(local).forEach(([key, value]) => setField(key, value));
+        setField(local); // bulk update
         toast.success(`${title} saved successfully!`);
     };
 

@@ -165,8 +165,8 @@ export const useContactProfileStore = create<ContactProfileStore>()(
               timezone: item.timezone,
               currency: item.currency,
               language: item.language,
-              latitude: item.locationLatitude,
-              longitude: item.locationLongitude,
+              locationLatitude: item.locationLatitude,
+              locationLongitude: item.locationLongitude,
             };
             set({ locationInfo: mapped });
           } else if (section === 'technology' && item) {

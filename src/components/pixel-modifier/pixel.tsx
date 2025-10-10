@@ -80,7 +80,7 @@ export const BubbleEditor: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 h-[calc(100vh-53px)]">
+    <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 rounded-lg h-[calc(100vh-114px)]">
       {/* Controls Panel */}
       <BubbleModifier 
         settings={settings}

@@ -5,7 +5,6 @@ import { RangeInput, ColorInput, SelectInput, TextInput, CheckboxInput, Gradient
 import { BubblePixelSettings } from './bubbletype';
 import { toast } from 'sonner';
 import { Button } from '@/ui/button';
-import { DownloadComponents } from './Downloader';
 
 // Constraint constants
 const CONSTRAINTS = {
@@ -520,25 +519,6 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                     </div>
                 )}
             </section>
-
-            <div className="mt-6 flex justify-between">
-                <Button
-                    onClick={async () => {
-                        try {
-                            const settingsJson = JSON.stringify(settings, null, 2);
-                            await navigator.clipboard.writeText(settingsJson);
-                            toast.success('Bubble settings copied to clipboard!');
-                        } catch (err) {
-                            toast.error(`Failed to copy: ${String(err)}`);
-                            alert('Failed to copy settings. Check console.');
-                        }
-                    }}
-                >
-                    Copy Settings
-                </Button>
-
-                <DownloadComponents settings={settings} />
-            </div>
         </div >
     );
 };

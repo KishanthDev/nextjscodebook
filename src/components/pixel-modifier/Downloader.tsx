@@ -5,11 +5,11 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { Button } from '@/ui/button';
 
-interface DownloadComponentsProps {
+interface BubbleDownloadProps {
   settings: any; // You may replace this with a more specific type as needed
 }
 
-export const DownloadComponents: React.FC<DownloadComponentsProps> = ({ settings }) => {
+export const BubbleDownload: React.FC<BubbleDownloadProps> = ({ settings }) => {
   const handleDownload = async () => {
     const zip = new JSZip();
 
@@ -356,11 +356,12 @@ export default BubbleComponent;
   return (
     <Button
       onClick={handleDownload}
-      type="button"
+      variant="outline"
+      size='sm'
     >
       Download 
     </Button>
   );
 };
 
-export default DownloadComponents;
+export default BubbleDownload;

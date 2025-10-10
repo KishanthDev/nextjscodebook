@@ -1,7 +1,10 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { BubblePixelSettings } from './bubbletype';
+import { Button } from '@/ui/button';
+import { toast } from 'sonner';
+import BubbleDownload from './Downloader';
 
 const ease = 'cubic-bezier(.2,.8,.2,1)';
 
@@ -10,6 +13,8 @@ interface BubblePreviewProps {
 }
 
 export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
+  const [hovered, setHovered] = useState(false);
+
   // Computed styles
   const gradient = useMemo(() => {
     if (settings.gradientType === 'none') return '';
@@ -71,112 +76,130 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
     borderColor: settings.border.color,
     ...(settings.borderGradientEnabled
       ? {
-          borderImage: borderImage,
-          borderColor: 'transparent',
-        }
+        borderImage: borderImage,
+        borderColor: 'transparent',
+      }
       : {}),
   }), [settings.border, settings.borderGradientEnabled, borderImage]);
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg p-8">
-      <div className="relative group" style={{ perspective: '800px' }}>
-        <div
-          className="relative flex items-center justify-center transition-all duration-300"
-          style={{
-            width: `${settings.width}px`,
-            height: `${settings.height}px`,
-            borderRadius: `${settings.borderRadius.tl}px ${settings.borderRadius.tr}px ${settings.borderRadius.br}px ${settings.borderRadius.bl}px`,
-            background: compositeBackground,
-            backgroundBlendMode: settings.backgroundBlendMode,
-            ...borderStyle,
-            boxShadow: [boxShadow, innerShadowValue].filter(Boolean).join(', '),
-            transformStyle: 'preserve-3d',
-            ...(settings.glass.enabled ? { 
-              backdropFilter: `blur(${settings.glass.blur}px)`, 
-              backgroundColor: `rgba(255,255,255,${settings.glass.bgOpacity})` 
-            } : {}),
-            ...(settings.neon.enabled ? { 
-              filter: `drop-shadow(0 0 ${10 * settings.neon.intensity}px ${settings.neon.color})`,
-              boxShadow: `${boxShadow}, 0 0 ${10 * settings.neon.intensity}px ${settings.neon.color}, 0 0 ${25 * settings.neon.intensity}px ${settings.neon.color}` 
-            } : {}),
-            ...entryAnimStyle,
+    <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg p-8 relative">
+      {/* Save & Download Buttons */}
+      <div className="absolute top-4 right-4 flex space-x-2 z-10">
+        <Button size='sm'
+          onClick={async () => {
+            try {
+              const settingsJson = JSON.stringify(settings, null, 2);
+              await navigator.clipboard.writeText(settingsJson);
+              toast.success('Bubble settings copied to clipboard!');
+            } catch (err) {
+              toast.error(`Failed to copy: ${String(err)}`);
+              alert('Failed to copy settings. Check console.');
+            }
           }}
         >
-          {/* Background image overlay */}
-          {settings.backgroundImageUrl && (
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                backgroundImage: `url(${settings.backgroundImageUrl})`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                backgroundSize: settings.backgroundImageSize,
-                opacity: settings.backgroundImageOpacity,
-                mixBlendMode: settings.backgroundBlendMode,
-                borderRadius: 'inherit',
-              }}
-            />
-          )}
+          Copy Settings
+        </Button>        <BubbleDownload settings={settings} />
+      </div>
 
-          {/* Center image/logo */}
-          {settings.centerImageUrl && (
-            <img
-              src={settings.centerImageUrl}
-              alt=""
-              className="transition-transform duration-300 center-image"
-              style={{
-                width: `${settings.centerImageSize}px`,
-                height: `${settings.centerImageSize}px`,
-                objectFit: 'contain',
-                opacity: settings.centerImageOpacity,
-                animation: settings.centerImagePulse ? 'imagePulse 2s ease-in-out infinite' : undefined,
-              }}
-            />
-          )}
+      <div
+        className="relative flex items-center justify-center transition-all duration-300 cursor-pointer"
+        style={{
+          width: `${settings.width}px`,
+          height: `${settings.height}px`,
+          borderRadius: `${settings.borderRadius.tl}px ${settings.borderRadius.tr}px ${settings.borderRadius.br}px ${settings.borderRadius.bl}px`,
+          background: compositeBackground,
+          backgroundBlendMode: settings.backgroundBlendMode,
+          ...borderStyle,
+          boxShadow: [boxShadow, innerShadowValue].filter(Boolean).join(', '),
+          transformStyle: 'preserve-3d',
+          ...(settings.glass.enabled ? {
+            backdropFilter: `blur(${settings.glass.blur}px)`,
+            backgroundColor: `rgba(255,255,255,${settings.glass.bgOpacity})`,
+          } : {}),
+          ...(settings.neon.enabled ? {
+            filter: `drop-shadow(0 0 ${10 * settings.neon.intensity}px ${settings.neon.color})`,
+            boxShadow: `${boxShadow}, 0 0 ${10 * settings.neon.intensity}px ${settings.neon.color}, 0 0 ${25 * settings.neon.intensity}px ${settings.neon.color}`,
+          } : {}),
+          ...entryAnimStyle,
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {/* Background Image Overlay */}
+        {settings.backgroundImageUrl && (
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: `url(${settings.backgroundImageUrl})`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              backgroundSize: settings.backgroundImageSize,
+              opacity: settings.backgroundImageOpacity,
+              mixBlendMode: settings.backgroundBlendMode,
+              borderRadius: 'inherit',
+            }}
+          />
+        )}
 
-          {/* Dots loader */}
-          {settings.dots && (
-            <div
-              className="absolute flex"
-              style={{ gap: `${settings.dots.spacing}px` }}
-            >
-              {[...Array(3)].map((_, i) => (
-                <span
-                  key={i}
-                  className="rounded-full"
-                  style={{
-                    width: `${settings.dots?.size ?? 0}px`,
-                    height: `${settings.dots?.size ?? 0}px`,
-                    backgroundColor: settings.dots?.color ?? 'transparent',
-                    animation:
-                      settings.dots?.animation === 'bounce'
-                        ? `dotBounce 1.2s ${ease} ${i * 0.12}s infinite`
-                        : settings.dots?.animation === 'pulse'
+        {/* Center Image/Logo */}
+        {settings.centerImageUrl && (
+          <img
+            src={settings.centerImageUrl}
+            alt=""
+            className="transition-transform duration-300 center-image"
+            style={{
+              width: `${settings.centerImageSize}px`,
+              height: `${settings.centerImageSize}px`,
+              objectFit: 'contain',
+              opacity: settings.centerImageOpacity,
+              animation: settings.centerImagePulse ? 'imagePulse 2s ease-in-out infinite' : undefined,
+            }}
+          />
+        )}
+
+        {/* Dots Loader */}
+        {settings.dots && (
+          <div
+            className="absolute flex"
+            style={{ gap: `${settings.dots.spacing}px` }}
+          >
+            {[...Array(3)].map((_, i) => (
+              <span
+                key={i}
+                className="rounded-full"
+                style={{
+                  width: `${settings.dots?.size ?? 0}px`,
+                  height: `${settings.dots?.size ?? 0}px`,
+                  backgroundColor: settings.dots?.color ?? 'transparent',
+                  animation:
+                    settings.dots?.animation === 'bounce'
+                      ? `dotBounce 1.2s ${ease} ${i * 0.12}s infinite`
+                      : settings.dots?.animation === 'pulse'
                         ? `dotPulse 1.4s ${ease} ${i * 0.1}s infinite`
                         : undefined,
-                  }}
-                />
-              ))}
-            </div>
-          )}
+                }}
+              />
+            ))}
+          </div>
+        )}
 
-          {/* Outline ring */}
-          {settings.outlineRing.enabled && (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                borderRadius: 'inherit',
-                boxShadow: `0 0 0 ${settings.outlineRing.width}px ${hexToRgba(settings.outlineRing.color, settings.outlineRing.opacity)}`,
-              }}
-            />
-          )}
-        </div>
-
-        {/* Keyframes */}
-        <style>{cssKeyframes(settings)}</style>
+        {/* Outline Ring */}
+        {settings.outlineRing.enabled && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              borderRadius: 'inherit',
+              boxShadow: `0 0 0 ${settings.outlineRing.width}px ${hexToRgba(settings.outlineRing.color, settings.outlineRing.opacity)}`,
+            }}
+          />
+        )}
       </div>
+
+      {/* Keyframes */}
+      <style>{cssKeyframes(settings)}</style>
     </div>
   );
 };

@@ -2,14 +2,7 @@
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/registry/new-york-v4/ui/tabs";
 import BubbleModifier from '@/components/pixel-modifier/pixel';
-
-function ChatBar() {
-    return (
-        <div className="flex flex-col w-full">
-            Chat Bar
-        </div>
-    );
-}
+import ChatBar from '@/components/pixel-modifier/CharBar';
 
 export default function Page() {
     return (

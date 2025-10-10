@@ -523,16 +523,15 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
 
             <div className="mt-6 flex justify-between">
                 <Button
-                    onClick={() => {
-                        const settingsJson = JSON.stringify(settings, null, 2); // pretty-print JSON
-                        navigator.clipboard.writeText(settingsJson)
-                            .then(() => {
-                                toast.success('Bubble settings copied to clipboard!');
-                            })
-                            .catch((err) => {
-                                toast.error('Failed to copy:', err);
-                                alert('Failed to copy settings. Check console.');
-                            });
+                    onClick={async () => {
+                        try {
+                            const settingsJson = JSON.stringify(settings, null, 2);
+                            await navigator.clipboard.writeText(settingsJson);
+                            toast.success('Bubble settings copied to clipboard!');
+                        } catch (err) {
+                            toast.error(`Failed to copy: ${String(err)}`);
+                            alert('Failed to copy settings. Check console.');
+                        }
                     }}
                 >
                     Copy Settings JSON

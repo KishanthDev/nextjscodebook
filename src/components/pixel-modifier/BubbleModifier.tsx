@@ -534,7 +534,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                         }
                     }}
                 >
-                    Copy Settings JSON
+                    Copy Settings
                 </Button>
 
                 <DownloadComponents settings={settings} />

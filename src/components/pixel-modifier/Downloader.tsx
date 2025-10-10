@@ -329,11 +329,7 @@ const settings = ${JSON.stringify(settings, null, 2)};
 export const BubbleComponent = () => {
   return (
     <div
-      style={{
-        width: settings.width,
-        height: settings.height,
-        backgroundColor: settings.backgroundColor,
-      }}
+      className="min-h-screen flex items-center justify-center bg-gray-50 p-4"
     >
       <BubblePreview settings={settings} />
     </div>

@@ -3,19 +3,28 @@ import { TextInputProps, RangeInputProps, ColorInputProps, SelectInputProps, Che
 import { Label } from '@/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
 import { Checkbox } from '@/registry/new-york-v4/ui/checkbox';
+import { Input } from '@/ui/input';
 
-export const TextInput: React.FC<TextInputProps> = ({ label, value, onChange, placeholder, className = "w-full" }) => (
-    <label className="block">
-        <span className="text-sm font-medium text-gray-700">{label}:</span>
-        <input
-            type="text"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            className={`mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
-        />
-    </label>
-);
+export const TextInput: React.FC<TextInputProps> = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  className = "w-full"
+}) => {
+  return (
+    <div className={`flex flex-col ${className}`}>
+      <Label className="text-sm font-medium text-gray-700">{label}</Label>
+      <Input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="mt-1"
+      />
+    </div>
+  );
+};
 
 export const RangeInput: React.FC<RangeInputProps> = ({
     label,

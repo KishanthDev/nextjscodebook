@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ChatWidgetSettings, Message } from './chat-widget-types';
 import { Button } from '@/ui/button';
-import { Smile, Send ,Paperclip} from 'lucide-react';
+import { Smile, Send, Paperclip, Mail, Smartphone, Volume2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -135,26 +135,34 @@ export default function ChatWidgetPreview({ settings }: Props) {
               ⋮
             </button>
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg min-w-[100px] z-10">
+              <div className="absolute right-0 mt-3 w-45 bg-white rounded-lg shadow-md border border-gray-200 z-10">
                 <button
-                  className="block w-full px-4 py-2 hover:bg-gray-100"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                   onClick={() => alert('Send transcript')}
                 >
-                  Send transcript
+                  <Mail size={18} className="text-gray-600" />
+                  <span>Send transcript</span>
                 </button>
+
                 <button
-                  className="block w-full px-4 py-2 hover:bg-gray-100"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                   onClick={() => alert('Move to mobile')}
                 >
-                  Move to mobile
+                  <Smartphone size={18} className="text-gray-600" />
+                  <span>Move to mobile</span>
                 </button>
-                <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-100">
-                  <span>Sounds</span>
+
+                <div className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                  <div className="flex items-center gap-2">
+                    <Volume2 size={18} className="text-gray-600" />
+                    <span>Sounds</span>
+                  </div>
                   <input
                     type="checkbox"
                     checked={soundsEnabled}
                     onChange={() => setSoundsEnabled(s => !s)}
                     disabled={!settings.soundsEnabled}
+                    className="cursor-pointer accent-blue-500"
                   />
                 </div>
               </div>
@@ -221,7 +229,7 @@ export default function ChatWidgetPreview({ settings }: Props) {
             <button
               style={{ color: settings.sendBtnIconColor }}
             >
-              <Paperclip size={20}  /> {/* Lucide Smile icon */}
+              <Paperclip size={20} /> {/* Lucide Smile icon */}
             </button>
             <button
               onClick={() => setShowEmojiPicker(e => !e)}

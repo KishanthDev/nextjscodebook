@@ -36,7 +36,7 @@ export default function ChatWidgetModifier({
         label="Width"
         value={settings.width}
         onChange={v => update('width', v)}
-        min={200}
+        min={260}
         max={600}
         step={10}
         unit="px"

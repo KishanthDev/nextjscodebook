@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ChatWidgetSettings, Message } from './chat-widget-types';
 import { Button } from '@/ui/button';
+import { Smile, Send ,Paperclip} from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -63,7 +64,7 @@ export default function ChatWidgetPreview({ settings }: Props) {
     settings.gradientStops,
   ]);
 
-    const copyToClipboard = async () => {
+  const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(settings, null, 2));
       toast.success('ChatWidget settings copied to clipboard!');
@@ -85,27 +86,27 @@ export default function ChatWidgetPreview({ settings }: Props) {
     URL.revokeObjectURL(url);
   };
 
-return (
-  <div className="flex-1 flex justify-center items-start p-6 relative">
-    {/* Actions area: make sure parent is relative */}
-    <div className="absolute  right-3 top-0 flex space-x-2 z-20">
-      <Button size="sm" onClick={copyToClipboard}>
-        Copy Settings
-      </Button>
-      <Button variant="outline" size="sm" onClick={downloadSettings}>
-        Download
-      </Button>
-    </div>
+  return (
+    <div className="flex-1 flex justify-center items-start p-6 relative">
+      {/* Actions area: make sure parent is relative */}
+      <div className="absolute  right-3 top-0 flex space-x-2 z-20">
+        <Button size="sm" onClick={copyToClipboard}>
+          Copy Settings
+        </Button>
+        <Button variant="outline" size="sm" onClick={downloadSettings}>
+          Download
+        </Button>
+      </div>
 
-    <div
-      className="flex flex-col mt-5 border rounded-lg shadow-lg overflow-hidden relative"
-      style={{
-        width: settings.width,
-        height: settings.height,
-        borderRadius: settings.borderRadius,
-        background: backgroundStyle,
-      }}
-    >
+      <div
+        className="flex flex-col mt-5 border rounded-lg shadow-lg overflow-hidden relative"
+        style={{
+          width: settings.width,
+          height: settings.height,
+          borderRadius: settings.borderRadius,
+          background: backgroundStyle,
+        }}
+      >
         {/* Header */}
         <div
           className="flex items-center justify-between p-3 border-b"
@@ -134,7 +135,7 @@ return (
               ⋮
             </button>
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-10">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg min-w-[100px] z-10">
                 <button
                   className="block w-full px-4 py-2 hover:bg-gray-100"
                   onClick={() => alert('Send transcript')}
@@ -216,12 +217,17 @@ return (
               color: settings.inputTextColor,
             }}
           />
-          <div className="absolute right-3 top-3 flex items-center gap-2">
+          <div className="absolute right-5 top-5 flex items-center gap-2">
+            <button
+              style={{ color: settings.sendBtnIconColor }}
+            >
+              <Paperclip size={20}  /> {/* Lucide Smile icon */}
+            </button>
             <button
               onClick={() => setShowEmojiPicker(e => !e)}
               style={{ color: settings.sendBtnIconColor }}
             >
-              😊
+              <Smile size={20} /> {/* Lucide Smile icon */}
             </button>
             <button
               onClick={onSendMessage}
@@ -231,7 +237,7 @@ return (
                 color: settings.sendBtnIconColor,
               }}
             >
-              ➤
+              <Send size={20} /> {/* Lucide Send icon */}
             </button>
           </div>
           {showEmojiPicker && (

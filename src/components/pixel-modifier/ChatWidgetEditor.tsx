@@ -7,7 +7,7 @@ import ChatWidgetPreview from './ChatWidgetPreview';
 import { ChatWidgetSettings } from './chat-widget-types';
 
 const defaultSettings: ChatWidgetSettings = {
-  width: 230,
+  width: 260,
   height: 300,
   borderRadius: 12,
 
@@ -38,7 +38,7 @@ const defaultSettings: ChatWidgetSettings = {
   inputPlaceholder: 'Type a message…',
 
   sendBtnBgColor: '#3b82f6',
-  sendBtnIconColor: '#ffffff',
+  sendBtnIconColor: '#000000ff',
 
   soundsEnabled: true,
   soundProfile: 'pop',

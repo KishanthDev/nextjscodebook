@@ -5,6 +5,8 @@ import { BubblePixelSettings } from './bubbletype';
 import { Button } from '@/ui/button';
 import { toast } from 'sonner';
 import BubbleDownload from './Downloader';
+import { LucideIconMap } from '@/lib/lucide-icons';
+import { Icon } from 'lucide-react';
 
 const ease = 'cubic-bezier(.2,.8,.2,1)';
 
@@ -12,8 +14,11 @@ interface BubblePreviewProps {
   settings: BubblePixelSettings;
 }
 
+
+
 export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
   const [hovered, setHovered] = useState(false);
+  const IconComponent = settings.backgroundOverlayType === 'lucide' ? LucideIconMap[settings.backgroundLucideIcon] : null;
 
   // Computed styles
   const gradient = useMemo(() => {
@@ -126,10 +131,9 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {/* Background Image Overlay */}
-        {settings.backgroundImageUrl && (
+        {/* Background Overlay */}
+       {settings.backgroundOverlayType === 'image' && settings.backgroundImageUrl && (
           <div
-            aria-hidden
             className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage: `url(${settings.backgroundImageUrl})`,
@@ -142,6 +146,24 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
             }}
           />
         )}
+        
+        {/* Fix: Use IconComponent directly, not IconComponent[...] */}
+        {settings.backgroundOverlayType === 'lucide' && IconComponent && (
+          <IconComponent
+            size={settings.backgroundLucideSize}
+            color={settings.backgroundLucideColor}
+            style={{
+              opacity: settings.backgroundLucideOpacity,
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              mixBlendMode: settings.backgroundBlendMode,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+
 
         {/* Dots Loader */}
         {settings.dots && hovered && (

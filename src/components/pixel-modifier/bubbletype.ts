@@ -1,6 +1,8 @@
 type EntryAnim = 'none' | 'fadeIn' | 'pop' | 'slideUp' | 'slideIn' | 'rise';
 type BorderStyle = 'solid' | 'dashed' | 'dotted' | 'double';
 type GradientType = 'none' | 'linear' | 'radial' | 'conic';
+export type OverlayType = 'image' | 'lucide';
+
 type BlendMode =
   | 'normal'
   | 'multiply'
@@ -25,6 +27,12 @@ export type BubblePixelSettings = {
   height: number; // px
   borderRadius: { tl: number; tr: number; bl: number; br: number }; // px
 
+  backgroundOverlayType: OverlayType;
+
+  backgroundLucideIcon: string;
+  backgroundLucideColor: string;
+  backgroundLucideSize: number;
+  backgroundLucideOpacity: number;
   // Background
   backgroundColor: string;
   gradientType: GradientType;

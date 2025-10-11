@@ -17,6 +17,11 @@ const defaultBubble: BubblePixelSettings = {
     { color: '#1E40AF', pos: 0 },
     { color: '#9333EA', pos: 100 },
   ],
+  backgroundOverlayType: 'image',
+  backgroundLucideColor: '#FFFFFF',
+  backgroundLucideSize: 24,
+  backgroundLucideOpacity: 0.2,
+  backgroundLucideIcon: 'Star',
   backgroundImageUrl: 'https://static.vecteezy.com/system/resources/previews/047/656/219/non_2x/abstract-logo-design-for-any-corporate-brand-business-company-vector.jpg',
   backgroundImageSize: 'contain',
   backgroundImageOpacity: 0.25,
@@ -76,7 +81,7 @@ export const BubbleEditor: React.FC = () => {
   return (
     <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 rounded-lg h-[calc(100vh-114px)]">
       {/* Controls Panel */}
-      <BubbleModifier 
+      <BubbleModifier
         settings={settings}
         updateSetting={updateSetting}
         updateNestedSetting={updateNestedSetting}

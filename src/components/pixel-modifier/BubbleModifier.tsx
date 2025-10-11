@@ -2,9 +2,8 @@
 
 import React from 'react';
 import { RangeInput, ColorInput, SelectInput, TextInput, CheckboxInput, GradientStopEditor } from './inputs';
-import { BubblePixelSettings } from './bubbletype';
-import { toast } from 'sonner';
-import { Button } from '@/ui/button';
+import { BubblePixelSettings,OverlayType } from './bubbletype';
+import { LucideIconPicker } from './LucideIconPicker';
 
 // Constraint constants
 const CONSTRAINTS = {
@@ -129,53 +128,97 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
             {/* Background Overlay Section */}
             <section className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Background Overlay</h3>
-                <TextInput
-                    label="Background Image URL"
-                    value={settings.backgroundImageUrl || ''}
-                    onChange={(backgroundImageUrl) => updateSetting('backgroundImageUrl', backgroundImageUrl)}
-                    placeholder="Overlay image url"
+
+                <SelectInput
+                    label="Overlay Type"
+                    value={settings.backgroundOverlayType}
+                    onChange={(v) => updateSetting('backgroundOverlayType', v as OverlayType)}
+                    options={[
+                        { value: 'image', label: 'Image URL' },
+                        { value: 'lucide', label: 'Lucide Icon' },
+                    ]}
                 />
-                {settings.backgroundImageUrl && (
+
+                {/* Image Controls */}
+                {settings.backgroundOverlayType === 'image' && (
                     <>
-                        <SelectInput
-                            label="Background Size"
-                            value={settings.backgroundImageSize}
-                            onChange={(backgroundImageSize) => updateSetting('backgroundImageSize', backgroundImageSize)}
-                            options={[
-                                { value: 'contain', label: 'Contain' },
-                                { value: 'cover', label: 'Cover' },
-                                { value: 'auto', label: 'Auto' }
-                            ]}
+                        <TextInput
+                            label="Background Image URL"
+                            value={settings.backgroundImageUrl || ''}
+                            onChange={(backgroundImageUrl) => updateSetting('backgroundImageUrl', backgroundImageUrl)}
+                            placeholder="Overlay image url"
+                        />
+                        {settings.backgroundImageUrl && (
+                            <>
+                                <SelectInput
+                                    label="Background Size"
+                                    value={settings.backgroundImageSize}
+                                    onChange={(v) => updateSetting('backgroundImageSize', v as any)}
+                                    options={[
+                                        { value: 'contain', label: 'Contain' },
+                                        { value: 'cover', label: 'Cover' },
+                                        { value: 'auto', label: 'Auto' }
+                                    ]}
+                                />
+                                <RangeInput
+                                    label="Background Opacity"
+                                    value={settings.backgroundImageOpacity}
+                                    onChange={(v) => updateSetting('backgroundImageOpacity', v)}
+                                    {...CONSTRAINTS.opacity}
+                                    unit=""
+                                />
+                                <SelectInput
+                                    label="Blend Mode"
+                                    value={settings.backgroundBlendMode}
+                                    onChange={(v) => updateSetting('backgroundBlendMode', v)}
+                                    options={[
+                                        { value: 'normal', label: 'Normal' },
+                                        { value: 'multiply', label: 'Multiply' },
+                                        { value: 'screen', label: 'Screen' },
+                                        { value: 'overlay', label: 'Overlay' },
+                                        { value: 'darken', label: 'Darken' },
+                                        { value: 'lighten', label: 'Lighten' },
+                                        { value: 'color-dodge', label: 'Color Dodge' },
+                                        { value: 'color-burn', label: 'Color Burn' },
+                                        { value: 'hard-light', label: 'Hard Light' },
+                                        { value: 'soft-light', label: 'Soft Light' },
+                                        { value: 'difference', label: 'Difference' },
+                                        { value: 'exclusion', label: 'Exclusion' }
+                                    ]}
+                                />
+                            </>
+                        )}
+                    </>
+                )}
+
+                {/* Lucide Controls */}
+                {settings.backgroundOverlayType === 'lucide' && (
+                    <>
+                        <LucideIconPicker
+                            value={settings.backgroundLucideIcon}
+                            onChange={v => updateSetting('backgroundLucideIcon', v)}
+                        />
+                        <ColorInput
+                            label="Icon Color"
+                            value={settings.backgroundLucideColor}
+                            onChange={(v) => updateSetting('backgroundLucideColor', v)}
                         />
                         <RangeInput
-                            label="Background Opacity"
-                            value={settings.backgroundImageOpacity}
-                            onChange={(backgroundImageOpacity) => updateSetting('backgroundImageOpacity', backgroundImageOpacity)}
-                            {...CONSTRAINTS.opacity}
-                            unit=""
+                            label="Icon Size"
+                            value={settings.backgroundLucideSize}
+                            onChange={v => updateSetting('backgroundLucideSize', v)}
+                            min={16} max={128} step={4}
                         />
-                        <SelectInput
-                            label="Blend Mode"
-                            value={settings.backgroundBlendMode}
-                            onChange={(backgroundBlendMode) => updateSetting('backgroundBlendMode', backgroundBlendMode)}
-                            options={[
-                                { value: 'normal', label: 'Normal' },
-                                { value: 'multiply', label: 'Multiply' },
-                                { value: 'screen', label: 'Screen' },
-                                { value: 'overlay', label: 'Overlay' },
-                                { value: 'darken', label: 'Darken' },
-                                { value: 'lighten', label: 'Lighten' },
-                                { value: 'color-dodge', label: 'Color Dodge' },
-                                { value: 'color-burn', label: 'Color Burn' },
-                                { value: 'hard-light', label: 'Hard Light' },
-                                { value: 'soft-light', label: 'Soft Light' },
-                                { value: 'difference', label: 'Difference' },
-                                { value: 'exclusion', label: 'Exclusion' }
-                            ]}
+                        <RangeInput
+                            label="Icon Opacity"
+                            value={settings.backgroundLucideOpacity}
+                            onChange={v => updateSetting('backgroundLucideOpacity', v)}
+                            min={0.1} max={1} step={0.05}
                         />
                     </>
                 )}
             </section>
+
 
             {/* Border Section */}
             <section className="space-y-4">

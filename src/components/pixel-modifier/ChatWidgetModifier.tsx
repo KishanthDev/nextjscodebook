@@ -6,8 +6,6 @@ import {
   ColorInput,
   RangeInput,
   SelectInput,
-  CheckboxInput,
-  GradientStopEditor,
 } from './lib/inputs';
 import { ChatWidgetSettings } from './chat-widget-types';
 
@@ -23,7 +21,6 @@ interface Props {
 export default function ChatWidgetModifier({
   settings,
   update,
-  isDarkMode,
 }: Props) {
   return (
     <div className="lg:w-96 space-y-6 bg-white p-6 rounded-lg shadow-sm overflow-y-auto">

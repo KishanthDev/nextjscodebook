@@ -57,13 +57,6 @@ export type BubblePixelSettings = {
   animation: { type: EntryAnim; duration: number; delay: number }; // duration/delay in ms
   idleAnim: { enabled: boolean; type: 'float' | 'bob'; amplitude: number; duration: number };
 
-  // Center image/logo
-  centerImageUrl?: string;
-  centerImageSize: number; // px
-  centerImageOpacity: number;
-  centerImageHoverScale: number;
-  centerImagePulse: boolean;
-
   // Loader dots (optional)
   dots?: { color: string; size: number; spacing: number; animation: 'bounce' | 'pulse' | 'none' };
 };

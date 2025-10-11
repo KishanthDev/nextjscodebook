@@ -126,46 +126,6 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                 )}
             </section>
 
-            {/* Center Image Section */}
-            <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Center Image</h3>
-                <TextInput
-                    label="Image URL"
-                    value={settings.centerImageUrl || ''}
-                    onChange={(centerImageUrl) => updateSetting('centerImageUrl', centerImageUrl)}
-                    placeholder="https://..."
-                />
-                {settings.centerImageUrl && (
-                    <>
-                        <RangeInput
-                            label="Image Size"
-                            value={settings.centerImageSize}
-                            onChange={(centerImageSize) => updateSetting('centerImageSize', centerImageSize)}
-                            {...CONSTRAINTS.imageSize}
-                        />
-                        <RangeInput
-                            label="Image Opacity"
-                            value={settings.centerImageOpacity}
-                            onChange={(centerImageOpacity) => updateSetting('centerImageOpacity', centerImageOpacity)}
-                            {...CONSTRAINTS.opacity}
-                            unit=""
-                        />
-                        <RangeInput
-                            label="Hover Scale"
-                            value={settings.centerImageHoverScale}
-                            onChange={(centerImageHoverScale) => updateSetting('centerImageHoverScale', centerImageHoverScale)}
-                            {...CONSTRAINTS.scale}
-                            unit="x"
-                        />
-                        <CheckboxInput
-                            label="Pulse Effect"
-                            checked={settings.centerImagePulse}
-                            onChange={(centerImagePulse) => updateSetting('centerImagePulse', centerImagePulse)}
-                        />
-                    </>
-                )}
-            </section>
-
             {/* Background Overlay Section */}
             <section className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Background Overlay</h3>

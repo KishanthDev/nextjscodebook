@@ -44,12 +44,6 @@ const defaultBubble: BubblePixelSettings = {
   animation: { type: 'fadeIn', duration: 350, delay: 0 },
   idleAnim: { enabled: true, type: 'float', amplitude: 6, duration: 3200 },
 
-  centerImageUrl: '',
-  centerImageSize: 48,
-  centerImageOpacity: 0.9,
-  centerImageHoverScale: 1.08,
-  centerImagePulse: false,
-
   dots: { color: '#F8FAFC', size: 6, spacing: 6, animation: 'bounce' },
 };
 

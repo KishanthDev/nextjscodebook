@@ -143,24 +143,8 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
           />
         )}
 
-        {/* Center Image/Logo */}
-        {settings.centerImageUrl && (
-          <img
-            src={settings.centerImageUrl}
-            alt=""
-            className="transition-transform duration-300 center-image"
-            style={{
-              width: `${settings.centerImageSize}px`,
-              height: `${settings.centerImageSize}px`,
-              objectFit: 'contain',
-              opacity: settings.centerImageOpacity,
-              animation: settings.centerImagePulse ? 'imagePulse 2s ease-in-out infinite' : undefined,
-            }}
-          />
-        )}
-
         {/* Dots Loader */}
-        {settings.dots && (
+        {settings.dots && hovered && (
           <div
             className="absolute flex"
             style={{ gap: `${settings.dots.spacing}px` }}

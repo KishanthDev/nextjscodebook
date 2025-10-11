@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { TextInputProps, RangeInputProps, ColorInputProps, SelectInputProps, CheckboxInputProps, GradientStopEditorProps } from './inputstype';
+import { Label } from '@/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
+import { Checkbox } from '@/registry/new-york-v4/ui/checkbox';
 
 export const TextInput: React.FC<TextInputProps> = ({ label, value, onChange, placeholder, className = "w-full" }) => (
     <label className="block">
@@ -121,41 +124,42 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
     </label>
 );
 
+//
+// 🟨 Select Input
+//
 export function SelectInput<T extends string>({
-    label,
-    value,
-    onChange,
-    options,
-    className = "w-full"
+  label,
+  value,
+  onChange,
+  options,
 }: SelectInputProps<T>) {
-    return (
-        <label className="block">
-            <span className="text-sm font-medium text-gray-700">{label}:</span>
-            <select
-                value={value}
-                onChange={(e) => onChange(e.target.value as T)}
-                className={`mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
-            >
-                {options.map(option => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </select>
-        </label>
-    );
+  return (
+    <div className="space-y-1">
+      <Label>{label}</Label>
+      <Select value={value} onValueChange={(val) => onChange(val as T)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select an option" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 }
 
+//
+// 🟪 Checkbox Input
+//
 export const CheckboxInput: React.FC<CheckboxInputProps> = ({ label, checked, onChange }) => (
-    <label className="inline-flex items-center gap-2 cursor-pointer">
-        <input
-            type="checkbox"
-            checked={checked}
-            onChange={(e) => onChange(e.target.checked)}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-        />
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-    </label>
+  <div className="flex items-center space-x-2">
+    <Checkbox checked={checked} onCheckedChange={(v) => onChange(!!v)} />
+    <Label>{label}</Label>
+  </div>
 );
 
 export const GradientStopEditor: React.FC<GradientStopEditorProps> = ({ stops, onChange }) => {

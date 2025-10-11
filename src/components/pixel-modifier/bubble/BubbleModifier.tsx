@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { RangeInput, ColorInput, SelectInput, TextInput, CheckboxInput, GradientStopEditor } from './inputs';
-import { BubblePixelSettings,OverlayType } from './bubbletype';
-import { LucideIconPicker } from './LucideIconPicker';
+import { RangeInput, ColorInput, SelectInput, TextInput, CheckboxInput, GradientStopEditor } from '../lib/inputs';
+import { BubblePixelSettings, OverlayType } from './bubbletype';
+import { LucideIconPicker } from '../lib/LucideIconPicker';
 
 // Constraint constants
 const CONSTRAINTS = {

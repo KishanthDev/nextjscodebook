@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useCallback } from 'react';
-import { BubbleModifier } from './BubbleModifier';
-import { BubblePreview } from './BubblePreview';
-import { BubblePixelSettings } from './bubbletype';
+import { BubbleModifier } from './bubble/BubbleModifier';
+import { BubblePreview } from './bubble/BubblePreview';
+import { BubblePixelSettings } from './bubble/bubbletype';
 
 // Default bubble configuration
 const defaultBubble: BubblePixelSettings = {

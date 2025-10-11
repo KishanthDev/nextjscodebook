@@ -6,24 +6,24 @@ import { Checkbox } from '@/registry/new-york-v4/ui/checkbox';
 import { Input } from '@/ui/input';
 
 export const TextInput: React.FC<TextInputProps> = ({
-  label,
-  value,
-  onChange,
-  placeholder,
-  className = "w-full"
+    label,
+    value,
+    onChange,
+    placeholder,
+    className = "w-full"
 }) => {
-  return (
-    <div className={`flex flex-col ${className}`}>
-      <Label className="text-sm font-medium text-gray-700">{label}</Label>
-      <Input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="mt-1"
-      />
-    </div>
-  );
+    return (
+        <div className={`flex flex-col ${className}`}>
+            <Label className="text-sm font-medium text-gray-700">{label}</Label>
+            <Input
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder}
+                className="mt-1"
+            />
+        </div>
+    );
 };
 
 export const RangeInput: React.FC<RangeInputProps> = ({
@@ -137,38 +137,38 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
 // 🟨 Select Input
 //
 export function SelectInput<T extends string>({
-  label,
-  value,
-  onChange,
-  options,
+    label,
+    value,
+    onChange,
+    options,
 }: SelectInputProps<T>) {
-  return (
-    <div className="space-y-1">
-      <Label>{label}</Label>
-      <Select value={value} onValueChange={(val) => onChange(val as T)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select an option" />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
+    return (
+        <div className="space-y-1">
+            <Label>{label}</Label>
+            <Select value={value} onValueChange={(val) => onChange(val as T)}>
+                <SelectTrigger>
+                    <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+                <SelectContent>
+                    {options.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+    );
 }
 
 //
 // 🟪 Checkbox Input
 //
 export const CheckboxInput: React.FC<CheckboxInputProps> = ({ label, checked, onChange }) => (
-  <div className="flex items-center space-x-2">
-    <Checkbox checked={checked} onCheckedChange={(v) => onChange(!!v)} />
-    <Label>{label}</Label>
-  </div>
+    <div className="flex items-center space-x-2">
+        <Checkbox checked={checked} onCheckedChange={(v) => onChange(!!v)} />
+        <Label>{label}</Label>
+    </div>
 );
 
 export const GradientStopEditor: React.FC<GradientStopEditorProps> = ({ stops, onChange }) => {

@@ -3,16 +3,8 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/registry/new-york-v4/ui/tabs";
 import BubbleModifier from '@/components/pixel-modifier/BubbleEditor';
 import ChatBar from '@/components/pixel-modifier/ChatBarEditor';
+import ChatWidgetEditor from "../../../components/pixel-modifier/ChatWidgetEditor";
 
-function ChatWidgetOpen(){
-    return (
-        <div className="">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition">
-                Open Chat
-            </button>
-        </div>
-    );
-}
 
 export default function Page() {
     return (
@@ -33,7 +25,7 @@ export default function Page() {
                 </TabsContent>
 
                 <TabsContent value="chatwidgetopen">
-                    <ChatWidgetOpen />
+                    <ChatWidgetEditor />
                 </TabsContent>
             </Tabs>
         </div>

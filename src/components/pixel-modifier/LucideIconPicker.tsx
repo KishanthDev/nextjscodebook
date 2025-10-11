@@ -38,22 +38,20 @@ export const LucideIconPicker: React.FC<LucideIconPickerProps> = ({ value, onCha
 useEffect(() => {
   import('lucide-react')
     .then(mod => {
-      // Filter only exports that are React components
       const namedIcons: LucideModule = {};
+
       for (const [key, value] of Object.entries(mod)) {
-        if (
-          typeof value === 'function' &&
-          // function with .render or name might indicate a component
-          ('render' in value || /^([A-Z]|[a-z])/.test(key))
-        ) {
+        if (typeof value === 'function' && ('render' in value || /^[A-Z]/.test(key))) {
           namedIcons[key] = value as unknown as React.FC<LucideProps>;
         }
       }
+
       setIcons(namedIcons);
+
+      return namedIcons; // ✅ satisfy promise/always-return rule
     })
     .catch(err => console.error('Failed to load lucide icons', err));
 }, []);
-
 
   const SelectedIcon = icons?.[value as keyof LucideModule];
 

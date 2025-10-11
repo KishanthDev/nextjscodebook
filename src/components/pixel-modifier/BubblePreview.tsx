@@ -4,9 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { BubblePixelSettings } from './bubbletype';
 import { Button } from '@/ui/button';
 import { toast } from 'sonner';
-import BubbleDownload from './Downloader';
 import { LucideIconMap } from '@/lib/lucide-icons';
-import { Icon } from 'lucide-react';
 
 const ease = 'cubic-bezier(.2,.8,.2,1)';
 
@@ -35,6 +33,16 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
         return '';
     }
   }, [settings.gradientType, settings.gradientAngle, settings.gradientStops]);
+
+  const handleDownload = () => {
+    const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bubble-settings.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const boxShadow = useMemo(() => {
     const { boxShadowOffsetX, boxShadowOffsetY, boxShadowBlur, boxShadowSpread, boxShadowOpacity } = settings;
@@ -104,7 +112,8 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
           }}
         >
           Copy Settings
-        </Button>        <BubbleDownload settings={settings} />
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleDownload}>Download</Button>
       </div>
 
       <div
@@ -132,7 +141,7 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
         onMouseLeave={() => setHovered(false)}
       >
         {/* Background Overlay */}
-       {settings.backgroundOverlayType === 'image' && settings.backgroundImageUrl && (
+        {settings.backgroundOverlayType === 'image' && settings.backgroundImageUrl && (
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -146,7 +155,7 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
             }}
           />
         )}
-        
+
         {/* Fix: Use IconComponent directly, not IconComponent[...] */}
         {settings.backgroundOverlayType === 'lucide' && IconComponent && (
           <IconComponent

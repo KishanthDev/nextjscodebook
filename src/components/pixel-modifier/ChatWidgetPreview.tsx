@@ -13,17 +13,16 @@ interface Props {
 const EMOJIS = ['😊', '👍', '❤️', '😂', '😢', '😎', '🤔', '👋', '🎉', '💯', '🔥', '🚀'];
 
 export default function ChatWidgetPreview({ settings }: Props) {
-  const [messages, setMessages] = useState<Message[]>(settings.messages || []);
+  const [messages, setMessages] = useState<Message[]>(
+    settings.question
+      ? [{ text: settings.question, isUser: false }]
+      : []
+  );
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [soundsEnabled, setSoundsEnabled] = useState(settings.soundsEnabled);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-  // Sync incoming messages
-  useEffect(() => {
-    setMessages(settings.messages || []);
-  }, [settings.messages]);
 
   // Typing indicator debounce
   useEffect(() => {
@@ -34,28 +33,50 @@ export default function ChatWidgetPreview({ settings }: Props) {
   }, [newMessage]);
 
   // Send message handler
-  const onSendMessage = () => {
-    if (!newMessage.trim()) return;
-    setMessages(prev => [...prev, { text: newMessage, isUser: true }]);
+  const onSendMessage = (text?: string) => {
+    const messageText = text ?? newMessage.trim();
+    if (!messageText) return;
+    setMessages(prev => [...prev, { text: messageText, isUser: true }]);
     setNewMessage('');
     setShowEmojiPicker(false);
+    scrollToBottom();
+  };
+
+  // Scroll helper
+  const scrollToBottom = () => {
     setTimeout(() => {
-      const c = document.getElementById('messagesContainer');
-      if (c) c.scrollTop = c.scrollHeight;
+      const container = document.getElementById('messagesContainer');
+      if (container) container.scrollTop = container.scrollHeight;
     }, 10);
   };
 
-  // Compute background (solid or gradient)
+  // Tag click handler (UI-only tags)
+  const handleTagClick = (tag: string) => {
+    onSendMessage(tag);
+    // Simulate bot response
+    setTimeout(() => {
+      setMessages(prev => [
+        ...prev,
+        {
+          text: `Thanks for selecting "${tag}". How else can I assist you?`,
+          isUser: false
+        }
+      ]);
+      scrollToBottom();
+    }, 1000);
+  };
+
+  // Background style memo
   const backgroundStyle = useMemo(() => {
     if (!settings.gradientEnabled) {
       return settings.bgColor;
     }
     const stops = settings.gradientStops
-      .map(s => `${s.color} ${s.pos}%`)
-      .join(', ');
+      ?.map(s => `${s.color} ${s.pos}%`)
+      .join(', ') || '';
     return settings.gradientType === 'radial'
       ? `radial-gradient(circle, ${stops})`
-      : `linear-gradient(${settings.gradientAngle}deg, ${stops})`;
+      : `linear-gradient(${settings.gradientAngle || 0}deg, ${stops})`;
   }, [
     settings.bgColor,
     settings.gradientEnabled,
@@ -64,6 +85,7 @@ export default function ChatWidgetPreview({ settings }: Props) {
     settings.gradientStops,
   ]);
 
+  // Copy & download settings
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(settings, null, 2));
@@ -73,7 +95,6 @@ export default function ChatWidgetPreview({ settings }: Props) {
       alert('Failed to copy settings. Check console.');
     }
   };
-
   const downloadSettings = () => {
     const blob = new Blob([JSON.stringify(settings, null, 2)], {
       type: 'application/json',
@@ -88,16 +109,13 @@ export default function ChatWidgetPreview({ settings }: Props) {
 
   return (
     <div className="flex-1 flex justify-center items-start p-6 relative">
-      {/* Actions area: make sure parent is relative */}
-      <div className="absolute  right-3 top-0 flex space-x-2 z-20">
-        <Button size="sm" onClick={copyToClipboard}>
-          Copy Settings
-        </Button>
-        <Button variant="outline" size="sm" onClick={downloadSettings}>
-          Download
-        </Button>
+      {/* Actions */}
+      <div className="absolute right-3 top-0 flex space-x-2 z-20">
+        <Button size="sm" onClick={copyToClipboard}>Copy Settings</Button>
+        <Button variant="outline" size="sm" onClick={downloadSettings}>Download</Button>
       </div>
 
+      {/* Widget Container */}
       <div
         className="flex flex-col mt-5 border rounded-lg shadow-lg overflow-hidden relative"
         style={{
@@ -126,6 +144,8 @@ export default function ChatWidgetPreview({ settings }: Props) {
               {settings.chatTitle}
             </span>
           </div>
+
+          {/* Dropdown */}
           <div className="relative">
             <button
               onClick={() => setShowDropdown(d => !d)}
@@ -135,24 +155,16 @@ export default function ChatWidgetPreview({ settings }: Props) {
               ⋮
             </button>
             {showDropdown && (
-              <div className="absolute right-0 mt-3 w-45 bg-white rounded-lg shadow-md border border-gray-200 z-10">
-                <button
-                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => alert('Send transcript')}
-                >
+              <div className="absolute right-0 mt-3 min-w-[180px] bg-white rounded-lg shadow-md border border-gray-200 z-10">
+                <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => alert('Send transcript')}>
                   <Mail size={18} className="text-gray-600" />
                   <span>Send transcript</span>
                 </button>
-
-                <button
-                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => alert('Move to mobile')}
-                >
+                <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => alert('Move to mobile')}>
                   <Smartphone size={18} className="text-gray-600" />
                   <span>Move to mobile</span>
                 </button>
-
-                <div className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                <div className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                   <div className="flex items-center gap-2">
                     <Volume2 size={18} className="text-gray-600" />
                     <span>Sounds</span>
@@ -173,38 +185,64 @@ export default function ChatWidgetPreview({ settings }: Props) {
         {/* Messages */}
         <div
           id="messagesContainer"
-          className="flex-1 p-4 overflow-y-auto"
-          style={{ backgroundColor: settings.messagesBgColor || settings.botMsgBgColor }}
+          className="flex-1 p-4 overflow-y-auto overflow-x-hidden"
+          style={{
+            backgroundColor: settings.messagesBgColor || settings.botMsgBgColor,
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
         >
-          {messages.map((m, i) => (
-            <div key={i} className={`flex mb-2 ${m.isUser ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className="px-3 py-2 rounded-lg"
-                style={{
-                  backgroundColor: m.isUser
-                    ? settings.userMsgBgColor
-                    : settings.botMsgBgColor,
-                  color: settings.msgTextColor,
-                  fontFamily: settings.fontFamily,
-                  fontSize: settings.fontSize,
-                }}
-              >
-                {m.text}
+          <style jsx>{`
+            #messagesContainer::-webkit-scrollbar { display: none; }
+            .typing-indicator { /* styling omitted for brevity */ }
+          `}</style>
+
+          <div className="space-y-3">
+            {/* Render messages */}
+            {messages.map((message, idx) => (
+              <div key={idx} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`px-3 py-2 rounded-lg max-w-xs break-words whitespace-pre-line ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
+                  style={{
+                    backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor,
+                    color: settings.msgTextColor,
+                    fontFamily: settings.fontFamily,
+                    fontSize: settings.fontSize,
+                  }}
+                >
+                  {message.text}
+
+                  {/* Display tags only on the very first bot message */}
+                  {idx === 0 && !message.isUser && settings.tags?.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {settings.tags.map((tag, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleTagClick(tag)}
+                          className="px-3 py-1 text-sm rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                          style={{
+                            backgroundColor: settings.sendBtnBgColor,
+                            color: settings.sendBtnIconColor
+                          }}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-          {isTyping && (
-            <div className="flex mb-2 justify-start">
-              <div
-                className="flex items-center px-3 py-2 rounded-lg"
-                style={{ backgroundColor: settings.botMsgBgColor }}
-              >
-                <span className="animate-ping h-2 w-2 bg-gray-500 rounded-full"></span>
-                <span className="animate-ping h-2 w-2 bg-gray-500 rounded-full delay-200"></span>
-                <span className="animate-ping h-2 w-2 bg-gray-500 rounded-full delay-400"></span>
+            ))}
+
+            {/* Typing indicator */}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Input Area */}
@@ -218,7 +256,7 @@ export default function ChatWidgetPreview({ settings }: Props) {
             onChange={e => setNewMessage(e.target.value)}
             onKeyPress={e => e.key === 'Enter' && onSendMessage()}
             placeholder={settings.inputPlaceholder}
-            className="w-full px-3 py-2 rounded-lg border"
+            className="w-full px-3 py-2 pr-24 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
             style={{
               borderColor: settings.inputBorderColor,
               fontFamily: settings.fontFamily,
@@ -226,33 +264,27 @@ export default function ChatWidgetPreview({ settings }: Props) {
             }}
           />
           <div className="absolute right-5 top-5 flex items-center gap-2">
-            <button
-              style={{ color: settings.sendBtnIconColor }}
-            >
-              <Paperclip size={20} /> {/* Lucide Smile icon */}
+            <button className="p-1 hover:bg-gray-100 rounded" style={{ color: settings.sendBtnIconColor }}>
+              <Paperclip size={20} />
+            </button>
+            <button onClick={() => setShowEmojiPicker(e => !e)} className="p-1 hover:bg-gray-100 rounded" style={{ color: settings.sendBtnIconColor }}>
+              <Smile size={20} />
             </button>
             <button
-              onClick={() => setShowEmojiPicker(e => !e)}
-              style={{ color: settings.sendBtnIconColor }}
+              onClick={() => onSendMessage()}
+              className="p-1 rounded hover:opacity-80 transition-opacity"
+              style={{ backgroundColor: settings.sendBtnBgColor, color: settings.sendBtnIconColor }}
+              disabled={!newMessage.trim()}
             >
-              <Smile size={20} /> {/* Lucide Smile icon */}
-            </button>
-            <button
-              onClick={onSendMessage}
-              className="p-1 rounded"
-              style={{
-                backgroundColor: settings.sendBtnBgColor,
-                color: settings.sendBtnIconColor,
-              }}
-            >
-              <Send size={20} /> {/* Lucide Send icon */}
+              <Send size={20} />
             </button>
           </div>
           {showEmojiPicker && (
-            <div className="absolute bottom-12 right-3 grid grid-cols-6 gap-1 bg-white border rounded shadow p-2">
+            <div className="absolute bottom-12 right-3 grid grid-cols-6 gap-1 bg-white border rounded shadow-lg p-2 z-10">
               {EMOJIS.map(emoji => (
                 <button
                   key={emoji}
+                  className="p-1 hover:bg-gray-100 rounded text-lg"
                   onClick={() => {
                     setNewMessage(prev => prev + emoji);
                     setShowEmojiPicker(false);
@@ -268,10 +300,7 @@ export default function ChatWidgetPreview({ settings }: Props) {
         {/* Footer */}
         <div
           className="p-1 text-center text-xs border-t"
-          style={{
-            backgroundColor: settings.footerBgColor,
-            color: settings.footerTextColor,
-          }}
+          style={{ backgroundColor: settings.footerBgColor, color: settings.footerTextColor }}
         >
           {settings.footerText}
         </div>

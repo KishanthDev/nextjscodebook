@@ -16,7 +16,7 @@ export interface ChatWidgetSettings {
 
   bgColor: string;
   gradientEnabled: boolean;
-  gradientType: 'linear' | 'radial';
+  gradientType: 'linear'|'radial';
   gradientAngle: number;
   gradientStops: GradientStop[];
 
@@ -41,11 +41,12 @@ export interface ChatWidgetSettings {
   sendBtnIconColor: string;
 
   soundsEnabled: boolean;
-  soundProfile: 'chime' | 'pop' | 'ding';
+  soundProfile: 'chime'|'pop'|'ding';
 
   footerBgColor: string;
   footerTextColor: string;
   footerText: string;
 
-  messages?: Message[];
+  question: string;
+  tags: string[];
 }

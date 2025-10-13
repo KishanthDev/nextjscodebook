@@ -46,8 +46,8 @@ const defaultSettings: ChatWidgetSettings = {
   footerBgColor: '#f9fafb',
   footerTextColor: '#6b7280',
   footerText: 'Powered by ChatWidget',
-
-  messages: [],
+  question: '👋 Hi there! How can I help you today?',
+  tags: ["📦 Track my order", "🔄 Return a product", "💳 Payment issues", "❓ Other questions"]
 };
 
 export default function ChatWidgetEditor() {
@@ -68,7 +68,7 @@ export default function ChatWidgetEditor() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 rounded-lg h-[calc(100vh-114px)]">
-      <ChatWidgetModifier settings={settings} update={update} isDarkMode={isDarkMode} />
+      <ChatWidgetModifier settings={settings} update={update}  />
       <ChatWidgetPreview settings={settings} />
     </div>
   );

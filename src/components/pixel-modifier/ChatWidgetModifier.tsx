@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   TextInput,
   ColorInput,
@@ -16,22 +16,32 @@ interface Props {
     key: K,
     value: ChatWidgetSettings[K]
   ) => void;
-  isDarkMode: boolean;
 }
 
-export default function ChatWidgetModifier({
-  settings,
-  update,
-}: Props) {
-  return (
-    <div className="lg:w-96 space-y-6 bg-white p-6 rounded-lg shadow-sm overflow-y-auto">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">
-        Chat Widget Modifier
-      </h2>
+export default function ChatWidgetModifier({ settings, update }: Props) {
+  const [newTag, setNewTag] = useState('');
 
-      {/* Dimensions Section */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Dimensions</h3>
+  const addTag = () => {
+    const tag = newTag.trim();
+    if (!tag) return;
+    const tags = settings.tags ? [...settings.tags, tag] : [tag];
+    update('tags', tags as any);
+    setNewTag('');
+  };
+
+  const removeTag = (idx: number) => {
+    if (!settings.tags) return;
+    const tags = settings.tags.filter((_, i) => i !== idx);
+    update('tags', tags as any);
+  };
+
+  return (
+    <div className="lg:w-96 p-6 bg-white rounded-lg shadow-sm overflow-y-auto space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Chat Widget Modifier</h2>
+
+      {/* Dimensions */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Dimensions</h3>
         <div className="grid grid-cols-2 gap-4">
           <RangeInput
             label="Width"
@@ -54,9 +64,30 @@ export default function ChatWidgetModifier({
         />
       </section>
 
-      {/* Header Section */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Header</h3>
+      {/* Colors & Typography */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Colors & Text</h3>
+        <ColorInput
+          label="Background"
+          value={settings.bgColor}
+          onChange={v => update('bgColor', v)}
+        />
+        <ColorInput
+          label="Message Text Color"
+          value={settings.msgTextColor}
+          onChange={v => update('msgTextColor', v)}
+        />
+        <SelectInput
+          label="Font Size"
+          value={String(settings.fontSize)}
+          onChange={v => update('fontSize', Number(v))}
+          options={FONT_SIZE_OPTIONS}
+        />
+      </section>
+
+      {/* Header */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Header</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
             label="Header Background"
@@ -83,72 +114,83 @@ export default function ChatWidgetModifier({
         />
       </section>
 
-      {/* Message Bubbles Section */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Message Bubbles</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <ColorInput
-            label="User Bubble Color"
-            value={settings.userMsgBgColor}
-            onChange={v => update('userMsgBgColor', v)}
-          />
-          <ColorInput
-            label="Bot Bubble Color"
-            value={settings.botMsgBgColor}
-            onChange={v => update('botMsgBgColor', v)}
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <ColorInput
-            label="Messages Background"
-            value={settings.messagesBgColor || settings.botMsgBgColor}
-            onChange={v => update('messagesBgColor', v)}
-          />
-          <ColorInput
-            label="Message Text Color"
-            value={settings.msgTextColor}
-            onChange={v => update('msgTextColor', v)}
-          />
-        </div>
-        <SelectInput
-          label="Font Size"
-          value={String(settings.fontSize)}
-          onChange={v => update('fontSize', Number(v))}
-          options={FONT_SIZE_OPTIONS}
-        />
-      </section>
-
-      {/* Input Area Section */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Input Area</h3>
+      {/* Input Area */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Input Area</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
             label="Input Background"
-            value={settings.inputBgColor || '#ffffff'}
+            value={settings.inputBgColor ?? ""}
             onChange={v => update('inputBgColor', v)}
           />
           <ColorInput
             label="Input Border Color"
-            value={settings.inputBorderColor || '#d1d5db'}
+            value={settings.inputBorderColor ?? ""}
             onChange={v => update('inputBorderColor', v)}
           />
         </div>
         <ColorInput
           label="Input Text Color"
-          value={settings.inputTextColor || '#111827'}
+          value={settings.inputTextColor ?? ''}
           onChange={v => update('inputTextColor', v)}
         />
         <TextInput
-          label="Placeholder Text"
+          label="Placeholder"
           value={settings.inputPlaceholder}
           onChange={v => update('inputPlaceholder', v)}
           placeholder="Type a message…"
         />
       </section>
 
-      {/* Send Button Section */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Send Button</h3>
+            {/* Question Prompt */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Bot Question</h3>
+        <TextInput
+          label="Question"
+          value={settings.question}
+          onChange={v => update('question', v)}
+          placeholder="How can I assist you?"
+        />
+      </section>
+
+      {/* Tags */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Quick-Reply Tags</h3>
+        <div className="flex flex-wrap gap-2">
+          {(settings.tags || []).map((tag, idx) => (
+            <div
+              key={idx}
+              className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+            >
+              {tag}
+              <button
+                onClick={() => removeTag(idx)}
+                className="ml-2 text-blue-500 hover:text-blue-700"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <TextInput
+            label="New Tag"
+            value={newTag}
+            onChange={setNewTag}
+            placeholder="Add tag"
+          />
+          <button
+            onClick={addTag}
+            className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Add
+          </button>
+        </div>
+      </section>
+
+      {/* Send Button */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Send Button</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
             label="Button Background"
@@ -163,9 +205,9 @@ export default function ChatWidgetModifier({
         </div>
       </section>
 
-      {/* Footer Section */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Footer</h3>
+      {/* Footer */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Footer</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
             label="Footer Background"

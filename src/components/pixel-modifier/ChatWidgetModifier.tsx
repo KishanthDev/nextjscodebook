@@ -66,17 +66,7 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
 
       {/* Colors & Typography */}
       <section className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-1">Colors & Text</h3>
-        <ColorInput
-          label="Background"
-          value={settings.bgColor}
-          onChange={v => update('bgColor', v)}
-        />
-        <ColorInput
-          label="Message Text Color"
-          value={settings.msgTextColor}
-          onChange={v => update('msgTextColor', v)}
-        />
+        <h3 className="text-lg font-semibold border-b pb-1">Text</h3>
         <SelectInput
           label="Font Size"
           value={String(settings.fontSize)}
@@ -114,35 +104,43 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
         />
       </section>
 
-      {/* Input Area */}
-      <section className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-1">Input Area</h3>
+      {/* Message Bubbles Section */}
+      <section className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Message Bubbles</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
-            label="Input Background"
-            value={settings.inputBgColor ?? ""}
-            onChange={v => update('inputBgColor', v)}
+            label="User Bubble Color"
+            value={settings.userMsgBgColor}
+            onChange={v => update('userMsgBgColor', v)}
           />
           <ColorInput
-            label="Input Border Color"
-            value={settings.inputBorderColor ?? ""}
-            onChange={v => update('inputBorderColor', v)}
+            label="Bot Bubble Color"
+            value={settings.botMsgBgColor}
+            onChange={v => update('botMsgBgColor', v)}
           />
         </div>
-        <ColorInput
-          label="Input Text Color"
-          value={settings.inputTextColor ?? ''}
-          onChange={v => update('inputTextColor', v)}
-        />
-        <TextInput
-          label="Placeholder"
-          value={settings.inputPlaceholder}
-          onChange={v => update('inputPlaceholder', v)}
-          placeholder="Type a message…"
+        <div className="grid grid-cols-2 gap-4">
+          <ColorInput
+            label="Messages Background"
+            value={settings.messagesBgColor || settings.botMsgBgColor}
+            onChange={v => update('messagesBgColor', v)}
+          />
+          <ColorInput
+            label="Message Text Color"
+            value={settings.msgTextColor}
+            onChange={v => update('msgTextColor', v)}
+          />
+        </div>
+        <SelectInput
+          label="Font Size"
+          value={String(settings.fontSize)}
+          onChange={v => update('fontSize', Number(v))}
+          options={FONT_SIZE_OPTIONS}
         />
       </section>
 
-            {/* Question Prompt */}
+
+      {/* Question Prompt */}
       <section className="space-y-2">
         <h3 className="text-lg font-semibold border-b pb-1">Bot Question</h3>
         <TextInput
@@ -186,6 +184,34 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
             Add
           </button>
         </div>
+      </section>
+
+      {/* Input Area */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-1">Input Area</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <ColorInput
+            label="Input Background"
+            value={settings.inputBgColor ?? ""}
+            onChange={v => update('inputBgColor', v)}
+          />
+          <ColorInput
+            label="Input Border Color"
+            value={settings.inputBorderColor ?? ""}
+            onChange={v => update('inputBorderColor', v)}
+          />
+        </div>
+        <ColorInput
+          label="Input Text Color"
+          value={settings.inputTextColor ?? ''}
+          onChange={v => update('inputTextColor', v)}
+        />
+        <TextInput
+          label="Placeholder"
+          value={settings.inputPlaceholder}
+          onChange={v => update('inputPlaceholder', v)}
+          placeholder="Type a message…"
+        />
       </section>
 
       {/* Send Button */}

@@ -202,12 +202,13 @@ export default function ChatWidgetPreview({ settings }: Props) {
             {messages.map((message, idx) => (
               <div key={idx} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`px-3 py-2 rounded-lg max-w-xs break-words whitespace-pre-line ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
+                  className={`px-3 py-2 rounded-lg break-words whitespace-pre-line ${message.isUser ? 'rounded-br-none' : 'rounded-bl-none'}`}
                   style={{
                     backgroundColor: message.isUser ? settings.userMsgBgColor : settings.botMsgBgColor,
                     color: settings.msgTextColor,
                     fontFamily: settings.fontFamily,
                     fontSize: settings.fontSize,
+                    width: 'fit-content',
                   }}
                 >
                   {message.text}

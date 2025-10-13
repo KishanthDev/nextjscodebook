@@ -1,5 +1,7 @@
 export type ChatbarSettings = {
     text: string;
+    textSize?: number;
+    letterSpacing?: number;
     bgColor: string;
     textColor: string;
     gradientEnabled: boolean;

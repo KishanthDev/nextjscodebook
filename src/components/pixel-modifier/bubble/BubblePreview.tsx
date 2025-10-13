@@ -12,8 +12,6 @@ interface BubblePreviewProps {
   settings: BubblePixelSettings;
 }
 
-
-
 export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
   const [hovered, setHovered] = useState(false);
   const IconComponent = settings.backgroundOverlayType === 'lucide' ? LucideIconMap[settings.backgroundLucideIcon] : null;

@@ -93,7 +93,15 @@ export default function ChatBarPreview({ settings, isDark }: PreviewProps) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <span className="font-medium">{settings.text}</span>
+        <span
+          style={{
+            fontSize: `${settings.textSize || 16}px`,
+            letterSpacing: `${settings.letterSpacing || 0}px`,
+          }}
+          className="inline-block"
+        >
+          {settings.text || 'Chat with us'}
+        </span>
         {settings.iconType === 'lucide' && IconComponent ? (
           <IconComponent
             color={settings.iconColor}

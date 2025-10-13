@@ -222,7 +222,6 @@ export default function ChatWidgetPreview({ settings }: Props) {
                           onClick={() => handleTagClick(tag)}
                           className="px-3 py-1 text-sm rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
                           style={{
-                            backgroundColor: settings.sendBtnBgColor,
                             color: settings.sendBtnIconColor
                           }}
                         >
@@ -248,50 +247,99 @@ export default function ChatWidgetPreview({ settings }: Props) {
 
         {/* Input Area */}
         <div
-          className="relative p-3 border-t"
+          className="flex-none relative p-3 border-t"
           style={{ backgroundColor: settings.inputBgColor || settings.headerBgColor }}
         >
           <input
             type="text"
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
-            onKeyPress={e => e.key === 'Enter' && onSendMessage()}
+            onKeyDown={e => e.key === 'Enter' && onSendMessage()}
             placeholder={settings.inputPlaceholder}
-            className="w-full px-3 py-2 pr-24 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg transition-all duration-200"
             style={{
-              borderColor: settings.inputBorderColor,
+              padding: `${settings.inputPadding}px`,
+              paddingRight: `${settings.inputPadding + 120}px`, // Extra space for icons
+              border: `1px solid ${settings.inputBorderColor}`,
+              borderRadius: settings.inputBorderRadius,
+              fontSize: settings.inputFontSize,
               fontFamily: settings.fontFamily,
               color: settings.inputTextColor,
+              backgroundColor: settings.inputBgColor,
+              outline: 'none'
+            }}
+            onFocus={e => {
+              if (settings.inputFocusRingWidth) {
+                e.target.style.outline = `${settings.inputFocusRingWidth}px solid ${settings.inputFocusRingColor}`;
+              }
+            }}
+            onBlur={e => {
+              e.target.style.outline = 'none';
             }}
           />
-          <div className="absolute right-5 top-5 flex items-center gap-2">
-            <button className="p-1 hover:bg-gray-100 rounded" style={{ color: settings.sendBtnIconColor }}>
-              <Paperclip size={20} />
+          <div
+            className="absolute right-6"
+            style={{
+              top: '50%',
+              transform: 'translateY(-50%)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <button
+              className="p-1 rounded transition-all duration-200 hover:bg-gray-100"
+              style={{
+                color: settings.sendBtnIconColor,
+                fontSize: settings.sendBtnIconSize
+              }}
+            >
+              <Paperclip size={settings.sendBtnIconSize} />
             </button>
-            <button onClick={() => setShowEmojiPicker(e => !e)} className="p-1 hover:bg-gray-100 rounded" style={{ color: settings.sendBtnIconColor }}>
-              <Smile size={20} />
+            <button
+              onClick={() => setShowEmojiPicker(p => !p)}
+              className="p-1 rounded transition-all duration-200 hover:bg-gray-100"
+              style={{
+                color: settings.sendBtnIconColor,
+                fontSize: settings.sendBtnIconSize
+              }}
+            >
+              <Smile size={settings.sendBtnIconSize} />
             </button>
             <button
               onClick={() => onSendMessage()}
-              className="p-1 rounded hover:opacity-80 transition-opacity"
-              style={{ backgroundColor: settings.sendBtnBgColor, color: settings.sendBtnIconColor }}
               disabled={!newMessage.trim()}
+              className="rounded transition-all duration-200"
+              style={{
+                backgroundColor: settings.sendBtnBgColor,
+                color: settings.sendBtnIconColor,
+                borderRadius: settings.sendBtnBorderRadius,
+                padding: `${settings.sendBtnPadding}px`,
+                fontSize: settings.sendBtnIconSize,
+                opacity: 1
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.opacity = settings.sendBtnHoverOpacity.toString();
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.opacity = '1';
+              }}
             >
-              <Send size={20} />
+              <Send size={settings.sendBtnIconSize} />
             </button>
           </div>
           {showEmojiPicker && (
-            <div className="absolute bottom-12 right-3 grid grid-cols-6 gap-1 bg-white border rounded shadow-lg p-2 z-10">
-              {EMOJIS.map(emoji => (
+            <div className="absolute bottom-12 right-6 grid grid-cols-6 gap-1 bg-white border rounded shadow p-2 z-10">
+              {EMOJIS.map(e => (
                 <button
-                  key={emoji}
-                  className="p-1 hover:bg-gray-100 rounded text-lg"
+                  key={e}
+                  className="p-1 hover:bg-gray-100 rounded"
                   onClick={() => {
-                    setNewMessage(prev => prev + emoji);
+                    setNewMessage(n => n + e);
                     setShowEmojiPicker(false);
                   }}
                 >
-                  {emoji}
+                  {e}
                 </button>
               ))}
             </div>

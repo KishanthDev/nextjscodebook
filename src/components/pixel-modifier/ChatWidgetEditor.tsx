@@ -47,7 +47,23 @@ const defaultSettings: ChatWidgetSettings = {
   footerTextColor: '#6b7280',
   footerText: 'Powered by ChatWidget',
   question: '👋 Hi there! How can I help you today?',
-  tags: ["📦 Track my order", "🔄 Return a product", "💳 Payment issues", "❓ Other questions"]
+  tags: ["📦 Track my order", "🔄 Return a product", "💳 Payment issues", "❓ Other questions"],
+
+  // Sample values for newly added types
+  inputBorderRadius: 8,
+  inputPadding: 12,
+  inputPlaceholderColor: '#9ca3af',
+  inputFontSize: 14,
+  inputFontFamily: 'Inter',
+  inputFocusRingWidth: 2,
+  inputFocusRingColor: '#3b82f6',
+
+  sendBtnBorderRadius: 8,
+  sendBtnHoverBgColor: '#2563eb',
+  sendBtnHoverIconColor: '#ffffff',
+  sendBtnPadding: 10,
+  sendBtnIconSize: 20,
+  sendBtnHoverOpacity: 0.85,
 };
 
 export default function ChatWidgetEditor() {

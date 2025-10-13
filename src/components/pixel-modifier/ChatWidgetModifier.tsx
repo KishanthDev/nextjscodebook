@@ -176,27 +176,81 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
       </section>
 
       {/* Input Area */}
-      <section className="space-y-2">
+      {/* Input Area */}
+      <section className="space-y-4">
         <h3 className="text-lg font-semibold border-b pb-1">Input Area</h3>
+
+        {/* Colors */}
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
-            label="Input Background"
-            value={settings.inputBgColor ?? ""}
+            label="Background"
+            value={settings.inputBgColor ?? ''}
             onChange={v => update('inputBgColor', v)}
           />
           <ColorInput
-            label="Input Border Color"
-            value={settings.inputBorderColor ?? ""}
+            label="Border Color"
+            value={settings.inputBorderColor ?? ''}
             onChange={v => update('inputBorderColor', v)}
           />
         </div>
+        <div className="grid grid-cols-2 gap-4">
+          <ColorInput
+            label="Text Color"
+            value={settings.inputTextColor ?? ''}
+            onChange={v => update('inputTextColor', v)}
+          />
+        </div>
+
+        {/* Dimensions & Typography */}
+        <div className="grid grid-cols-2 gap-4">
+          <RangeInput
+            label="Border Radius"
+            value={settings.inputBorderRadius}
+            onChange={v => update('inputBorderRadius', v)}
+            min={0}
+            max={24}
+            step={1}
+            unit="px"
+          />
+          <RangeInput
+            label="Padding"
+            value={settings.inputPadding}
+            onChange={v => update('inputPadding', v)}
+            min={4}
+            max={20}
+            step={1}
+            unit="px"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <RangeInput
+            label="Font Size"
+            value={settings.inputFontSize}
+            onChange={v => update('inputFontSize', v)}
+            min={12}
+            max={20}
+            step={1}
+            unit="px"
+          />
+          <RangeInput
+            label="Focus Ring Width"
+            value={settings.inputFocusRingWidth}
+            onChange={v => update('inputFocusRingWidth', v)}
+            min={0}
+            max={4}
+            step={1}
+            unit="px"
+          />
+        </div>
         <ColorInput
-          label="Input Text Color"
-          value={settings.inputTextColor ?? ''}
-          onChange={v => update('inputTextColor', v)}
+          label="Focus Ring Color"
+          value={settings.inputFocusRingColor}
+          onChange={v => update('inputFocusRingColor', v)}
         />
+
+        {/* Placeholder text */}
         <TextInput
-          label="Placeholder"
+          label="Placeholder Text"
           value={settings.inputPlaceholder}
           onChange={v => update('inputPlaceholder', v)}
           placeholder="Type a message…"
@@ -204,7 +258,7 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
       </section>
 
       {/* Send Button */}
-      <section className="space-y-2">
+      <section className="space-y-4">
         <h3 className="text-lg font-semibold border-b pb-1">Send Button</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
@@ -213,12 +267,44 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
             onChange={v => update('sendBtnBgColor', v)}
           />
           <ColorInput
-            label="Button Icon Color"
+            label="Icon Color"
             value={settings.sendBtnIconColor}
             onChange={v => update('sendBtnIconColor', v)}
           />
         </div>
+        <div className="grid grid-cols-2 gap-4">
+          <RangeInput
+            label="Border Radius"
+            value={settings.sendBtnBorderRadius}
+            onChange={v => update('sendBtnBorderRadius', v)}
+            min={0}
+            max={24}
+            step={1}
+            unit="px"
+          />
+          <RangeInput
+            label="Padding"
+            value={settings.sendBtnPadding}
+            onChange={v => update('sendBtnPadding', v)}
+            min={4}
+            max={16}
+            step={1}
+            unit="px"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <RangeInput
+            label="Icon Size"
+            value={settings.sendBtnIconSize}
+            onChange={v => update('sendBtnIconSize', v)}
+            min={16}
+            max={32}
+            step={1}
+            unit="px"
+          />
+        </div>
       </section>
+
 
       {/* Footer */}
       <section className="space-y-2">

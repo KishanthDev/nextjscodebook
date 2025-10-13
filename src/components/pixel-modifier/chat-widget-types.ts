@@ -16,7 +16,7 @@ export interface ChatWidgetSettings {
 
   bgColor: string;
   gradientEnabled: boolean;
-  gradientType: 'linear'|'radial';
+  gradientType: 'linear' | 'radial';
   gradientAngle: number;
   gradientStops: GradientStop[];
 
@@ -36,12 +36,28 @@ export interface ChatWidgetSettings {
   inputBorderColor?: string;
   inputTextColor?: string;
   inputPlaceholder: string;
+  inputBorderRadius: number;
+  inputPadding: number;
+  inputPlaceholderColor: string;
+  inputFontSize: number;
+  inputFontFamily: string;
+  inputFocusRingWidth: number;
+  inputFocusRingColor: string;
+
 
   sendBtnBgColor: string;
   sendBtnIconColor: string;
+  sendBtnBorderRadius: number;
+  sendBtnHoverBgColor: string;
+  sendBtnHoverIconColor: string;
+  sendBtnPadding: number;
+  sendBtnIconSize: number;
+  sendBtnHoverOpacity: number;
+
+
 
   soundsEnabled: boolean;
-  soundProfile: 'chime'|'pop'|'ding';
+  soundProfile: 'chime' | 'pop' | 'ding';
 
   footerBgColor: string;
   footerTextColor: string;

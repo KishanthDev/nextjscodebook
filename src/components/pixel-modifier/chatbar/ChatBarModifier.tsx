@@ -12,15 +12,70 @@ import {
 import { LucideIconPicker } from '../lib/LucideIconPicker';
 import { ChatbarSettings } from './chatbartype';
 
+
+export const CONSTRAINTS = {
+    width: { min: 0, max: 600, step: 2 },
+    height: { min: 0, max: 100, step: 2 },
+    borderRadius: { min: 0, max: 200, step: 1 },
+};
+
+
 interface ModifierProps {
     settings: ChatbarSettings;
     update: <K extends keyof ChatbarSettings>(key: K, value: ChatbarSettings[K]) => void;
 }
 
 export default function ChatBarModifier({ settings, update }: ModifierProps) {
+    // Helper function for nested border radius updates
+    const updateNestedSetting = (
+        parent: 'borderRadius',
+        key: 'tl' | 'tr' | 'bl' | 'br',
+        value: number
+    ) => {
+        update(parent, {
+            ...settings[parent],
+            [key]: value,
+        });
+    };
+
     return (
         <div className="lg:w-96 space-y-6 bg-white p-6 rounded-lg shadow-sm overflow-y-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Chat Bar Modifier</h2>
+
+            {/* Dimensions Section */}
+            <section className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Dimensions</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    <RangeInput
+                        label="Width"
+                        value={settings.width}
+                        onChange={(width) => update('width', width)}
+                        {...CONSTRAINTS.width}
+                    />
+                    <RangeInput
+                        label="Height"
+                        value={settings.height}
+                        onChange={(height) => update('height', height)}
+                        {...CONSTRAINTS.height}
+                    />
+                </div>
+            </section>
+
+            {/* Border Radius Section */}
+            <section className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Border Radius</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
+                        <RangeInput
+                            key={corner}
+                            label={corner.toUpperCase()}
+                            value={settings.borderRadius[corner]}
+                            onChange={(value) => updateNestedSetting('borderRadius', corner, value)}
+                            {...CONSTRAINTS.borderRadius}
+                        />
+                    ))}
+                </div>
+            </section>
 
             <TextInput
                 label="Text"
@@ -81,6 +136,7 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
                     { value: 'image', label: 'Image URL' },
                 ]}
             />
+
             {settings.iconType === 'lucide' ? (
                 <>
                     <LucideIconPicker
@@ -91,6 +147,24 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
                         label="Icon Color"
                         value={settings.iconColor}
                         onChange={v => update('iconColor', v)}
+                    />
+                    <RangeInput
+                        label="Icon Height"
+                        value={settings.iconHeight || 24}
+                        onChange={v => update('iconHeight', v)}
+                        min={12}
+                        max={64}
+                        step={1}
+                        unit="px"
+                    />
+                    <RangeInput
+                        label="Icon Width"
+                        value={settings.iconWidth || 24}
+                        onChange={v => update('iconWidth', v)}
+                        min={12}
+                        max={64}
+                        step={1}
+                        unit="px"
                     />
                 </>
             ) : (
@@ -109,6 +183,24 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
                             { value: 'contain', label: 'Contain' },
                             { value: 'cover', label: 'Cover' },
                         ]}
+                    />
+                    <RangeInput
+                        label="Image Height"
+                        value={settings.iconHeight || 24}
+                        onChange={v => update('iconHeight', v)}
+                        min={12}
+                        max={64}
+                        step={1}
+                        unit="px"
+                    />
+                    <RangeInput
+                        label="Image Width"
+                        value={settings.iconWidth || 24}
+                        onChange={v => update('iconWidth', v)}
+                        min={12}
+                        max={64}
+                        step={1}
+                        unit="px"
                     />
                     <RangeInput
                         label="Image Opacity"
@@ -139,31 +231,6 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
                     />
                 </>
             )}
-
-            <RangeInput
-                label="Width"
-                value={settings.width}
-                onChange={v => update('width', v)}
-                min={150}
-                max={400}
-                step={5}
-            />
-            <RangeInput
-                label="Height"
-                value={settings.height}
-                onChange={v => update('height', v)}
-                min={32}
-                max={64}
-                step={1}
-            />
-            <RangeInput
-                label="Border Radius"
-                value={settings.borderRadius}
-                onChange={v => update('borderRadius', v)}
-                min={0}
-                max={20}
-                step={1}
-            />
 
             <div className="flex items-center space-x-2">
                 <input

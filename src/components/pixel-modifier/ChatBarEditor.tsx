@@ -26,7 +26,7 @@ const defaultSettings: ChatbarSettings = {
   iconBlend: 'normal',
   width: 255,
   height: 40,
-  borderRadius: 12,
+  borderRadius: { tl: 20, tr: 20, bl: 20, br: 20 },
   shadow: true,
 };
 

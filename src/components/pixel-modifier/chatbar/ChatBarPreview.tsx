@@ -35,6 +35,9 @@ export default function ChatBarPreview({ settings, isDark }: PreviewProps) {
     settings.bgColor,
   ]);
 
+  // Generate border radius CSS from individual corner values
+  const borderRadiusStyle = `${settings.borderRadius.tl}px ${settings.borderRadius.tr}px ${settings.borderRadius.br}px ${settings.borderRadius.bl}px`;
+
   const IconComponent = settings.iconType === 'lucide'
     ? LucideIconMap[settings.lucideIcon]
     : null;
@@ -75,11 +78,11 @@ export default function ChatBarPreview({ settings, isDark }: PreviewProps) {
       <div
         className="flex justify-between items-center transition-all duration-200 cursor-pointer"
         style={{
-          width: `${settings.width}px`,
-          height: `${settings.height}px`,
+          width: settings.width,
+          height: settings.height,
           background: backgroundStyle,
           color: settings.textColor,
-          borderRadius: `${settings.borderRadius}px`,
+          borderRadius: borderRadiusStyle,
           boxShadow: settings.shadow
             ? isDark
               ? '0 2px 8px rgba(0,0,0,0.6)'
@@ -93,19 +96,22 @@ export default function ChatBarPreview({ settings, isDark }: PreviewProps) {
         <span className="font-medium">{settings.text}</span>
         {settings.iconType === 'lucide' && IconComponent ? (
           <IconComponent
-            size={20}
             color={settings.iconColor}
-            className={hovered ? 'opacity-100' : 'opacity-80'}
+            width={settings.iconWidth || 24}
+            height={settings.iconHeight || 24}
+            style={{
+              opacity: hovered ? 1 : 0.8,
+            }}
           />
-        ) : settings.iconImageUrl ? (
+        ) : settings.iconType === 'image' && settings.iconImageUrl ? (
           <img
             src={settings.iconImageUrl}
             alt="icon"
-            width={20}
-            height={20}
             style={{
               objectFit: settings.iconFit,
               opacity: settings.iconOpacity,
+              width: settings.iconWidth || 24,
+              height: settings.iconHeight || 24,
               mixBlendMode: settings.iconBlend as any,
             }}
             className="rounded"

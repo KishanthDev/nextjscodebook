@@ -64,17 +64,6 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
         />
       </section>
 
-      {/* Colors & Typography */}
-      <section className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-1">Text</h3>
-        <SelectInput
-          label="Font Size"
-          value={String(settings.fontSize)}
-          onChange={v => update('fontSize', Number(v))}
-          options={FONT_SIZE_OPTIONS}
-        />
-      </section>
-
       {/* Header */}
       <section className="space-y-2">
         <h3 className="text-lg font-semibold border-b pb-1">Header</h3>

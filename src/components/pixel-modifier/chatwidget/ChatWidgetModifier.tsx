@@ -6,7 +6,7 @@ import {
   ColorInput,
   RangeInput,
   SelectInput,
-} from './lib/inputs';
+} from '../lib/inputs';
 import { ChatWidgetSettings } from './chat-widget-types';
 import { CHAT_WIDGET_CONSTRAINTS, FONT_SIZE_OPTIONS } from './ChatWidgetConstraints';
 

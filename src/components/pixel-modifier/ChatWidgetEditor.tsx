@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-import ChatWidgetModifier from './ChatWidgetModifier';
-import ChatWidgetPreview from './ChatWidgetPreview';
-import { ChatWidgetSettings } from './chat-widget-types';
+import ChatWidgetModifier from './chatwidget/ChatWidgetModifier';
+import ChatWidgetPreview from './chatwidget/ChatWidgetPreview';
+import { ChatWidgetSettings } from './chatwidget/chat-widget-types';
 
 const defaultSettings: ChatWidgetSettings = {
   "width": 260,
@@ -85,7 +85,7 @@ export default function ChatWidgetEditor() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 rounded-lg h-[calc(100vh-114px)]">
-      <ChatWidgetModifier settings={settings} update={update}  />
+      <ChatWidgetModifier settings={settings} update={update} />
       <ChatWidgetPreview settings={settings} />
     </div>
   );

@@ -1,77 +1,33 @@
 'use client';
+
 import React, { useState, useCallback } from 'react';
-import { BubbleModifier } from './bubble/BubbleModifier';
-import { BubblePreview } from './bubble/BubblePreview';
+import dynamic from 'next/dynamic';
 import { BubblePixelSettings } from './bubble/bubbletype';
 
-// Default bubble configuration
-const defaultBubble: BubblePixelSettings = {
-  width: 50,
-  height: 50,
-  borderRadius: { tl: 50, tr: 50, bl: 50, br: 50 },
+const BubbleModifier = dynamic(() => import('./bubble/BubbleModifier'), {
+  ssr: false, loading: () => <div className="h-100 w-full bg-gray-100 animate-pulse" />
+});
+const BubblePreview = dynamic(() => import('./bubble/BubblePreview'), {
+  ssr: false, loading: () => <div className="h-100 w-full bg-gray-100 animate-pulse" />
+});
 
-  backgroundColor: '#1E40AF',
-  gradientType: 'linear',
-  gradientAngle: 135,
-  gradientStops: [
-    { color: '#1E40AF', pos: 0 },
-    { color: '#9333EA', pos: 100 },
-  ],
-  backgroundOverlayType: 'image',
-  backgroundLucideColor: '#FFFFFF',
-  backgroundLucideSize: 24,
-  backgroundLucideOpacity: 0.2,
-  backgroundLucideIcon: 'Star',
-  backgroundImageUrl: 'https://static.vecteezy.com/system/resources/previews/047/656/219/non_2x/abstract-logo-design-for-any-corporate-brand-business-company-vector.jpg',
-  backgroundImageSize: 'contain',
-  backgroundImageOpacity: 0.25,
-  backgroundBlendMode: 'normal',
+export interface BubbleEditorSSRProps {
+  initialSettings: BubblePixelSettings;
+}
 
-  border: { width: 0, color: '#3B82F6', style: 'solid' },
-  borderGradientEnabled: true,
-  borderGradientAngle: 90,
-  borderGradientStops: [
-    { color: '#60A5FA', pos: 0 },
-    { color: '#A78BFA', pos: 100 },
-  ],
-  borderOffsetAnim: false,
-  outlineRing: { enabled: true, width: 3, color: '#22D3EE', opacity: 0.4 },
+export const BubbleEditorSSR: React.FC<BubbleEditorSSRProps> = ({ initialSettings }) => {
+  const [settings, setSettings] = useState<BubblePixelSettings>(initialSettings);
 
-  boxShadowBlur: 20,
-  boxShadowSpread: 0,
-  boxShadowOffsetX: 0,
-  boxShadowOffsetY: 8,
-  boxShadowOpacity: 0.25,
-  innerShadow: { enabled: true, blur: 12, opacity: 0.25 },
-  glass: { enabled: false, blur: 10, bgOpacity: 0.3 },
-  neon: { enabled: false, color: '#22D3EE', intensity: 0.8 },
-
-  animation: { type: 'fadeIn', duration: 350, delay: 0 },
-  idleAnim: { enabled: true, type: 'float', amplitude: 6, duration: 3200 },
-
-  dots: { color: '#F8FAFC', size: 6, spacing: 6, animation: 'bounce' },
-};
-
-export const BubbleEditor: React.FC = () => {
-  const [settings, setSettings] = useState<BubblePixelSettings>(defaultBubble);
-
-  // Helper function to update settings
+  // Update functions
   const updateSetting = useCallback(<K extends keyof BubblePixelSettings>(
     key: K,
     value: BubblePixelSettings[K]
-  ) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-  }, []);
+  ) => setSettings(prev => ({ ...prev, [key]: value })), []);
 
-  // Helper function to update nested settings
   const updateNestedSetting = useCallback(<
     K extends keyof BubblePixelSettings,
     NK extends keyof NonNullable<BubblePixelSettings[K]>
-  >(
-    key: K,
-    nestedKey: NK,
-    value: NonNullable<BubblePixelSettings[K]>[NK]
-  ) => {
+  >(key: K, nestedKey: NK, value: NonNullable<BubblePixelSettings[K]>[NK]) => {
     setSettings(prev => ({
       ...prev,
       [key]: { ...(typeof prev[key] === 'object' && prev[key] !== null ? prev[key] : {}), [nestedKey]: value }
@@ -86,11 +42,9 @@ export const BubbleEditor: React.FC = () => {
         updateSetting={updateSetting}
         updateNestedSetting={updateNestedSetting}
       />
-
-      {/* Preview Panel */}
       <BubblePreview settings={settings} />
     </div>
   );
 };
 
-export default BubbleEditor;
+export default BubbleEditorSSR;

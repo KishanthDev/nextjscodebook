@@ -8,10 +8,9 @@ import { ChatbarSettings } from './chatbartype';
 
 interface PreviewProps {
   settings: ChatbarSettings;
-  isDark: boolean;
 }
 
-export default function ChatBarPreview({ settings, isDark }: PreviewProps) {
+export default function ChatBarPreview({ settings }: PreviewProps) {
   const [hovered, setHovered] = useState(false);
 
   const backgroundStyle = useMemo(() => {
@@ -84,9 +83,7 @@ export default function ChatBarPreview({ settings, isDark }: PreviewProps) {
           color: settings.textColor,
           borderRadius: borderRadiusStyle,
           boxShadow: settings.shadow
-            ? isDark
-              ? '0 2px 8px rgba(0,0,0,0.6)'
-              : '0 2px 8px rgba(0,0,0,0.2)'
+            ? '0 2px 8px rgba(0,0,0,0.2)'
             : 'none',
           padding: '0 12px',
         }}

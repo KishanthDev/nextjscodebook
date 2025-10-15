@@ -5,6 +5,7 @@ import { BubblePixelSettings } from './bubbletype';
 import { Button } from '@/ui/button';
 import { toast } from 'sonner';
 import { LucideIconMap } from '@/lib/lucide-icons';
+import { SaveButton } from '../lib/SaveButton';
 
 const ease = 'cubic-bezier(.2,.8,.2,1)';
 
@@ -112,8 +113,8 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
           Copy Settings
         </Button>
         <Button variant="outline" size="sm" onClick={handleDownload}>Download</Button>
+        <SaveButton type='bubble' data={settings} />
       </div>
-
       <div
         className="relative flex items-center justify-center transition-all duration-300 cursor-pointer"
         style={{

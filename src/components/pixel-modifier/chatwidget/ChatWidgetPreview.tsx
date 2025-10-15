@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ChatWidgetSettings, Message } from './chat-widget-types';
 import { Button } from '@/ui/button';
-import { Smile, Send, Paperclip, Mail, Smartphone, Volume2 } from 'lucide-react';
+import { Smile, Send, Paperclip, Mail, Smartphone, Volume2, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { SaveButton } from '../lib/SaveButton';
 
 interface Props {
   settings: ChatWidgetSettings;
@@ -113,6 +114,7 @@ export default function ChatWidgetPreview({ settings }: Props) {
       <div className="absolute right-3 top-0 flex space-x-2 z-20">
         <Button size="sm" onClick={copyToClipboard}>Copy Settings</Button>
         <Button variant="outline" size="sm" onClick={downloadSettings}>Download</Button>
+        <SaveButton type='chatwidget' data={settings} />
       </div>
 
       {/* Widget Container */}

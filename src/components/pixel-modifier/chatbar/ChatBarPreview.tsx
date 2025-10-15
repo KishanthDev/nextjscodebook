@@ -5,6 +5,7 @@ import { Button } from '@/ui/button';
 import { toast } from 'sonner';
 import { LucideIconMap } from '@/lib/lucide-icons';
 import { ChatbarSettings } from './chatbartype';
+import { SaveButton } from '../lib/SaveButton';
 
 interface PreviewProps {
   settings: ChatbarSettings;
@@ -72,6 +73,7 @@ export default function ChatBarPreview({ settings }: PreviewProps) {
         <Button variant="outline" size="sm" onClick={downloadSettings}>
           Download
         </Button>
+        <SaveButton type='chatbar' data={settings} />
       </div>
 
       <div

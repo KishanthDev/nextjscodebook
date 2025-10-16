@@ -42,7 +42,7 @@ export default function ChatBarPreview({ settings }: PreviewProps) {
     : null;
 
   return (
-    <div className="flex-1 relative bg-gray-50 rounded p-6 flex justify-center items-center">
+    <div className="flex-1 relative bg-gray-50 dark:bg-neutral-800 rounded p-6 flex justify-center rounded-lg items-center transition-colors duration-200">
       <div className="absolute top-4 right-4 flex space-x-2 z-10">
         <CopyDownloadButtons settings={settings} filename='chatbar-settings.json' />
         <SaveButton type='chatbar' data={settings} />

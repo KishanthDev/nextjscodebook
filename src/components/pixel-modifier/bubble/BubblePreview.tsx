@@ -84,7 +84,7 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
   }), [settings.border, settings.borderGradientEnabled, borderImage]);
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg p-8 relative">
+    <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-neutral-800 rounded-lg p-8 relative">
       {/* Save & Download Buttons */}
       <div className="absolute top-4 right-4 flex space-x-2 z-10">
         <CopyDownloadButtons settings={settings} filename='bubble-settings.json' />
@@ -146,7 +146,6 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
             }}
           />
         )}
-
 
         {/* Dots Loader */}
         {settings.dots && hovered && (
@@ -249,7 +248,7 @@ function cssKeyframes(settings: BubblePixelSettings) {
       50% { transform: scale(1.25); } 
     }
 
-    /* Custom slider styles */
+    /* Custom slider styles - Light Mode */
     .slider::-webkit-slider-thumb {
       appearance: none;
       height: 18px;
@@ -259,6 +258,12 @@ function cssKeyframes(settings: BubblePixelSettings) {
       cursor: pointer;
       border: 2px solid #ffffff;
       box-shadow: 0 0 0 1px #e5e7eb;
+      transition: all 0.2s ease;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      background: #2563EB;
+      transform: scale(1.1);
     }
 
     .slider::-moz-range-thumb {
@@ -269,6 +274,56 @@ function cssKeyframes(settings: BubblePixelSettings) {
       cursor: pointer;
       border: 2px solid #ffffff;
       box-shadow: 0 0 0 1px #e5e7eb;
+      transition: all 0.2s ease;
+    }
+
+    .slider::-moz-range-thumb:hover {
+      background: #2563EB;
+      transform: scale(1.1);
+    }
+
+    /* Custom slider styles - Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      .slider::-webkit-slider-thumb {
+        background: #60A5FA;
+        border-color: #1F2937;
+        box-shadow: 0 0 0 1px #374151;
+      }
+
+      .slider::-webkit-slider-thumb:hover {
+        background: #3B82F6;
+      }
+
+      .slider::-moz-range-thumb {
+        background: #60A5FA;
+        border-color: #1F2937;
+        box-shadow: 0 0 0 1px #374151;
+      }
+
+      .slider::-moz-range-thumb:hover {
+        background: #3B82F6;
+      }
+    }
+
+    /* Dark mode support using Tailwind's dark: class strategy */
+    .dark .slider::-webkit-slider-thumb {
+      background: #60A5FA;
+      border-color: #1F2937;
+      box-shadow: 0 0 0 1px #374151;
+    }
+
+    .dark .slider::-webkit-slider-thumb:hover {
+      background: #3B82F6;
+    }
+
+    .dark .slider::-moz-range-thumb {
+      background: #60A5FA;
+      border-color: #1F2937;
+      box-shadow: 0 0 0 1px #374151;
+    }
+
+    .dark .slider::-moz-range-thumb:hover {
+      background: #3B82F6;
     }
   `;
 }

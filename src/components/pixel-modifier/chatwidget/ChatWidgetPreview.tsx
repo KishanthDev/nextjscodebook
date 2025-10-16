@@ -86,7 +86,7 @@ export default function ChatWidgetPreview({ settings }: Props) {
   ]);
 
   return (
-    <div className="flex-1 flex justify-center items-start p-6 relative">
+    <div className="flex-1 flex justify-center dark:bg-neutral-800 rounded-lg  items-start p-6 relative">
       {/* Actions */}
       <div className="absolute right-3 top-0 flex space-x-2 z-20">
         <CopyDownloadButtons settings={settings} filename='chatwidget-settings.json' />

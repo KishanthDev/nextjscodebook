@@ -9,7 +9,7 @@ interface AIIconProps {
   active?: boolean;
 }
 
-export function AIIcon({ size = 18, className, active = false }: AIIconProps) {
+export function AIIcon({ size = 18, className = "", active = false }: AIIconProps) {
   return (
     <Image
       src="/icons/ai.png"
@@ -17,7 +17,11 @@ export function AIIcon({ size = 18, className, active = false }: AIIconProps) {
       width={size}
       height={size}
       unoptimized
-      className={`${className} ${active ? "filter invert brightness-0" : ""}`}
+      className={`
+        ${className}
+        ${active ? "scale-110" : ""}
+        dark:invert dark:brightness-200
+      `}
     />
   );
 }

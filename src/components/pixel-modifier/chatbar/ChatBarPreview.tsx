@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Button } from '@/ui/button';
-import { toast } from 'sonner';
 import { LucideIconMap } from '@/lib/lucide-icons';
 import { ChatbarSettings } from './chatbartype';
 import { SaveButton } from '../lib/SaveButton';
+import { CopyDownloadButtons } from '../lib/CopyDownloadButtons';
 
 interface PreviewProps {
   settings: ChatbarSettings;
@@ -42,37 +41,10 @@ export default function ChatBarPreview({ settings }: PreviewProps) {
     ? LucideIconMap[settings.lucideIcon]
     : null;
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(settings, null, 2));
-      toast.success('ChatBar settings copied to clipboard!');
-    } catch (err) {
-      toast.error(`Failed to copy: ${String(err)}`);
-      alert('Failed to copy settings. Check console.');
-    }
-  };
-
-  const downloadSettings = () => {
-    const blob = new Blob([JSON.stringify(settings, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'chatbar-settings.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="flex-1 relative bg-gray-50 rounded p-6 flex justify-center items-center">
       <div className="absolute top-4 right-4 flex space-x-2 z-10">
-        <Button size="sm" onClick={copyToClipboard}>
-          Copy Settings
-        </Button>
-        <Button variant="outline" size="sm" onClick={downloadSettings}>
-          Download
-        </Button>
+        <CopyDownloadButtons settings={settings} filename='chatbar-settings.json' />
         <SaveButton type='chatbar' data={settings} />
       </div>
 

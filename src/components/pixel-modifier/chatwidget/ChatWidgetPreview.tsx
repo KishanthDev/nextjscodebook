@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { ChatWidgetSettings, Message } from './chat-widget-types';
-import { Button } from '@/ui/button';
-import { Smile, Send, Paperclip, Mail, Smartphone, Volume2, Save } from 'lucide-react';
-import { toast } from 'sonner';
+import { Smile, Send, Paperclip, Mail, Smartphone, Volume2 } from 'lucide-react';
 import { SaveButton } from '../lib/SaveButton';
+import { CopyDownloadButtons } from '../lib/CopyDownloadButtons';
 
 interface Props {
   settings: ChatWidgetSettings;
@@ -86,34 +85,11 @@ export default function ChatWidgetPreview({ settings }: Props) {
     settings.gradientStops,
   ]);
 
-  // Copy & download settings
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(settings, null, 2));
-      toast.success('ChatWidget settings copied to clipboard!');
-    } catch (err) {
-      toast.error(`Failed to copy: ${String(err)}`);
-      alert('Failed to copy settings. Check console.');
-    }
-  };
-  const downloadSettings = () => {
-    const blob = new Blob([JSON.stringify(settings, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'chat-widget-settings.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="flex-1 flex justify-center items-start p-6 relative">
       {/* Actions */}
       <div className="absolute right-3 top-0 flex space-x-2 z-20">
-        <Button size="sm" onClick={copyToClipboard}>Copy Settings</Button>
-        <Button variant="outline" size="sm" onClick={downloadSettings}>Download</Button>
+        <CopyDownloadButtons settings={settings} filename='chatwidget-settings.json' />
         <SaveButton type='chatwidget' data={settings} />
       </div>
 

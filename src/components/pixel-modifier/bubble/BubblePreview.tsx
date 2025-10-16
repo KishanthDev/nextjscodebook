@@ -2,10 +2,9 @@
 
 import React, { useMemo, useState } from 'react';
 import { BubblePixelSettings } from './bubbletype';
-import { Button } from '@/ui/button';
-import { toast } from 'sonner';
 import { LucideIconMap } from '@/lib/lucide-icons';
 import { SaveButton } from '../lib/SaveButton';
+import { CopyDownloadButtons } from '../lib/CopyDownloadButtons';
 
 const ease = 'cubic-bezier(.2,.8,.2,1)';
 
@@ -32,16 +31,6 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
         return '';
     }
   }, [settings.gradientType, settings.gradientAngle, settings.gradientStops]);
-
-  const handleDownload = () => {
-    const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'bubble-settings.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   const boxShadow = useMemo(() => {
     const { boxShadowOffsetX, boxShadowOffsetY, boxShadowBlur, boxShadowSpread, boxShadowOpacity } = settings;
@@ -98,21 +87,7 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
     <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg p-8 relative">
       {/* Save & Download Buttons */}
       <div className="absolute top-4 right-4 flex space-x-2 z-10">
-        <Button size='sm'
-          onClick={async () => {
-            try {
-              const settingsJson = JSON.stringify(settings, null, 2);
-              await navigator.clipboard.writeText(settingsJson);
-              toast.success('Bubble settings copied to clipboard!');
-            } catch (err) {
-              toast.error(`Failed to copy: ${String(err)}`);
-              alert('Failed to copy settings. Check console.');
-            }
-          }}
-        >
-          Copy Settings
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleDownload}>Download</Button>
+        <CopyDownloadButtons settings={settings} filename='bubble-settings.json' />
         <SaveButton type='bubble' data={settings} />
       </div>
       <div

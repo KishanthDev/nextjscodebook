@@ -19,7 +19,7 @@ export const CopyDownloadButtons: React.FC<CopyDownloadButtonsProps> = ({ settin
     try {
       await navigator.clipboard.writeText(JSON.stringify(settings, null, 2));
       setCopied(true);
-      toast.success( `${filename} copied to clipboard!`);
+      toast.success(`${filename} copied to clipboard!`);
       setTimeout(() => setCopied(false), 1500);
     } catch (err) {
       console.error(err);
@@ -49,7 +49,7 @@ export const CopyDownloadButtons: React.FC<CopyDownloadButtonsProps> = ({ settin
   return (
     <div className="flex items-center gap-2">
       {/* Copy Button */}
-      <Button size="sm" onClick={copyToClipboard} className="flex items-center gap-1 relative overflow-hidden">
+      <Button size="sm" title='Copy' onClick={copyToClipboard} className="flex items-center cursor-pointer gap-1 relative overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={copied ? 'check' : 'copy'}
@@ -69,7 +69,9 @@ export const CopyDownloadButtons: React.FC<CopyDownloadButtonsProps> = ({ settin
         variant="outline"
         size="sm"
         onClick={downloadSettings}
-        className="flex items-center gap-1 relative overflow-hidden"
+        className="flex items-center cursor-pointer gap-1 relative overflow-hidden"
+        title="Download"
+
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
@@ -88,6 +90,6 @@ export const CopyDownloadButtons: React.FC<CopyDownloadButtonsProps> = ({ settin
           </motion.div>
         </AnimatePresence>
       </Button>
-    </div>
+    </div >
   );
 };

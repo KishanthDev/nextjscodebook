@@ -36,12 +36,12 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
   };
 
   return (
-    <div className="lg:w-96 p-6 bg-white rounded-lg shadow-sm overflow-y-auto space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">Chat Widget Modifier</h2>
+    <div className="lg:w-96 p-6 bg-white dark:bg-neutral-900 rounded-lg shadow-sm dark:shadow-gray-800/30 overflow-y-auto space-y-6 border border-gray-200 dark:border-gray-800">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Chat Widget Modifier</h2>
 
       {/* Dimensions */}
       <section className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-1">Dimensions</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Dimensions</h3>
         <div className="grid grid-cols-2 gap-4">
           <RangeInput
             label="Width"
@@ -66,7 +66,7 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
 
       {/* Header */}
       <section className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-1">Header</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Header</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
             label="Header Background"
@@ -95,7 +95,7 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
 
       {/* Message Bubbles Section */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Message Bubbles</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">Message Bubbles</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
             label="User Bubble Color"
@@ -128,10 +128,9 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
         />
       </section>
 
-
       {/* Question Prompt */}
       <section className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-1">Bot Question</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Bot Question</h3>
         <TextInput
           label="Question"
           value={settings.question}
@@ -142,17 +141,17 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
 
       {/* Tags */}
       <section className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-1">Quick-Reply Tags</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Quick-Reply Tags</h3>
         <div className="flex flex-wrap gap-2">
           {(settings.tags || []).map((tag, idx) => (
             <div
               key={idx}
-              className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+              className="flex items-center bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium border border-blue-200 dark:border-blue-800"
             >
               {tag}
               <button
                 onClick={() => removeTag(idx)}
-                className="ml-2 text-blue-500 hover:text-blue-700"
+                className="ml-2 text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
               >
                 ×
               </button>
@@ -160,15 +159,17 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
           ))}
         </div>
         <div className="flex gap-2">
-          <TextInput
-            label="New Tag"
-            value={newTag}
-            onChange={setNewTag}
-            placeholder="Add tag"
-          />
+          <div className="flex-1">
+            <TextInput
+              label="New Tag"
+              value={newTag}
+              onChange={setNewTag}
+              placeholder="Add tag"
+            />
+          </div>
           <button
             onClick={addTag}
-            className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white font-medium rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
           >
             Add
           </button>
@@ -176,9 +177,8 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
       </section>
 
       {/* Input Area */}
-      {/* Input Area */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold border-b pb-1">Input Area</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Input Area</h3>
 
         {/* Colors */}
         <div className="grid grid-cols-2 gap-4">
@@ -259,7 +259,7 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
 
       {/* Send Button */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold border-b pb-1">Send Button</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Send Button</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
             label="Button Background"
@@ -305,10 +305,9 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
         </div>
       </section>
 
-
       {/* Footer */}
       <section className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-1">Footer</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Footer</h3>
         <div className="grid grid-cols-2 gap-4">
           <ColorInput
             label="Footer Background"

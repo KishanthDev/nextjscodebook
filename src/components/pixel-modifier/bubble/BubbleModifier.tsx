@@ -28,12 +28,14 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
     updateNestedSetting,
 }) => {
     return (
-        <div className="lg:w-96 space-y-6 bg-white p-6 rounded-lg shadow-sm overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Bubble Modifier</h2>
+        <div className="lg:w-96 space-y-6 bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-neutral-700 overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Bubble Modifier</h2>
 
             {/* Dimensions Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Dimensions</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
+                    Dimensions
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                     <RangeInput
                         label="Width"
@@ -52,7 +54,9 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
 
             {/* Border Radius Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Border Radius</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
+                    Border Radius
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                     {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
                         <RangeInput
@@ -68,7 +72,9 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
 
             {/* Background Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Background</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
+                    Background
+                </h3>
                 <ColorInput
                     label="Base Color"
                     value={settings.backgroundColor}
@@ -104,7 +110,9 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
 
             {/* Background Overlay Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Background Overlay</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
+                    Background Overlay
+                </h3>
 
                 <SelectInput
                     label="Overlay Type"
@@ -196,10 +204,11 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                 )}
             </section>
 
-
             {/* Border Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Border</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
+                    Border
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                     <RangeInput
                         label="Width"
@@ -253,7 +262,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                         onChange={(enabled) => updateNestedSetting('outlineRing', 'enabled', enabled)}
                     />
                     {settings.outlineRing.enabled && (
-                        <div className="mt-3 space-y-3 pl-6">
+                        <div className="mt-3 space-y-3 pl-6 border-l-2 border-gray-200 dark:border-neutral-700">
                             <RangeInput
                                 label="Ring Width"
                                 value={settings.outlineRing.width}
@@ -279,7 +288,9 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
 
             {/* Shadows & Effects Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Shadows & Effects</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
+                    Shadows & Effects
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                     <RangeInput
                         label="Shadow Blur"
@@ -322,7 +333,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                     onChange={(enabled) => updateNestedSetting('innerShadow', 'enabled', enabled)}
                 />
                 {settings.innerShadow.enabled && (
-                    <div className="pl-6 space-y-3">
+                    <div className="pl-6 space-y-3 border-l-2 border-gray-200 dark:border-neutral-700">
                         <RangeInput
                             label="Inner Blur"
                             value={settings.innerShadow.blur}
@@ -345,7 +356,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                     onChange={(enabled) => updateNestedSetting('glass', 'enabled', enabled)}
                 />
                 {settings.glass.enabled && (
-                    <div className="pl-6 space-y-3">
+                    <div className="pl-6 space-y-3 border-l-2 border-gray-200 dark:border-neutral-700">
                         <RangeInput
                             label="Backdrop Blur"
                             value={settings.glass.blur}
@@ -370,7 +381,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                     onChange={(enabled) => updateNestedSetting('neon', 'enabled', enabled)}
                 />
                 {settings.neon.enabled && (
-                    <div className="pl-6 space-y-3">
+                    <div className="pl-6 space-y-3 border-l-2 border-gray-200 dark:border-neutral-700">
                         <ColorInput
                             label="Neon Color"
                             value={settings.neon.color}
@@ -389,7 +400,9 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
 
             {/* Animation Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Animation</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
+                    Animation
+                </h3>
                 <SelectInput
                     label="Entry Animation"
                     value={settings.animation.type}
@@ -426,7 +439,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                     onChange={(enabled) => updateNestedSetting('idleAnim', 'enabled', enabled)}
                 />
                 {settings.idleAnim.enabled && (
-                    <div className="pl-6 space-y-3">
+                    <div className="pl-6 space-y-3 border-l-2 border-gray-200 dark:border-neutral-700">
                         <SelectInput
                             label="Type"
                             value={settings.idleAnim.type}
@@ -457,7 +470,9 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
 
             {/* Dots Loader Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Dots Loader</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
+                    Dots Loader
+                </h3>
                 <CheckboxInput
                     label="Show Dots"
                     checked={!!settings.dots}
@@ -466,7 +481,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                     }}
                 />
                 {settings.dots && (
-                    <div className="pl-6 space-y-3">
+                    <div className="pl-6 space-y-3 border-l-2 border-gray-200 dark:border-neutral-700">
                         <ColorInput
                             label="Dot Color"
                             value={settings.dots.color}
@@ -499,7 +514,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
                     </div>
                 )}
             </section>
-        </div >
+        </div>
     );
 };
 

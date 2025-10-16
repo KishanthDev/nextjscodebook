@@ -32,12 +32,12 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
     };
 
     return (
-        <div className="lg:w-96 space-y-6 bg-white p-6 rounded-lg shadow-sm overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Chat Bar Modifier</h2>
+        <div className="lg:w-96 space-y-6 bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-sm overflow-y-auto border border-gray-200 dark:border-neutral-700">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Chat Bar Modifier</h2>
 
             {/* Dimensions Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Dimensions</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">Dimensions</h3>
                 <div className="grid grid-cols-2 gap-4">
                     <RangeInput
                         label="Width"
@@ -56,7 +56,7 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
 
             {/* Border Radius Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Border Radius</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">Border Radius</h3>
                 <div className="grid grid-cols-2 gap-4">
                     {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
                         <RangeInput
@@ -72,7 +72,7 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
 
             {/* Text Settings Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Text Settings</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">Text Settings</h3>
 
                 <TextInput
                     label="Text"
@@ -104,7 +104,7 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
 
             {/* Background Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Background</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">Background</h3>
 
                 <ColorInput
                     label="Background Color"
@@ -146,7 +146,7 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
 
             {/* Icon Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Icon Settings</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">Icon Settings</h3>
 
                 <SelectInput
                     label="Icon Type"
@@ -239,7 +239,7 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
 
             {/* Shadow Section */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Shadow</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">Shadow</h3>
 
                 <CheckboxInput
                     label="Enable Shadow"

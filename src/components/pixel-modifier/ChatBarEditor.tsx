@@ -26,7 +26,7 @@ export default function ChatBarEditor({ initialSettings }: ChatBarEditorProps) {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 rounded-lg h-[calc(100vh-114px)]">
+    <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 rounded-lg dark:bg-neutral-900 h-[calc(100vh-114px)]">
       <ChatBarModifier settings={settings} update={update} />
       <ChatBarPreview settings={settings} />
     </div>

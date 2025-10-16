@@ -14,7 +14,7 @@ export const TextInput: React.FC<TextInputProps> = ({
 }) => {
     return (
         <div className={`flex flex-col ${className}`}>
-            <Label className="text-sm font-medium text-gray-700">{label}</Label>
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</Label>
             <Input
                 type="text"
                 value={value}
@@ -79,8 +79,8 @@ export const RangeInput: React.FC<RangeInputProps> = ({
     return (
         <label className="block">
             <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">{label}:</span>
-                <div className="flex items-center bg-gray-100 rounded overflow-hidden">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}:</span>
+                <div className="flex items-center bg-gray-100 dark:bg-neutral-800 rounded overflow-hidden">
                     {isEditing ? (
                         <input
                             type="number"
@@ -91,14 +91,14 @@ export const RangeInput: React.FC<RangeInputProps> = ({
                             min={min}
                             max={max}
                             step={step}
-                            className="w-16 px-2 py-1 text-xs text-center bg-white border-0 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-16 px-2 py-1 text-xs text-center bg-white dark:bg-neutral-900 dark:text-gray-200 border-0 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400"
                             autoFocus
                         />
                     ) : (
                         <button
                             type="button"
                             onClick={handleValueClick}
-                            className="px-2 py-1 text-xs text-gray-700 hover:bg-gray-200 transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400"
                         >
                             {value}{unit}
                         </button>
@@ -112,7 +112,7 @@ export const RangeInput: React.FC<RangeInputProps> = ({
                 step={step}
                 value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
-                className={`${className} h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider`}
+                className={`${className} h-2 bg-gray-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer slider`}
             />
         </label>
     );
@@ -120,15 +120,15 @@ export const RangeInput: React.FC<RangeInputProps> = ({
 
 export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }) => (
     <label className="block">
-        <span className="text-sm font-medium text-gray-700">{label}:</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}:</span>
         <div className="mt-1 flex items-center gap-2">
             <input
                 type="color"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-12 h-8 border border-gray-300 rounded cursor-pointer"
+                className="w-12 h-8 border border-gray-300 dark:border-neutral-600 rounded cursor-pointer bg-white dark:bg-neutral-800"
             />
-            <span className="text-xs text-gray-500 font-mono">{value}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">{value}</span>
         </div>
     </label>
 );
@@ -144,14 +144,18 @@ export function SelectInput<T extends string>({
 }: SelectInputProps<T>) {
     return (
         <div className="space-y-1">
-            <Label>{label}</Label>
+            <Label className="text-gray-700 dark:text-gray-300">{label}</Label>
             <Select value={value} onValueChange={(val) => onChange(val as T)}>
-                <SelectTrigger>
+                <SelectTrigger className="dark:bg-neutral-800 dark:border-neutral-600 dark:text-gray-200">
                     <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="dark:bg-neutral-800 dark:border-neutral-600">
                     {options.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
+                        <SelectItem 
+                            key={opt.value} 
+                            value={opt.value}
+                            className="dark:text-gray-200 dark:focus:bg-neutral-700 dark:hover:bg-neutral-700"
+                        >
                             {opt.label}
                         </SelectItem>
                     ))}
@@ -166,8 +170,12 @@ export function SelectInput<T extends string>({
 //
 export const CheckboxInput: React.FC<CheckboxInputProps> = ({ label, checked, onChange }) => (
     <div className="flex items-center space-x-2">
-        <Checkbox checked={checked} onCheckedChange={(v) => onChange(!!v)} />
-        <Label>{label}</Label>
+        <Checkbox 
+            checked={checked} 
+            onCheckedChange={(v) => onChange(!!v)}
+            className="dark:border-neutral-600 dark:data-[state=checked]:bg-blue-600"
+        />
+        <Label className="text-gray-700 dark:text-gray-300 cursor-pointer">{label}</Label>
     </div>
 );
 
@@ -190,9 +198,9 @@ export const GradientStopEditor: React.FC<GradientStopEditorProps> = ({ stops, o
 
     return (
         <div className="space-y-3">
-            <div className="font-medium text-sm text-gray-700">Gradient Stops</div>
+            <div className="font-medium text-sm text-gray-700 dark:text-gray-300">Gradient Stops</div>
             {stops.map((stop, idx) => (
-                <div key={idx} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                <div key={idx} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-neutral-800 rounded border border-gray-200 dark:border-neutral-700">
                     <ColorInput
                         label=""
                         value={stop.color}
@@ -211,7 +219,7 @@ export const GradientStopEditor: React.FC<GradientStopEditorProps> = ({ stops, o
                         <button
                             type="button"
                             onClick={() => removeStop(idx)}
-                            className="px-2 py-1 text-xs bg-red-100 text-red-700 border border-red-300 rounded hover:bg-red-200"
+                            className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                         >
                             Remove
                         </button>
@@ -221,7 +229,7 @@ export const GradientStopEditor: React.FC<GradientStopEditorProps> = ({ stops, o
             <button
                 type="button"
                 onClick={addStop}
-                className="px-3 py-1 text-xs bg-blue-100 text-blue-700 border border-blue-300 rounded hover:bg-blue-200"
+                className="px-3 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800 rounded hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
             >
                 Add Stop
             </button>

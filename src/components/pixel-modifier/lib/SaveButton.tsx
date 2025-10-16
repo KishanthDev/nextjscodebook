@@ -36,7 +36,7 @@ export const SaveButton: React.FC<SaveButtonProps> = ({ type, data }) => {
                 if (type === 'chatwidget') setChatwidget(data);
 
                 // simulate slight delay for smooth UX
-                await new Promise((r) => setTimeout(r, 300));
+                await new Promise((resolve) => setTimeout(resolve, 300));
 
                 setSuccess(true);
                 setTimeout(() => setSuccess(false), 2000);

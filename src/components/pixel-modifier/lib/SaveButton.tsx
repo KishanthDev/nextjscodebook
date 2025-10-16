@@ -20,35 +20,40 @@ export const SaveButton: React.FC<SaveButtonProps> = ({ type, data }) => {
         setLoading(true);
         setSuccess(false);
 
-        await toast.promise(
-            (async () => {
-                const res = await fetch('/api/config', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type, data }),
-                });
+        try {
+            await toast.promise(
+                (async () => {
+                    const res = await fetch('/api/config', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type, data }),
+                    });
 
-                if (!res.ok) throw new Error('Failed to save configuration.');
+                    if (!res.ok) throw new Error('Failed to save configuration.');
 
-                // ✅ Update Zustand store
-                if (type === 'bubble') setBubble(data);
-                if (type === 'chatbar') setChatbar(data);
-                if (type === 'chatwidget') setChatwidget(data);
+                    // ✅ Update Zustand store
+                    if (type === 'bubble') setBubble(data);
+                    if (type === 'chatbar') setChatbar(data);
+                    if (type === 'chatwidget') setChatwidget(data);
 
-                // simulate slight delay for smooth UX
-                await new Promise((resolve) => setTimeout(resolve, 300));
+                    // simulate slight delay for smooth UX
+                    await new Promise((resolve) => setTimeout(resolve, 300));
+                })(),
+                {
+                    loading: 'Saving configuration...',
+                    success: 'Configuration saved successfully!',
+                    error: 'Failed to save configuration.',
+                }
+            );
 
-                setSuccess(true);
-                setTimeout(() => setSuccess(false), 2000);
-            })(),
-            {
-                loading: 'Saving configuration...',
-                success: 'Configuration saved successfully!',
-                error: 'Failed to save configuration.',
-            }
-        );
-
-        setLoading(false);
+            // show success icon
+            setSuccess(true);
+            setTimeout(() => setSuccess(false), 2000);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -58,13 +63,14 @@ export const SaveButton: React.FC<SaveButtonProps> = ({ type, data }) => {
             disabled={loading}
             variant="outline"
             className="
-    relative flex items-center justify-center
-    w-9 h-9 p-0
-    cursor-pointer
-    transition-all duration-200
-    hover:bg-muted/50
-    disabled:cursor-not-allowed
-  "      title="Save"
+        relative flex items-center justify-center
+        w-9 h-9 p-0
+        cursor-pointer
+        transition-all duration-200
+        hover:bg-muted/50
+        disabled:cursor-not-allowed
+      "
+            title="Save"
         >
             {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin text-blue-500" />

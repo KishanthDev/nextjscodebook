@@ -9,6 +9,7 @@ import { useConfigStore } from "@/stores/useConfigStore";
 import { useEffect } from "react";
 import { AddWidgetButton } from "@/components/pixel-modifier/lib/AddWidgetButton";
 import { DeleteWidgetButton } from "@/components/pixel-modifier/lib/DeleteButton";
+import EyecatcherMain from "@/components/pixel-modifier/eyecatcher/EyecatcherMain";
 
 export default function PageClient({ configs }: { configs: any[] }) {
   const { setAllConfigs, getCurrentWidget } = useConfigStore();
@@ -16,7 +17,7 @@ export default function PageClient({ configs }: { configs: any[] }) {
   // Store all widgets in Zustand on mount
   useEffect(() => {
     setAllConfigs(configs);
-  }, [configs, setAllConfigs]); 
+  }, [configs, setAllConfigs]);
 
   const current = getCurrentWidget();
 
@@ -32,6 +33,8 @@ export default function PageClient({ configs }: { configs: any[] }) {
             <TabsTrigger value="bubble">Bubble</TabsTrigger>
             <TabsTrigger value="chat">Chat Bar</TabsTrigger>
             <TabsTrigger value="chatwidgetopen">Chat Widget Open</TabsTrigger>
+            <TabsTrigger value="eyecatcher">Eye Catcher</TabsTrigger>
+
           </TabsList>
 
           {/* Button group on the right */}
@@ -52,6 +55,10 @@ export default function PageClient({ configs }: { configs: any[] }) {
 
         <TabsContent value="chatwidgetopen">
           <ChatWidgetEditor key={current.id} initialSettings={current.chatwidgetSettings} />
+        </TabsContent>
+
+        <TabsContent value="eyecatcher">
+          <EyecatcherMain />
         </TabsContent>
       </Tabs>
     </div>

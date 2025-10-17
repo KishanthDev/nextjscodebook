@@ -83,6 +83,10 @@ export const BubblePreview: React.FC<BubblePreviewProps> = ({ settings }) => {
       : {}),
   }), [settings.border, settings.borderGradientEnabled, borderImage]);
 
+  
+if (!settings) return <div className="text-gray-500">No chatbar settings available</div>;
+
+
   return (
     <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-neutral-800 rounded-lg p-8 relative">
       {/* Save & Download Buttons */}

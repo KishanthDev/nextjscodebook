@@ -8,39 +8,40 @@ import { useConfigStore } from "@/stores/useConfigStore";
 
 interface SaveButtonProps {
   type: 'bubble' | 'chatbar' | 'chatwidget';
-  data: any; // the updated settings for that type
+  data: any; // updated settings for that type
 }
 
 export const SaveButton: React.FC<SaveButtonProps> = ({ type, data }) => {
-  const { widgets } = useConfigStore();
+  const { widgets, currentWidgetId, updateWidget } = useConfigStore();
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
 
   const handleSave = async () => {
-    if (!widgets || widgets.length === 0) {
-      toast.error("No widget data found to save!");
+    if (!widgets || widgets.length === 0 || currentWidgetId === null) {
+      toast.error("No widget selected to save!");
       return;
     }
 
     setLoading(true);
     setSuccess(false);
 
+    const current = widgets.find(w => w.id === currentWidgetId);
+    if (!current) {
+      toast.error("Selected widget not found!");
+      setLoading(false);
+      return;
+    }
+
+    // Merge updated data into current widget
+    const payload = {
+      ...current,
+      bubblejson: type === 'bubble' ? data : current.bubblejson,
+      chatbarjson: type === 'chatbar' ? data : current.chatbarjson,
+      chatwidgetSettings: type === 'chatwidget' ? data : current.chatwidgetSettings,
+      updatedAt: new Date().toISOString(),
+    };
+
     try {
-      const first = widgets[0];
-
-      // Build payload using the updated settings for the selected type
-      const payload = {
-        id: first.id,
-        customerId: first.customerId,
-        websiteId: first.websiteId,
-        bubblejson: type === 'bubble' ? data : first.bubblejson,
-        chatbarjson: type === 'chatbar' ? data : first.chatbarjson,
-        chatwindowjson: first.chatwindowjson || {},
-        chatwidgetSettings: type === 'chatwidget' ? data : first.chatwidgetSettings,
-        createdAt: first.createdAt,
-        updatedAt: new Date().toISOString(),
-      };
-
       await toast.promise(
         (async () => {
           const res = await fetch("/api/config", {
@@ -51,7 +52,10 @@ export const SaveButton: React.FC<SaveButtonProps> = ({ type, data }) => {
 
           if (!res.ok) throw new Error("Failed to save configuration");
 
-          await new Promise((resolve) => setTimeout(resolve, 300));
+          // Update local store after successful save
+          updateWidget(currentWidgetId, payload);
+
+          await new Promise(resolve => setTimeout(resolve, 300));
         })(),
         {
           loading: "Saving configuration...",

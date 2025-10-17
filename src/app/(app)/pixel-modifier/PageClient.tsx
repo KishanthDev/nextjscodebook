@@ -4,45 +4,52 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/registry/new-york-v4
 import BubbleEditorSSR from "@/components/pixel-modifier/BubbleEditor";
 import ChatBar from "@/components/pixel-modifier/ChatBarEditor";
 import ChatWidgetEditor from "@/components/pixel-modifier/ChatWidgetEditor";
-import { useEffect } from "react";
+import WidgetDropdown from "@/components/pixel-modifier/lib/Dropdown";
 import { useConfigStore } from "@/stores/useConfigStore";
+import { useEffect } from "react";
+import { AddWidgetButton } from "@/components/pixel-modifier/lib/AddWidgetButton";
+import { DeleteWidgetButton } from "@/components/pixel-modifier/lib/DeleteButton";
 
-interface PageClientProps {
-  configs: any[];
-}
+export default function PageClient({ configs }: { configs: any[] }) {
+  const { setAllConfigs, getCurrentWidget } = useConfigStore();
 
-export default function PageClient({ configs }: PageClientProps) {
-  const { setAllConfigs, widgets } = useConfigStore();
-
-  // ✅ Store all widget configs in Zustand on mount
+  // Store all widgets in Zustand on mount
   useEffect(() => {
     setAllConfigs(configs);
   }, [configs, setAllConfigs]);
 
-  if (widgets.length === 0) return <div>Loading editors...</div>;
+  const current = getCurrentWidget();
 
-  // Just editing first widget for now (can extend to multiple)
-  const first = widgets[0];
+  if (!current) return <div>Loading widgets...</div>;
+  console.log(current);
+
 
   return (
-    <Tabs defaultValue="bubble" className="w-full">
-      <TabsList>
-        <TabsTrigger value="bubble">Bubble</TabsTrigger>
-        <TabsTrigger value="chat">Chat Bar</TabsTrigger>
-        <TabsTrigger value="chatwidgetopen">Chat Widget Open</TabsTrigger>
-      </TabsList>
+    <div className="flex flex-col w-full h-[calc(100vh-114px)] mx-auto p-4">
+      {/* Dropdown to select which widget to edit */}
+      <WidgetDropdown />
+<AddWidgetButton/>
+<DeleteWidgetButton/>
+      <Tabs defaultValue="bubble" className="w-full flex-1 mt-4">
+        <TabsList>
+          <TabsTrigger value="bubble">Bubble</TabsTrigger>
+          <TabsTrigger value="chat">Chat Bar</TabsTrigger>
+          <TabsTrigger value="chatwidgetopen">Chat Widget Open</TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="bubble" className="relative">
-        <BubbleEditorSSR initialSettings={first.bubblejson} />
-      </TabsContent>
+        <TabsContent value="bubble" className="relative">
+          <BubbleEditorSSR key={current.id} initialSettings={current.bubblejson} />
+        </TabsContent>
 
-      <TabsContent value="chat">
-        <ChatBar initialSettings={first.chatbarjson} />
-      </TabsContent>
+        <TabsContent value="chat">
+          <ChatBar key={current.id} initialSettings={current.chatbarjson} />
+        </TabsContent>
 
-      <TabsContent value="chatwidgetopen">
-        <ChatWidgetEditor initialSettings={first.chatwidgetSettings} />
-      </TabsContent>
-    </Tabs>
+        <TabsContent value="chatwidgetopen">
+          <ChatWidgetEditor key={current.id} initialSettings={current.chatwidgetSettings} />
+        </TabsContent>
+
+      </Tabs>
+    </div>
   );
 }

@@ -20,9 +20,8 @@ export default function EyecatcherMain() {
 
     return (
         <div className="flex flex-col lg:flex-row gap-8 p-6 h-[calc(100vh-114px)]">
-                    <EyecatcherModifier settings={settings} update={updateSetting} />
-                    <EyecatcherPreview settings={settings} />
-              
+            <EyecatcherModifier settings={settings} update={updateSetting} />
+            <EyecatcherPreview settings={settings} />
         </div>
     );
 }

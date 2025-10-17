@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { AddWidgetButton } from "@/components/pixel-modifier/lib/AddWidgetButton";
 import { DeleteWidgetButton } from "@/components/pixel-modifier/lib/DeleteButton";
 import EyecatcherMain from "@/components/pixel-modifier/eyecatcher/EyecatcherMain";
+import GreetingMain from "@/components/pixel-modifier/greeting/GreetingMain";
 
 export default function PageClient({ configs }: { configs: any[] }) {
   const { setAllConfigs, getCurrentWidget } = useConfigStore();
@@ -34,6 +35,7 @@ export default function PageClient({ configs }: { configs: any[] }) {
             <TabsTrigger value="chat">Chat Bar</TabsTrigger>
             <TabsTrigger value="chatwidgetopen">Chat Widget Open</TabsTrigger>
             <TabsTrigger value="eyecatcher">Eye Catcher</TabsTrigger>
+            <TabsTrigger value="greeting">Greeting</TabsTrigger>
 
           </TabsList>
 
@@ -59,6 +61,10 @@ export default function PageClient({ configs }: { configs: any[] }) {
 
         <TabsContent value="eyecatcher">
           <EyecatcherMain />
+        </TabsContent>
+
+        <TabsContent value="greeting">
+          <GreetingMain />
         </TabsContent>
       </Tabs>
     </div>

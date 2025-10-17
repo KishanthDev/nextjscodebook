@@ -6,29 +6,23 @@ import ChatBar from "@/components/pixel-modifier/ChatBarEditor";
 import ChatWidgetEditor from "@/components/pixel-modifier/ChatWidgetEditor";
 import { useEffect } from "react";
 import { useConfigStore } from "@/stores/useConfigStore";
-import { BubblePixelSettings } from "@/components/pixel-modifier/bubble/bubbletype";
-import { ChatbarSettings } from "@/components/pixel-modifier/chatbar/chatbartype";
-import { ChatWidgetSettings } from "@/components/pixel-modifier/chatwidget/chat-widget-types";
 
 interface PageClientProps {
-  bubble: BubblePixelSettings;
-  chatbar: ChatbarSettings;
-  chatwidget: ChatWidgetSettings;
+  configs: any[];
 }
 
-export default function PageClient({ bubble, chatbar, chatwidget }: PageClientProps) {
-  const { setBubble, setChatbar, setChatwidget } = useConfigStore();
+export default function PageClient({ configs }: PageClientProps) {
+  const { setAllConfigs, widgets } = useConfigStore();
 
+  // ✅ Store all widget configs in Zustand on mount
   useEffect(() => {
-    setBubble(bubble);
-    setChatbar(chatbar);
-    setChatwidget(chatwidget);
-  }, [bubble, chatbar, chatwidget, setBubble, setChatbar, setChatwidget]);
+    setAllConfigs(configs);
+  }, [configs, setAllConfigs]);
 
-  const store = useConfigStore();
-  const { bubble: bubbleStore, chatbar: chatbarStore, chatwidget: chatwidgetStore } = store;
+  if (widgets.length === 0) return <div>Loading editors...</div>;
 
-  if (!bubbleStore || !chatbarStore || !chatwidgetStore) return <div>Loading editors...</div>;
+  // Just editing first widget for now (can extend to multiple)
+  const first = widgets[0];
 
   return (
     <Tabs defaultValue="bubble" className="w-full">
@@ -38,16 +32,16 @@ export default function PageClient({ bubble, chatbar, chatwidget }: PageClientPr
         <TabsTrigger value="chatwidgetopen">Chat Widget Open</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="bubble">
-        <BubbleEditorSSR initialSettings={bubbleStore} />
+      <TabsContent value="bubble" className="relative">
+        <BubbleEditorSSR initialSettings={first.bubblejson} />
       </TabsContent>
 
       <TabsContent value="chat">
-        <ChatBar initialSettings={chatbarStore} />
+        <ChatBar initialSettings={first.chatbarjson} />
       </TabsContent>
 
       <TabsContent value="chatwidgetopen">
-        <ChatWidgetEditor initialSettings={chatwidgetStore} />
+        <ChatWidgetEditor initialSettings={first.chatwidgetSettings} />
       </TabsContent>
     </Tabs>
   );

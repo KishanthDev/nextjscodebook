@@ -3,20 +3,31 @@ import { BubblePixelSettings } from '@/components/pixel-modifier/bubble/bubblety
 import { ChatbarSettings } from '@/components/pixel-modifier/chatbar/chatbartype';
 import { ChatWidgetSettings } from '@/components/pixel-modifier/chatwidget/chat-widget-types';
 
+export interface ChatWidgetConfig {
+  id?: number;
+  customerId: number;
+  websiteId: number;
+  bubblejson: BubblePixelSettings;
+  chatbarjson: ChatbarSettings;
+  chatwindowjson?: Record<string, any>;
+  chatwidgetSettings: ChatWidgetSettings;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface ConfigStore {
-  bubble: BubblePixelSettings | null;
-  chatbar: ChatbarSettings | null;
-  chatwidget: ChatWidgetSettings | null;
-  setBubble: (data: BubblePixelSettings) => void;
-  setChatbar: (data: ChatbarSettings) => void;
-  setChatwidget: (data: ChatWidgetSettings) => void;
+  widgets: ChatWidgetConfig[];
+  setAllConfigs: (configs: ChatWidgetConfig[]) => void;
+  updateWidget: (id: number, updatedData: Partial<ChatWidgetConfig>) => void;
 }
 
 export const useConfigStore = create<ConfigStore>((set) => ({
-  bubble: null,
-  chatbar: null,
-  chatwidget: null,
-  setBubble: (data) => set({ bubble: data }),
-  setChatbar: (data) => set({ chatbar: data }),
-  setChatwidget: (data) => set({ chatwidget: data }),
+  widgets: [],
+  setAllConfigs: (configs) => set({ widgets: configs }),
+  updateWidget: (id, updatedData) =>
+    set((state) => ({
+      widgets: state.widgets.map((w) =>
+        w.id === id ? { ...w, ...updatedData } : w
+      ),
+    })),
 }));

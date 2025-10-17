@@ -1,47 +1,46 @@
 import { NextResponse } from "next/server";
-import pool from "./db";
 
-// ✅ GET all configs
-export async function GET() {
-  const client = await pool.connect();
-  try {
-    const [bubble, chatbar, chatwidget] = await Promise.all([
-      client.query("SELECT data FROM bubble_config ORDER BY id ASC LIMIT 1"),
-      client.query("SELECT data FROM chatbar_config ORDER BY id ASC LIMIT 1"),
-      client.query("SELECT data FROM chatwidget_config ORDER BY id ASC LIMIT 1"),
-    ]);
-
-    return NextResponse.json({
-      bubble: bubble.rows[0]?.data || {},
-      chatbar: chatbar.rows[0]?.data || {},
-      chatwidget: chatwidget.rows[0]?.data || {},
-    });
-  } catch (err: any) {
-    console.error("GET /api/config error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  } finally {
-    client.release();
-  }
-}
-
-// ✅ PUT to update one config
 export async function PUT(req: Request) {
-  const client = await pool.connect();
   try {
-    const { type, data } = await req.json();
+    const body = await req.json();
 
-    if (!["bubble", "chatbar", "chatwidget"].includes(type)) {
-      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+    // We now send full array data from client
+    const res = await fetch(
+      "https://zotlyadminapis-39lct.ondigitalocean.app/zotlyadmin/chatwidgets/update",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body), // send full array
+      }
+    );
+
+    // Try parsing as JSON safely
+    const resultText = await res.text();
+    let data;
+    try {
+      data = JSON.parse(resultText);
+    } catch {
+      // Fallback if it’s not JSON
+      console.error("Non-JSON response:", resultText);
+      return NextResponse.json(
+        { error: "Invalid JSON from server", message: resultText },
+        { status: 500 }
+      );
     }
 
-    const table = `${type}_config`;
-    await client.query(`UPDATE ${table} SET data = $1, updated_at = NOW() WHERE id = 1`, [data]);
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: "Server error", message: data },
+        { status: res.status }
+      );
+    }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(data);
   } catch (err: any) {
-    console.error("PUT /api/config error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  } finally {
-    client.release();
+    console.error("API /config error:", err);
+    return NextResponse.json(
+      { error: "Internal Server Error", message: err.message },
+      { status: 500 }
+    );
   }
 }

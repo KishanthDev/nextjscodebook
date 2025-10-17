@@ -30,14 +30,12 @@ export const AddWidgetButton: React.FC = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      const res = await fetch(
-        'https://zotlyadminapis-39lct.ondigitalocean.app/zotlyadmin/chatwidgets/save',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch("/api/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
 
       if (!res.ok) throw new Error('Failed to create new widget');
 

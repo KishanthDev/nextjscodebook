@@ -16,26 +16,31 @@ export default function PageClient({ configs }: { configs: any[] }) {
   // Store all widgets in Zustand on mount
   useEffect(() => {
     setAllConfigs(configs);
-  }, [configs, setAllConfigs]);
+  }, [configs, setAllConfigs]); 
 
   const current = getCurrentWidget();
 
   if (!current) return <div>Loading widgets...</div>;
   console.log(current);
 
-
   return (
-    <div className="flex flex-col w-full h-[calc(100vh-114px)] mx-auto p-4">
-      {/* Dropdown to select which widget to edit */}
-      <WidgetDropdown />
-<AddWidgetButton/>
-<DeleteWidgetButton/>
-      <Tabs defaultValue="bubble" className="w-full flex-1 mt-4">
-        <TabsList>
-          <TabsTrigger value="bubble">Bubble</TabsTrigger>
-          <TabsTrigger value="chat">Chat Bar</TabsTrigger>
-          <TabsTrigger value="chatwidgetopen">Chat Widget Open</TabsTrigger>
-        </TabsList>
+    <div className="flex flex-col w-full h-[calc(100vh-114px)] mx-auto">
+      <Tabs defaultValue="bubble" className="w-full flex-1">
+        {/* Header with TabsList and Buttons */}
+        <div className="flex items-center justify-between gap-4">
+          <TabsList>
+            <TabsTrigger value="bubble">Bubble</TabsTrigger>
+            <TabsTrigger value="chat">Chat Bar</TabsTrigger>
+            <TabsTrigger value="chatwidgetopen">Chat Widget Open</TabsTrigger>
+          </TabsList>
+
+          {/* Button group on the right */}
+          <div className="flex items-center gap-2">
+            <WidgetDropdown />
+            <AddWidgetButton />
+            <DeleteWidgetButton />
+          </div>
+        </div>
 
         <TabsContent value="bubble" className="relative">
           <BubbleEditorSSR key={current.id} initialSettings={current.bubblejson} />
@@ -48,7 +53,6 @@ export default function PageClient({ configs }: { configs: any[] }) {
         <TabsContent value="chatwidgetopen">
           <ChatWidgetEditor key={current.id} initialSettings={current.chatwidgetSettings} />
         </TabsContent>
-
       </Tabs>
     </div>
   );

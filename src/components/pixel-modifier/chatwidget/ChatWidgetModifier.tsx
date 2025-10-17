@@ -36,7 +36,7 @@ export default function ChatWidgetModifier({ settings, update }: Props) {
   };
 
   return (
-    <div className="lg:w-96 p-6 bg-white dark:bg-neutral-900 rounded-lg shadow-sm dark:shadow-gray-800/30 overflow-y-auto space-y-6 border border-gray-200 dark:border-gray-800">
+    <div className="lg:w-96 p-6 bg-white dark:bg-neutral-900 rounded-lg shadow-sm dark:shadow-gray-800/30 overflow-y-auto space-y-6 border border-gray-300 dark:border-gray-800">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Chat Widget Modifier</h2>
 
       {/* Dimensions */}

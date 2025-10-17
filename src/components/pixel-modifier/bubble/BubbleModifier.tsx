@@ -28,7 +28,7 @@ export const BubbleModifier: React.FC<BubbleModifierProps> = ({
     updateNestedSetting,
 }) => {
     return (
-        <div className="lg:w-96 space-y-6 bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-neutral-700 overflow-y-auto">
+        <div className="lg:w-96 space-y-6 bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-sm border border-gray-300 dark:border-neutral-700 overflow-y-auto">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Bubble Modifier</h2>
 
             {/* Dimensions Section */}

@@ -20,11 +20,7 @@ export default function WidgetDropdown() {
   };
 
   return (
-    <div className="mb-4 w-64">
-      <label className="block mb-1 font-medium text-gray-700 dark:text-gray-200">
-        Select Chat Widget
-      </label>
-
+    <div className="w-64">
       <Select value={currentWidgetId?.toString() ?? widgets[0].id.toString()} onValueChange={handleChange}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select a widget" />

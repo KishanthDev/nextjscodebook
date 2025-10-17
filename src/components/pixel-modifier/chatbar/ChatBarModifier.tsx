@@ -32,7 +32,7 @@ export default function ChatBarModifier({ settings, update }: ModifierProps) {
     };
 
     return (
-        <div className="lg:w-96 space-y-6 bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-sm overflow-y-auto border border-gray-200 dark:border-neutral-700">
+        <div className="lg:w-96 space-y-6 bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-sm overflow-y-auto border border-gray-300 dark:border-neutral-700">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Chat Bar Modifier</h2>
 
             {/* Dimensions Section */}

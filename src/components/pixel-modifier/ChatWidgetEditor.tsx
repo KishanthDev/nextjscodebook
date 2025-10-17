@@ -26,7 +26,7 @@ export default function ChatWidgetEditor({ initialSettings }: ChatWidgetEditorPr
   );
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 rounded-lg dark:bg-neutral-900 h-[calc(100vh-114px)]">
+    <div className="flex flex-col lg:flex-row gap-8 p-6 h-[calc(100vh-114px)]">
       <ChatWidgetModifier settings={settings} update={update} />
       <ChatWidgetPreview settings={settings} />
     </div>

@@ -11,6 +11,8 @@ import { AddWidgetButton } from "@/components/pixel-modifier/lib/AddWidgetButton
 import { DeleteWidgetButton } from "@/components/pixel-modifier/lib/DeleteButton";
 import EyecatcherMain from "@/components/pixel-modifier/eyecatcher/EyecatcherMain";
 import GreetingMain from "@/components/pixel-modifier/greeting/GreetingMain";
+import CustomerSelect from "@/components/pixel-modifier/poc/CustomerSelect";
+import ChatWidgetMain from "@/components/pixel-modifier/contact/ChatWidgetMain";
 
 export default function PageClient({ configs }: { configs: any[] }) {
   const { setAllConfigs, getCurrentWidget } = useConfigStore();
@@ -36,11 +38,12 @@ export default function PageClient({ configs }: { configs: any[] }) {
             <TabsTrigger value="chatwidgetopen">Chat Widget Open</TabsTrigger>
             <TabsTrigger value="eyecatcher">Eye Catcher</TabsTrigger>
             <TabsTrigger value="greeting">Greeting</TabsTrigger>
-
+            <TabsTrigger value="contact">Contact</TabsTrigger>
           </TabsList>
 
           {/* Button group on the right */}
           <div className="flex items-center gap-2">
+            <CustomerSelect/>
             <WidgetDropdown />
             <AddWidgetButton />
             <DeleteWidgetButton />
@@ -65,6 +68,10 @@ export default function PageClient({ configs }: { configs: any[] }) {
 
         <TabsContent value="greeting">
           <GreetingMain />
+        </TabsContent>
+
+        <TabsContent value="contact">
+          <ChatWidgetMain/>
         </TabsContent>
       </Tabs>
     </div>

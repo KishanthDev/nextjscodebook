@@ -4,7 +4,6 @@ import React, { useState, useMemo } from 'react';
 import { X, Menu, Minus, ChevronLeft, Send, Smile, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatWidgetSettings, Message } from './chatwidgettype';
-import { SaveButton } from '../lib/SaveButton';
 import { CopyDownloadButtons } from '../lib/CopyDownloadButtons';
 
 interface PreviewProps {
@@ -146,7 +145,6 @@ export default function ChatWidgetPreview({ settings }: PreviewProps) {
     <div className="flex-1 relative bg-gray-50 dark:bg-neutral-800 rounded p-6 flex flex-col justify-center items-center transition-colors duration-200">
       <div className="absolute top-4 right-4 flex space-x-2 z-10">
         <CopyDownloadButtons settings={settings} filename="chatwidget-settings.json" />
-        <SaveButton type="chatwidget" data={settings} />
       </div>
       <div
         className="flex flex-col overflow-y-auto"

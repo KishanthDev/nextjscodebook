@@ -24,16 +24,16 @@ export default function ChatWidgetModifier({ settings, update }: ModifierProps) 
   return (
     <div className="lg:w-96 space-y-6 bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-sm overflow-y-auto border border-gray-200 dark:border-neutral-700 max-h-[calc(100vh-2rem)]">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-        Chat Widget Modifier
+        Chat Contact Modifier
       </h2>
 
       {/* Widget Dimensions */}
       <section className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-neutral-700 pb-2">
-          Widget Dimensions
+          Dimensions
         </h3>
         <RangeInput
-          label="Widget Width"
+          label="Width"
           value={settings.widgetWidth}
           onChange={(v) => update('widgetWidth', v)}
           {...CHATWIDGET_CONSTRAINTS.widgetWidth}

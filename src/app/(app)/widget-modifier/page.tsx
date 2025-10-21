@@ -16,6 +16,7 @@ import { BubbleWidget, ChatBarWidget, ChatWidgetOpen } from "@/components/widget
 import newChatBarJson from "@/defaults/newchatbar.json";
 import newChatWidgetJson from "@/defaults/newchatwidget.json";
 import CustomerSelect from "@/components/widget-builder/poc/CustomerSelect";
+import BubbleMain from "@/components/widget-modifier/bubble/BubbleMain";
 
 const TABS = [
     { label: "All", value: "all" },
@@ -98,7 +99,14 @@ export default function Page() {
                                 ))}
                             </div>
                         </div>
-                        <div>........................</div>
+                        {selectedOption === "bubble" && (
+                            <div className="mt-4">
+                                <BubbleMain
+                                    key={selectedBubble?._id}
+                                    initialSettings={selectedBubble?.bubbleSettings || {}}
+                                />
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <div className="text-lg text-gray-600 dark:text-gray-300">

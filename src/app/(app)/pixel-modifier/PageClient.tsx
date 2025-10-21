@@ -1,36 +1,51 @@
 'use client';
 
+import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/registry/new-york-v4/ui/tabs";
 import BubbleEditorSSR from "@/components/pixel-modifier/BubbleEditor";
 import ChatBar from "@/components/pixel-modifier/ChatBarEditor";
 import ChatWidgetEditor from "@/components/pixel-modifier/ChatWidgetEditor";
-import WidgetDropdown from "@/components/pixel-modifier/lib/Dropdown";
 import { useConfigStore } from "@/stores/useConfigStore";
-import { useEffect } from "react";
 import { AddWidgetButton } from "@/components/pixel-modifier/lib/AddWidgetButton";
 import { DeleteWidgetButton } from "@/components/pixel-modifier/lib/DeleteButton";
 import EyecatcherMain from "@/components/pixel-modifier/eyecatcher/EyecatcherMain";
 import GreetingMain from "@/components/pixel-modifier/greeting/GreetingMain";
 import CustomerSelect from "@/components/pixel-modifier/poc/CustomerSelect";
 import ChatWidgetMain from "@/components/pixel-modifier/contact/ChatWidgetMain";
+import WidgetSelect from "@/components/pixel-modifier/WidgetSelect";
+
+// sample defaults
+import newBubbleJson from "@/defaults/newbubble.json";
+import { BubbleWidget, ChatBarWidget, ChatWidgetOpen } from "@/components/pixel-modifier/widgetTypes";
+import newChatBarJson from "@/defaults/newchatbar.json";
+import newChatWidgetJson from "@/defaults/newchatwidget.json";
 
 export default function PageClient({ configs }: { configs: any[] }) {
   const { setAllConfigs, getCurrentWidget } = useConfigStore();
 
-  // Store all widgets in Zustand on mount
+  const [activeTab, setActiveTab] = useState("bubble");
+
+  // Local state for selected items of each type
+  const newBubble: BubbleWidget[] = newBubbleJson as unknown as BubbleWidget[];
+  const newChatBar: ChatBarWidget[] = newChatBarJson as unknown as ChatBarWidget[];
+  const newChatWidget: ChatWidgetOpen[] = newChatWidgetJson as unknown as ChatWidgetOpen[];
+
+  const [selectedBubble, setSelectedBubble] = useState(newBubble[0]);
+  const [selectedChatBar, setSelectedChatBar] = useState(newChatBar[0]);
+  const [selectedChatWidget, setSelectedChatWidget] = useState(newChatWidget[0]);
+
   useEffect(() => {
     setAllConfigs(configs);
   }, [configs, setAllConfigs]);
 
   const current = getCurrentWidget();
-
   if (!current) return <div>Loading widgets...</div>;
-  console.log(current);
+
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-114px)] mx-auto">
-      <Tabs defaultValue="bubble" className="w-full flex-1">
-        {/* Header with TabsList and Buttons */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1">
+        {/* Header */}
         <div className="flex items-center justify-between gap-4">
           <TabsList>
             <TabsTrigger value="bubble">Bubble</TabsTrigger>
@@ -41,27 +56,58 @@ export default function PageClient({ configs }: { configs: any[] }) {
             <TabsTrigger value="contact">Contact</TabsTrigger>
           </TabsList>
 
-          {/* Button group on the right */}
           <div className="flex items-center gap-2">
-            <CustomerSelect/>
-            <WidgetDropdown />
+            <CustomerSelect />
+            {activeTab === "bubble" && (
+              <WidgetSelect
+                type="bubble"
+                selectedId={selectedBubble._id}
+                onSelect={setSelectedBubble}
+              />
+            )}
+            {activeTab === "chat" && (
+              <WidgetSelect
+                type="chat"
+                selectedId={selectedChatBar._id}
+                onSelect={setSelectedChatBar}
+              />
+            )}
+            {activeTab === "chatwidgetopen" && (
+              <WidgetSelect
+                type="chatwidgetopen"
+                selectedId={selectedChatWidget._id}
+                onSelect={setSelectedChatWidget}
+              />
+            )}
             <AddWidgetButton />
             <DeleteWidgetButton />
           </div>
+
         </div>
 
-        <TabsContent value="bubble" className="relative">
-          <BubbleEditorSSR key={current.id} initialSettings={current.bubblejson} />
+        <TabsContent value="bubble">
+          <BubbleEditorSSR
+            key={selectedBubble?._id}
+            initialSettings={selectedBubble?.bubbleSettings || {}}
+          />
         </TabsContent>
 
         <TabsContent value="chat">
-          <ChatBar key={current.id} initialSettings={current.chatbarjson} />
+          <ChatBar
+            key={selectedChatBar?._id}
+            initialSettings={selectedChatBar?.chatBarSettings || {}}
+          />
         </TabsContent>
 
         <TabsContent value="chatwidgetopen">
-          <ChatWidgetEditor key={current.id} initialSettings={current.chatwidgetSettings} />
+          <ChatWidgetEditor
+            key={selectedChatWidget?._id}
+            initialSettings={selectedChatWidget?.chatwidgetSettings || {}}
+          />
         </TabsContent>
 
+
+        {/* Other Tabs */}
         <TabsContent value="eyecatcher">
           <EyecatcherMain />
         </TabsContent>
@@ -71,7 +117,7 @@ export default function PageClient({ configs }: { configs: any[] }) {
         </TabsContent>
 
         <TabsContent value="contact">
-          <ChatWidgetMain/>
+          <ChatWidgetMain />
         </TabsContent>
       </Tabs>
     </div>

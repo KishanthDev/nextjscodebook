@@ -16,7 +16,20 @@ export const SaveButton: React.FC<SaveButtonProps> = ({ type, data }) => {
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
 
-  const handleSave = async () => {
+
+  const handleSave = () => {
+    setLoading(true);
+
+    // Show "Coming Soon" toast instead of calling API
+    toast.info(`Coming soon 🚀`, { duration: 4000 });
+
+    // Optional: simulate a brief delay to show loading state
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  };
+
+  const handleSav = async () => {
     if (!widgets || widgets.length === 0 || currentWidgetId === null) {
       toast.error("No widget selected to save!");
       return;

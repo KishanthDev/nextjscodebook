@@ -8,13 +8,23 @@ import { useConfigStore } from '@/stores/useConfigStore';
 import bubbleDefaults from '@/defaults/bubble.json';
 import chatBarDefaults from '@/defaults/chatbar.json';
 import chatWidgetDefaults from '@/defaults/chatwidget.json';
-import { create } from 'zustand';
 
 export const AddWidgetButton: React.FC = () => {
   const { addWidget, setCurrentWidget } = useConfigStore();
   const [loading, setLoading] = useState(false);
+  const handleAdd = () => {
+    setLoading(true);
 
-  const handleAdd = async () => {
+    // Show "Coming Soon" toast instead of calling API
+    toast.info(`Coming soon 🚀`, { duration: 4000 });
+
+    // Optional: simulate a brief delay to show loading state
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  };
+
+  const handleAd = async () => {
     setLoading(true);
 
     try {

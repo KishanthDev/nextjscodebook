@@ -1,0 +1,125 @@
+[
+  {
+    "_id": "01",
+    "custId": "1",
+    "custName": "PYPL",
+    "type": "chatBar",
+    "chatBarName": "Rounded Pink 1",
+    "chatBarSettings": {
+      "text": "Chat",
+      "bgColor": "#007bff",
+      "textColor": "#ffffff",
+      "gradientEnabled": false,
+      "gradientStops": [
+        {
+          "color": "#007bff",
+          "pos": 0
+        },
+        {
+          "color": "#a855f7",
+          "pos": 100
+        }
+      ],
+      "gradientType": "linear",
+      "gradientAngle": 90,
+      "iconType": "lucide",
+      "iconColor": "#ffffff",
+      "lucideIcon": "MessageCircle",
+      "iconImageUrl": "",
+      "iconFit": "contain",
+      "iconOpacity": 1,
+      "iconBlend": "normal",
+      "width": 255,
+      "height": 40,
+      "borderRadius": {
+        "tl": 20,
+        "tr": 20,
+        "bl": 20,
+        "br": 20
+      },
+      "shadow": true
+    }
+  },
+  {
+    "_id": "02",
+    "custId": "2",
+    "custName": "GOOG",
+    "type": "chatBar",
+    "chatBarName": "Rounded Pink 2",
+    "chatBarSettings": {
+      "text": "Chat us",
+      "bgColor": "#007bff",
+      "textColor": "#ffffff",
+      "gradientEnabled": false,
+      "gradientStops": [
+        {
+          "color": "#007bff",
+          "pos": 0
+        },
+        {
+          "color": "#a855f7",
+          "pos": 100
+        }
+      ],
+      "gradientType": "linear",
+      "gradientAngle": 90,
+      "iconType": "lucide",
+      "iconColor": "#ffffff",
+      "lucideIcon": "MessageCircle",
+      "iconImageUrl": "",
+      "iconFit": "contain",
+      "iconOpacity": 1,
+      "iconBlend": "normal",
+      "width": 255,
+      "height": 40,
+      "borderRadius": {
+        "tl": 20,
+        "tr": 20,
+        "bl": 20,
+        "br": 20
+      },
+      "shadow": true
+    }
+  },
+  {
+    "_id": "03",
+    "custId": "2",
+    "custName": "TSLA",
+    "type": "chatBar",
+    "chatBarName": "Rounded Pink 3",
+    "chatBarSettings": {
+      "text": "Chat with us",
+      "bgColor": "#007bff",
+      "textColor": "#ffffff",
+      "gradientEnabled": false,
+      "gradientStops": [
+        {
+          "color": "#007bff",
+          "pos": 0
+        },
+        {
+          "color": "#a855f7",
+          "pos": 100
+        }
+      ],
+      "gradientType": "linear",
+      "gradientAngle": 90,
+      "iconType": "lucide",
+      "iconColor": "#ffffff",
+      "lucideIcon": "MessageCircle",
+      "iconImageUrl": "",
+      "iconFit": "contain",
+      "iconOpacity": 1,
+      "iconBlend": "normal",
+      "width": 255,
+      "height": 40,
+      "borderRadius": {
+        "tl": 20,
+        "tr": 20,
+        "bl": 20,
+        "br": 20
+      },
+      "shadow": true
+    }
+  }
+]

@@ -1,0 +1,302 @@
+[
+    {
+        "_id": "bub_001",
+        "custId": "1",
+        "custName": "PYPL",
+        "type": "bubble",
+        "bubbleName": "Rounded Pink",
+        "bubbleSettings": {
+            "position": "bottom-right",
+            "fontFamily": "Poppins",
+            "width": 50,
+            "height": 50,
+            "borderRadius": {
+                "tl": 50,
+                "tr": 50,
+                "bl": 50,
+                "br": 50
+            },
+            "backgroundColor": "#1E40AF",
+            "gradientType": "linear",
+            "gradientAngle": 135,
+            "gradientStops": [
+                {
+                    "color": "#1E40AF",
+                    "pos": 0
+                },
+                {
+                    "color": "#9333EA",
+                    "pos": 100
+                }
+            ],
+            "backgroundOverlayType": "image",
+            "backgroundLucideColor": "#FFFFFF",
+            "backgroundLucideSize": 24,
+            "backgroundLucideOpacity": 0.2,
+            "backgroundLucideIcon": "Star",
+            "backgroundImageUrl": "https://static.vecteezy.com/system/resources/previews/047/656/219/non_2x/abstract-logo-design-for-any-corporate-brand-business-company-vector.jpg",
+            "backgroundImageSize": "contain",
+            "backgroundImageOpacity": 0.25,
+            "backgroundBlendMode": "normal",
+            "border": {
+                "width": 0,
+                "color": "#3B82F6",
+                "style": "solid"
+            },
+            "borderGradientEnabled": true,
+            "borderGradientAngle": 90,
+            "borderGradientStops": [
+                {
+                    "color": "#60A5FA",
+                    "pos": 0
+                },
+                {
+                    "color": "#A78BFA",
+                    "pos": 100
+                }
+            ],
+            "borderOffsetAnim": false,
+            "outlineRing": {
+                "enabled": true,
+                "width": 3,
+                "color": "#22D3EE",
+                "opacity": 0.4
+            },
+            "boxShadowBlur": 20,
+            "boxShadowSpread": 0,
+            "boxShadowOffsetX": 0,
+            "boxShadowOffsetY": 8,
+            "boxShadowOpacity": 0.25,
+            "innerShadow": {
+                "enabled": true,
+                "blur": 12,
+                "opacity": 0.25
+            },
+            "glass": {
+                "enabled": false,
+                "blur": 10,
+                "bgOpacity": 0.3
+            },
+            "neon": {
+                "enabled": false,
+                "color": "#22D3EE",
+                "intensity": 0.8
+            },
+            "animation": {
+                "type": "fadeIn",
+                "duration": 350,
+                "delay": 0
+            },
+            "idleAnim": {
+                "enabled": true,
+                "type": "float",
+                "amplitude": 6,
+                "duration": 3200
+            },
+            "dots": {
+                "color": "#F8FAFC",
+                "size": 6,
+                "spacing": 6,
+                "animation": "bounce"
+            }
+        },
+        "createdAt": "2025-10-18T10:10:00Z",
+        "createdBy": "system",
+        "updatedBy": "system",
+        "updatedAt": "2025-10-18T10:10:00Z"
+    },
+    {
+        "_id": "bub_002",
+        "custId": "1",
+        "custName": "PYPL",
+        "type": "bubble",
+        "bubbleName": "Sharp Blue",
+        "bubbleSettings": {
+            "position": "top-left",
+            "fontFamily": "Roboto",
+            "width": 50,
+            "height": 50,
+            "borderRadius": {
+                "tl": 10,
+                "tr": 40,
+                "bl": 40,
+                "br": 10
+            },
+            "backgroundColor": "#34D399",
+            "gradientType": "linear",
+            "gradientAngle": 45,
+            "gradientStops": [
+                {
+                    "color": "#34D399",
+                    "pos": 0
+                },
+                {
+                    "color": "#60A5FA",
+                    "pos": 100
+                }
+            ],
+            "backgroundOverlayType": "none",
+            "backgroundLucideColor": "#000000",
+            "backgroundLucideSize": 32,
+            "backgroundLucideOpacity": 0.1,
+            "backgroundLucideIcon": "Circle",
+            "backgroundImageUrl": "",
+            "backgroundImageSize": "cover",
+            "backgroundImageOpacity": 0,
+            "backgroundBlendMode": "multiply",
+            "border": {
+                "width": 2,
+                "color": "#3B82F6",
+                "style": "dashed"
+            },
+            "borderGradientEnabled": false,
+            "borderGradientAngle": 0,
+            "borderGradientStops": [],
+            "borderOffsetAnim": false,
+            "outlineRing": {
+                "enabled": false,
+                "width": 0,
+                "color": "#000000",
+                "opacity": 0
+            },
+            "boxShadowBlur": 16,
+            "boxShadowSpread": 2,
+            "boxShadowOffsetX": 2,
+            "boxShadowOffsetY": 4,
+            "boxShadowOpacity": 0.1,
+            "innerShadow": {
+                "enabled": false,
+                "blur": 0,
+                "opacity": 0
+            },
+            "glass": {
+                "enabled": false,
+                "blur": 0,
+                "bgOpacity": 0
+            },
+            "neon": {
+                "enabled": true,
+                "color": "#34D399",
+                "intensity": 1
+            },
+            "animation": {
+                "type": "slideIn",
+                "duration": 250,
+                "delay": 0
+            },
+            "idleAnim": {
+                "enabled": false,
+                "type": "none",
+                "amplitude": 0,
+                "duration": 0
+            },
+            "dots": {
+                "color": "#111827",
+                "size": 4,
+                "spacing": 8,
+                "animation": "none"
+            }
+        },
+        "createdAt": "2025-10-18T10:15:00Z",
+        "createdBy": "system",
+        "updatedBy": "system",
+        "updatedAt": "2025-10-18T10:15:00Z"
+    },
+    {
+        "_id": "bub_003",
+        "custId": "2",
+        "custName": "GOOG",
+        "type": "bubble",
+        "bubbleName": "Minimal Orange",
+        "bubbleSettings": {
+            "position": "bottom-left",
+            "fontFamily": "Montserrat",
+            "width": 50,
+            "height": 50,
+            "borderRadius": {
+                "tl": 25,
+                "tr": 25,
+                "bl": 25,
+                "br": 25
+            },
+            "backgroundColor": "#F59E42",
+            "gradientType": "radial",
+            "gradientAngle": 180,
+            "gradientStops": [
+                {
+                    "color": "#FDE68A",
+                    "pos": 0
+                },
+                {
+                    "color": "#F59E42",
+                    "pos": 100
+                }
+            ],
+            "backgroundOverlayType": "none",
+            "backgroundLucideColor": "#FFEDD5",
+            "backgroundLucideSize": 20,
+            "backgroundLucideOpacity": 0.12,
+            "backgroundLucideIcon": "Sun",
+            "backgroundImageUrl": "",
+            "backgroundImageSize": "contain",
+            "backgroundImageOpacity": 0,
+            "backgroundBlendMode": "normal",
+            "border": {
+                "width": 1,
+                "color": "#F59E42",
+                "style": "solid"
+            },
+            "borderGradientEnabled": false,
+            "borderGradientAngle": 0,
+            "borderGradientStops": [],
+            "borderOffsetAnim": false,
+            "outlineRing": {
+                "enabled": true,
+                "width": 2,
+                "color": "#FDE68A",
+                "opacity": 0.18
+            },
+            "boxShadowBlur": 14,
+            "boxShadowSpread": 0,
+            "boxShadowOffsetX": 0,
+            "boxShadowOffsetY": 6,
+            "boxShadowOpacity": 0.16,
+            "innerShadow": {
+                "enabled": false,
+                "blur": 0,
+                "opacity": 0
+            },
+            "glass": {
+                "enabled": false,
+                "blur": 0,
+                "bgOpacity": 0
+            },
+            "neon": {
+                "enabled": false,
+                "color": "#FDE68A",
+                "intensity": 0.6
+            },
+            "animation": {
+                "type": "zoomIn",
+                "duration": 400,
+                "delay": 0
+            },
+            "idleAnim": {
+                "enabled": true,
+                "type": "pulse",
+                "amplitude": 3,
+                "duration": 2400
+            },
+            "dots": {
+                "color": "#fff7ed",
+                "size": 5,
+                "spacing": 10,
+                "animation": "ripple"
+            }
+        },
+        "createdAt": "2025-10-18T10:20:00Z",
+        "createdBy": "system",
+        "updatedBy": "system",
+        "updatedAt": "2025-10-18T10:20:00Z"
+    }
+]

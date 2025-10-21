@@ -2,21 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/registry/new-york-v4/ui/tabs";
-import BubbleEditorSSR from "@/components/pixel-modifier/BubbleEditor";
-import ChatBar from "@/components/pixel-modifier/ChatBarEditor";
-import ChatWidgetEditor from "@/components/pixel-modifier/ChatWidgetEditor";
+import BubbleEditorSSR from "@/components/widget-builder/BubbleEditor";
+import ChatBar from "@/components/widget-builder/ChatBarEditor";
+import ChatWidgetEditor from "@/components/widget-builder/ChatWidgetEditor";
 import { useConfigStore } from "@/stores/useConfigStore";
-import { AddWidgetButton } from "@/components/pixel-modifier/lib/AddWidgetButton";
-import { DeleteWidgetButton } from "@/components/pixel-modifier/lib/DeleteButton";
-import EyecatcherMain from "@/components/pixel-modifier/eyecatcher/EyecatcherMain";
-import GreetingMain from "@/components/pixel-modifier/greeting/GreetingMain";
-import CustomerSelect from "@/components/pixel-modifier/poc/CustomerSelect";
-import ChatWidgetMain from "@/components/pixel-modifier/contact/ChatWidgetMain";
-import WidgetSelect from "@/components/pixel-modifier/WidgetSelect";
+import { AddWidgetButton } from "@/components/widget-builder/lib/AddWidgetButton";
+import { DeleteWidgetButton } from "@/components/widget-builder/lib/DeleteButton";
+import EyecatcherMain from "@/components/widget-builder/eyecatcher/EyecatcherMain";
+import GreetingMain from "@/components/widget-builder/greeting/GreetingMain";
+import CustomerSelect from "@/components/widget-builder/poc/CustomerSelect";
+import ChatWidgetMain from "@/components/widget-builder/contact/ChatWidgetMain";
+import WidgetSelect from "@/components/widget-builder/WidgetSelect";
 
 // sample defaults
 import newBubbleJson from "@/defaults/newbubble.json";
-import { BubbleWidget, ChatBarWidget, ChatWidgetOpen } from "@/components/pixel-modifier/widgetTypes";
+import { BubbleWidget, ChatBarWidget, ChatWidgetOpen } from "@/components/widget-builder/widgetTypes";
 import newChatBarJson from "@/defaults/newchatbar.json";
 import newChatWidgetJson from "@/defaults/newchatwidget.json";
 

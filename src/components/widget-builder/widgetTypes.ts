@@ -1,6 +1,6 @@
-import { BubblePixelSettings } from "@/components/pixel-modifier/bubble/bubbletype"; 
-import { ChatbarSettings } from "@/components/pixel-modifier/chatbar/chatbartype";
-import { ChatWidgetSettings } from "@/components/pixel-modifier/chatwidget/chat-widget-types";
+import { BubblePixelSettings } from "@/components/widget-builder/bubble/bubbletype";
+import { ChatbarSettings } from "@/components/widget-builder/chatbar/chatbartype";
+import { ChatWidgetSettings } from "@/components/widget-builder/chatwidget/chat-widget-types";
 // 👆 your existing bubble settings type import
 
 export interface BaseWidget {

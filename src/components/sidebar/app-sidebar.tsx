@@ -37,6 +37,8 @@ import {
   BadgeDollarSign,
   ChartGanttIcon,
   Edit,
+  Building,
+  Flame,
 } from 'lucide-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -69,7 +71,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { href: '/hive-consumer', icon: Bot, label: 'User' },
     { href: '/ai-assistants', icon: AIIcon, label: 'AI Assistants' },
     { href: '/ai-assistants-users', icon: AIIcon, label: 'AI Assistant Users' },
-    { href: '/pixel-modifier', icon: Edit, label: 'Pixel Modifier' },
+    { href: '/widget-builder', icon: Building, label: 'Widget Builder' },
+    { href: '/widget-modifier', icon: Edit, label: 'Widget Modifier' },
+    { href: '/widget-flavours', icon: Flame, label: 'Widget Flavours' }
+
   ];
 
   return (

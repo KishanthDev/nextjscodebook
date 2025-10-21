@@ -19,6 +19,9 @@ import CustomerSelect from "@/components/widget-builder/poc/CustomerSelect";
 import BubbleMain from "@/components/widget-modifier/bubble/BubbleMain";
 import EyecatcherMain from "@/components/widget-modifier/eyecatcher/EyecatcherMain";
 import ChatBarMain from "@/components/widget-modifier/chatbar/ChatBarMain";
+import ChatWidgetMain from "@/components/widget-modifier/chatwidget/ChatWidgetMain";
+import GreetingMain from "@/components/widget-modifier/greeting/GreetingMain";
+import ContactMain from "@/components/widget-modifier/contact/ContactMain";
 
 const TABS = [
     { label: "All", value: "all" },
@@ -120,6 +123,23 @@ export default function Page() {
                                 <ChatBarMain key={selectedChatBar?._id}
                                     initialSettings={selectedChatBar?.chatBarSettings || {}}
                                 />
+                            </div>
+                        )}
+                        {selectedOption === "chat-widget-open" && (
+                            <div className="mt-4">
+                                <ChatWidgetMain key={selectedChatWidget?._id}
+                                    initialSettings={selectedChatWidget?.chatwidgetSettings || {}}
+                                />
+                            </div>
+                        )}
+                        {selectedOption === "chat-widget-greeting" && (
+                            <div className="mt-4">
+                                <GreetingMain />
+                            </div>
+                        )}
+                         {selectedOption === "chat-widget-contact" && (
+                            <div className="mt-4">
+                                <ContactMain />
                             </div>
                         )}
                     </div>

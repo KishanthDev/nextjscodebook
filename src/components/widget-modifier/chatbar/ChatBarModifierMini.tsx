@@ -5,11 +5,7 @@ import {
     TextInput,
     ColorInput,
     RangeInput,
-    SelectInput,
-    CheckboxInput,
-    GradientStopEditor,
 } from '@/components/widget-builder/lib/inputs';
-import { LucideIconPicker } from '@/components/widget-builder/lib/LucideIconPicker';
 import { ChatbarSettings } from '@/components/widget-builder/chatbar/chatbartype';
 import { CHAT_BAR_CONSTRAINTS } from '@/components/widget-builder/chatbar/CHAT_BAR_CONSTRAINTS';
 

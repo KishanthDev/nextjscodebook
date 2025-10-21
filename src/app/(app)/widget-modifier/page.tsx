@@ -17,6 +17,8 @@ import newChatBarJson from "@/defaults/newchatbar.json";
 import newChatWidgetJson from "@/defaults/newchatwidget.json";
 import CustomerSelect from "@/components/widget-builder/poc/CustomerSelect";
 import BubbleMain from "@/components/widget-modifier/bubble/BubbleMain";
+import EyecatcherMain from "@/components/widget-modifier/eyecatcher/EyecatcherMain";
+import ChatBarMain from "@/components/widget-modifier/chatbar/ChatBarMain";
 
 const TABS = [
     { label: "All", value: "all" },
@@ -27,6 +29,7 @@ const TABS = [
 
 export default function Page() {
     const [activeTab, setActiveTab] = useState("all");
+
     const [selectedOption, setSelectedOption] = useState("eyecatcher");
 
     // Customer selection
@@ -104,6 +107,18 @@ export default function Page() {
                                 <BubbleMain
                                     key={selectedBubble?._id}
                                     initialSettings={selectedBubble?.bubbleSettings || {}}
+                                />
+                            </div>
+                        )}
+                        {selectedOption === "eyecatcher" && (
+                            <div className="mt-4">
+                                <EyecatcherMain />
+                            </div>
+                        )}
+                        {selectedOption === "chat-bar" && (
+                            <div className="mt-4">
+                                <ChatBarMain key={selectedChatBar?._id}
+                                    initialSettings={selectedChatBar?.chatBarSettings || {}}
                                 />
                             </div>
                         )}

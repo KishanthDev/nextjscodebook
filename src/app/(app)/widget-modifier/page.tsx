@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import clsx from "clsx";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/registry/new-york-v4/ui/tabs";
 
 import BubblePreview from "@/components/widget-builder/bubble/BubblePreview";
 import ChatBarPreview from "@/components/widget-builder/chatbar/ChatBarPreview";
@@ -50,7 +51,7 @@ export default function Page() {
     return (
         <div className="flex h-[calc(100vh-3.5rem)]">
             {/* Left Sidebar */}
-            <aside className="w-[220px] border-r bg-gray-50 dark:bg-zinc-900 p-4 flex flex-col gap-4">
+            <aside className="w-[190px] border-r bg-gray-50 dark:bg-zinc-900 p-4 flex flex-col gap-4">
                 <h2 className="text-lg font-semibold dark:text-white">Settings</h2>
 
                 <CustomerSelect />
@@ -79,82 +80,70 @@ export default function Page() {
                 {activeTab === "all" ? (
                     <div className="max-w-4xl mx-auto space-y-6">
 
-                        <div>
-                            <label className="block font-semibold text-lg mb-2">
-                                Choose Setting Type:
-                            </label>
-                            <div className="flex gap-6 flex-wrap">
-                                {[
-                                    { value: "bubble", label: "Bubble" },
-                                    { value: "chat-bar", label: "Chat Bar" },
-                                    { value: "chat-widget-open", label: "Chat Widget Open" },
-                                    { value: "eyecatcher", label: "Eyecatcher" },
-                                    { value: "chat-widget-greeting", label: "Chat Widget Greeting" },
-                                    { value: "chat-widget-contact", label: "Chat Widget Contact" },
-                                ].map(({ value, label }) => (
-                                    <label key={value} className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            name="settingOption"
-                                            value={value}
-                                            checked={selectedOption === value}
-                                            onChange={(e) => setSelectedOption(e.target.value)}
-                                        />
-                                        <span className="text-sm font-semibold">{label}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-                        {selectedOption === "bubble" && (
-                            <> <WidgetSelect
-                                type="bubble"
-                                selectedId={selectedBubble._id}
-                                onSelect={setSelectedBubble}
-                            />
-                                <BubbleMain
-                                    key={selectedBubble?._id}
-                                    initialSettings={selectedBubble?.bubbleSettings || {}}
-                                />
-                            </>
-                        )}
-                        {selectedOption === "eyecatcher" && (
-                            <EyecatcherMain />
-                        )}
-                        {selectedOption === "chat-bar" && (
-                            <>
-                                <WidgetSelect
-                                    type="chat"
-                                    selectedId={selectedChatBar._id}
-                                    onSelect={setSelectedChatBar}
-                                />
-                                <ChatBarMain key={selectedChatBar?._id}
-                                    initialSettings={selectedChatBar?.chatBarSettings || {}}
-                                /></>
-                        )}
-                        {selectedOption === "chat-widget-open" && (
-                            <>
-                                <WidgetSelect
-                                    type="chatwidgetopen"
-                                    selectedId={selectedChatWidget._id}
-                                    onSelect={setSelectedChatWidget}
-                                />
-                                <ChatWidgetMain key={selectedChatWidget?._id}
-                                    initialSettings={selectedChatWidget?.chatwidgetSettings || {}}
-                                />
-                            </>
+                        <div className="mt-5">
+                            <Tabs value={selectedOption} onValueChange={setSelectedOption}>
+                                <TabsList className="flex flex-wrap gap-2">
+                                    <TabsTrigger value="bubble">Bubble</TabsTrigger>
+                                    <TabsTrigger value="chat-bar">Chat Bar</TabsTrigger>
+                                    <TabsTrigger value="chat-widget-open">Chat Widget Open</TabsTrigger>
+                                    <TabsTrigger value="eyecatcher">Eyecatcher</TabsTrigger>
+                                    <TabsTrigger value="chat-widget-greeting">Greeting</TabsTrigger>
+                                    <TabsTrigger value="chat-widget-contact">Contact</TabsTrigger>
+                                </TabsList>
 
-                        )}
-                        {selectedOption === "chat-widget-greeting" && (
-                            <GreetingMain />
-                        )}
-                        {selectedOption === "chat-widget-contact" && (
-                            <ContactMain />
-                        )}
+                                <TabsContent value="bubble">
+                                    <WidgetSelect
+                                        type="bubble"
+                                        selectedId={selectedBubble._id}
+                                        onSelect={setSelectedBubble}
+                                    />
+                                    <BubbleMain
+                                        key={selectedBubble?._id}
+                                        initialSettings={selectedBubble?.bubbleSettings || {}}
+                                    />
+                                </TabsContent>
+
+                                <TabsContent value="eyecatcher">
+                                    <EyecatcherMain />
+                                </TabsContent>
+
+                                <TabsContent value="chat-bar">
+                                    <WidgetSelect
+                                        type="chat"
+                                        selectedId={selectedChatBar._id}
+                                        onSelect={setSelectedChatBar}
+                                    />
+                                    <ChatBarMain
+                                        key={selectedChatBar?._id}
+                                        initialSettings={selectedChatBar?.chatBarSettings || {}}
+                                    />
+                                </TabsContent>
+
+                                <TabsContent value="chat-widget-open">
+                                    <WidgetSelect
+                                        type="chatwidgetopen"
+                                        selectedId={selectedChatWidget._id}
+                                        onSelect={setSelectedChatWidget}
+                                    />
+                                    <ChatWidgetMain
+                                        key={selectedChatWidget?._id}
+                                        initialSettings={selectedChatWidget?.chatwidgetSettings || {}}
+                                    />
+                                </TabsContent>
+
+                                <TabsContent value="chat-widget-greeting">
+                                    <GreetingMain />
+                                </TabsContent>
+
+                                <TabsContent value="chat-widget-contact">
+                                    <ContactMain />
+                                </TabsContent>
+                            </Tabs>
+                        </div>
                     </div>
                 ) : (
                     <div className="text-lg text-gray-600 dark:text-gray-300">
                         <div className="pb-6">
-                            {/* Widget Select (conditional on customer) */}
                             {selectedCustomer && activeTab !== "all" && (
                                 <>
                                     {activeTab === "bubble" && (

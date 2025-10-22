@@ -52,98 +52,119 @@ export default function Page() {
         <div className="flex h-[calc(100vh-3.5rem)]">
             {/* Left Sidebar */}
             <aside className="w-[190px] border-r bg-gray-50 dark:bg-zinc-900 p-4 flex flex-col gap-4">
-                <h2 className="text-lg font-semibold dark:text-white">Settings</h2>
+                <h2 className="text-normal font-semibold dark:text-white">---- Select User ----</h2>
 
                 <CustomerSelect />
 
-                {/* Tabs */}
-                <nav className="flex flex-col gap-2 mt-4">
-                    {TABS.map((tab) => (
-                        <button
-                            key={tab.value}
-                            onClick={() => setActiveTab(tab.value)}
-                            className={clsx(
-                                "px-3 py-2 rounded-md text-left text-sm font-medium capitalize",
-                                activeTab === tab.value
-                                    ? "bg-blue-100 text-blue-900 dark:bg-blue-800 dark:text-white"
-                                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800"
-                            )}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </nav>
+                <hr />
+
+                <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical">
+                    <TabsList className="flex flex-col w-full gap-1 mt-15 bg-transparent p-0">
+                        {TABS.map((tab) => (
+                            <TabsTrigger
+                                key={tab.value}
+                                value={tab.value}
+                                className={clsx(
+                                    "w-full justify-start px-3 py-2 rounded-md text-sm font-medium capitalize",
+                                    "data-[state=active]:bg-blue-100 data-[state=active]:text-blue-900",
+                                    "dark:data-[state=active]:bg-blue-800 dark:data-[state=active]:text-white"
+                                )}
+                            >
+                                {tab.label}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </Tabs>
             </aside>
 
             {/* Right Content */}
             <main className="flex-1 overflow-y-auto">
                 {activeTab === "all" ? (
                     <div className="max-w-4xl mx-auto space-y-6">
-
                         <div className="mt-5">
                             <Tabs value={selectedOption} onValueChange={setSelectedOption}>
-                                <TabsList className="flex flex-wrap gap-2">
-                                    <TabsTrigger value="bubble">Bubble</TabsTrigger>
-                                    <TabsTrigger value="chat-bar">Chat Bar</TabsTrigger>
-                                    <TabsTrigger value="chat-widget-open">Chat Widget Open</TabsTrigger>
-                                    <TabsTrigger value="eyecatcher">Eyecatcher</TabsTrigger>
-                                    <TabsTrigger value="chat-widget-greeting">Greeting</TabsTrigger>
-                                    <TabsTrigger value="chat-widget-contact">Contact</TabsTrigger>
-                                </TabsList>
+                                {/* Tabs Header */}
+                                <div className="flex items-center justify-between flex-wrap gap-3">
+                                    {/* Left: TabsList */}
+                                    <TabsList className="flex flex-wrap gap-2">
+                                        <TabsTrigger value="bubble">Bubble</TabsTrigger>
+                                        <TabsTrigger value="chat-bar">Chat Bar</TabsTrigger>
+                                        <TabsTrigger value="chat-widget-open">Chat Widget Open</TabsTrigger>
+                                        <TabsTrigger value="eyecatcher">Eyecatcher</TabsTrigger>
+                                        <TabsTrigger value="chat-widget-greeting">Greeting</TabsTrigger>
+                                        <TabsTrigger value="chat-widget-contact">Contact</TabsTrigger>
+                                    </TabsList>
 
-                                <TabsContent value="bubble">
-                                    <WidgetSelect
-                                        type="bubble"
-                                        selectedId={selectedBubble._id}
-                                        onSelect={setSelectedBubble}
-                                    />
-                                    <BubbleMain
-                                        key={selectedBubble?._id}
-                                        initialSettings={selectedBubble?.bubbleSettings || {}}
-                                    />
-                                </TabsContent>
+                                    {/* Right: WidgetSelect (changes dynamically per tab) */}
+                                    <div className="ml-auto">
+                                        {selectedOption === "bubble" && (
+                                            <WidgetSelect
+                                                type="bubble"
+                                                selectedId={selectedBubble._id}
+                                                onSelect={setSelectedBubble}
+                                            />
+                                        )}
 
-                                <TabsContent value="eyecatcher">
-                                    <EyecatcherMain />
-                                </TabsContent>
+                                        {selectedOption === "chat-bar" && (
+                                            <WidgetSelect
+                                                type="chat"
+                                                selectedId={selectedChatBar._id}
+                                                onSelect={setSelectedChatBar}
+                                            />
+                                        )}
 
-                                <TabsContent value="chat-bar">
-                                    <WidgetSelect
-                                        type="chat"
-                                        selectedId={selectedChatBar._id}
-                                        onSelect={setSelectedChatBar}
-                                    />
-                                    <ChatBarMain
-                                        key={selectedChatBar?._id}
-                                        initialSettings={selectedChatBar?.chatBarSettings || {}}
-                                    />
-                                </TabsContent>
+                                        {selectedOption === "chat-widget-open" && (
+                                            <WidgetSelect
+                                                type="chatwidgetopen"
+                                                selectedId={selectedChatWidget._id}
+                                                onSelect={setSelectedChatWidget}
+                                            />
+                                        )}
+                                    </div>
+                                </div>
 
-                                <TabsContent value="chat-widget-open">
-                                    <WidgetSelect
-                                        type="chatwidgetopen"
-                                        selectedId={selectedChatWidget._id}
-                                        onSelect={setSelectedChatWidget}
-                                    />
-                                    <ChatWidgetMain
-                                        key={selectedChatWidget?._id}
-                                        initialSettings={selectedChatWidget?.chatwidgetSettings || {}}
-                                    />
-                                </TabsContent>
+                                {/* Tabs Content */}
+                                <div className="mt-4">
+                                    <TabsContent value="bubble">
+                                        <BubbleMain
+                                            key={selectedBubble?._id}
+                                            initialSettings={selectedBubble?.bubbleSettings || {}}
+                                        />
+                                    </TabsContent>
 
-                                <TabsContent value="chat-widget-greeting">
-                                    <GreetingMain />
-                                </TabsContent>
+                                    <TabsContent value="chat-bar">
+                                        <ChatBarMain
+                                            key={selectedChatBar?._id}
+                                            initialSettings={selectedChatBar?.chatBarSettings || {}}
+                                        />
+                                    </TabsContent>
 
-                                <TabsContent value="chat-widget-contact">
-                                    <ContactMain />
-                                </TabsContent>
+                                    <TabsContent value="chat-widget-open">
+                                        <ChatWidgetMain
+                                            key={selectedChatWidget?._id}
+                                            initialSettings={selectedChatWidget?.chatwidgetSettings || {}}
+                                        />
+                                    </TabsContent>
+
+                                    <TabsContent value="eyecatcher">
+                                        <EyecatcherMain />
+                                    </TabsContent>
+
+                                    <TabsContent value="chat-widget-greeting">
+                                        <GreetingMain />
+                                    </TabsContent>
+
+                                    <TabsContent value="chat-widget-contact">
+                                        <ContactMain />
+                                    </TabsContent>
+                                </div>
                             </Tabs>
                         </div>
                     </div>
+
                 ) : (
                     <div className="text-lg text-gray-600 dark:text-gray-300">
-                        <div className="pb-6">
+                        <div className="p-6">
                             {selectedCustomer && activeTab !== "all" && (
                                 <>
                                     {activeTab === "bubble" && (

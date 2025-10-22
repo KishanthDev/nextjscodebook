@@ -75,7 +75,7 @@ export default function Page() {
             </aside>
 
             {/* Right Content */}
-            <main className="flex-1 p-6 overflow-y-auto">
+            <main className="flex-1 overflow-y-auto">
                 {activeTab === "all" ? (
                     <div className="max-w-4xl mx-auto space-y-6">
 
@@ -85,10 +85,10 @@ export default function Page() {
                             </label>
                             <div className="flex gap-6 flex-wrap">
                                 {[
-                                    { value: "eyecatcher", label: "Eyecatcher" },
                                     { value: "bubble", label: "Bubble" },
                                     { value: "chat-bar", label: "Chat Bar" },
                                     { value: "chat-widget-open", label: "Chat Widget Open" },
+                                    { value: "eyecatcher", label: "Eyecatcher" },
                                     { value: "chat-widget-greeting", label: "Chat Widget Greeting" },
                                     { value: "chat-widget-contact", label: "Chat Widget Contact" },
                                 ].map(({ value, label }) => (
@@ -106,41 +106,49 @@ export default function Page() {
                             </div>
                         </div>
                         {selectedOption === "bubble" && (
-                            <div className="mt-4">
+                            <> <WidgetSelect
+                                type="bubble"
+                                selectedId={selectedBubble._id}
+                                onSelect={setSelectedBubble}
+                            />
                                 <BubbleMain
                                     key={selectedBubble?._id}
                                     initialSettings={selectedBubble?.bubbleSettings || {}}
                                 />
-                            </div>
+                            </>
                         )}
                         {selectedOption === "eyecatcher" && (
-                            <div className="mt-4">
-                                <EyecatcherMain />
-                            </div>
+                            <EyecatcherMain />
                         )}
                         {selectedOption === "chat-bar" && (
-                            <div className="mt-4">
+                            <>
+                                <WidgetSelect
+                                    type="chat"
+                                    selectedId={selectedChatBar._id}
+                                    onSelect={setSelectedChatBar}
+                                />
                                 <ChatBarMain key={selectedChatBar?._id}
                                     initialSettings={selectedChatBar?.chatBarSettings || {}}
-                                />
-                            </div>
+                                /></>
                         )}
                         {selectedOption === "chat-widget-open" && (
-                            <div className="mt-4">
+                            <>
+                                <WidgetSelect
+                                    type="chatwidgetopen"
+                                    selectedId={selectedChatWidget._id}
+                                    onSelect={setSelectedChatWidget}
+                                />
                                 <ChatWidgetMain key={selectedChatWidget?._id}
                                     initialSettings={selectedChatWidget?.chatwidgetSettings || {}}
                                 />
-                            </div>
+                            </>
+
                         )}
                         {selectedOption === "chat-widget-greeting" && (
-                            <div className="mt-4">
-                                <GreetingMain />
-                            </div>
+                            <GreetingMain />
                         )}
-                         {selectedOption === "chat-widget-contact" && (
-                            <div className="mt-4">
-                                <ContactMain />
-                            </div>
+                        {selectedOption === "chat-widget-contact" && (
+                            <ContactMain />
                         )}
                     </div>
                 ) : (
